@@ -16,22 +16,22 @@ C:.
 │   gradlew.bat
 │   HELP.md
 │   settings.gradle
-│
+│   
 ├───.gradle
 │   │   file-system.probe
-│   │
+│   │   
 │   ├───8.14.2
 │   │   │   gc.properties
-│   │   │
+│   │   │   
 │   │   ├───checksums
 │   │   │       checksums.lock
 │   │   │       md5-checksums.bin
 │   │   │       sha1-checksums.bin
-│   │   │
+│   │   │       
 │   │   ├───executionHistory
 │   │   │       executionHistory.bin
 │   │   │       executionHistory.lock
-│   │   │
+│   │   │       
 │   │   ├───expanded
 │   │   ├───fileChanges
 │   │   │       last-build.bin
