@@ -1,4 +1,4 @@
-package com.vocealuga.controller;
+package com.vocealuga.controller.p_api;
 
 import com.vocealuga.model.Manutencao;
 import com.vocealuga.service.ManutencaoService;
