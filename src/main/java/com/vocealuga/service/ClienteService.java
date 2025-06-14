@@ -4,7 +4,6 @@ import com.vocealuga.model.Cliente;
 import com.vocealuga.dao.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -46,4 +45,9 @@ public class ClienteService {
     public void deleteCliente(Integer id) {
         clienteRepository.deleteById(id);
     }
+
+    public Optional<Cliente> login(String email, String senha) {
+        return clienteRepository.findByEmailAndSenha(email, senha);
+    }
+
 }
