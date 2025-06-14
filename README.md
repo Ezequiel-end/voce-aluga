@@ -64,16 +64,17 @@ C:.
 │   │       │           │   VoceAlugaApplication.class
 │   │       │           │
 │   │       │           ├───controller
-│   │       │           │   │   ClienteController.class
-│   │       │           │   │   EstoqueController.class
-│   │       │           │   │   FilialController.class
-│   │       │           │   │   FormaPagamentoController.class
-│   │       │           │   │   FuncionarioController.class
-│   │       │           │   │   GrupoVeiculoController.class
-│   │       │           │   │   ManutencaoController.class
-│   │       │           │   │   PagamentoController.class
-│   │       │           │   │   ReservaController.class
-│   │       │           │   │   VeiculoController.class
+|   |       |           |   ├───p_api
+│   │       │           │   │       ClienteController.class
+│   │       │           │   │       EstoqueController.class
+│   │       │           │   │       FilialController.class
+│   │       │           │   │       FormaPagamentoController.class
+│   │       │           │   │       FuncionarioController.class
+│   │       │           │   │       GrupoVeiculoController.class
+│   │       │           │   │       ManutencaoController.class
+│   │       │           │   │       PagamentoController.class
+│   │       │           │   │       ReservaController.class
+│   │       │           │   │       VeiculoController.class
 │   │       │           │   │
 │   │       │           │   └───web
 │   │       │           │           ClienteViewController.class
