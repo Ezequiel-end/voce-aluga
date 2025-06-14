@@ -18,6 +18,8 @@ C:.
 │   settings.gradle
 │
 ├───.gradle
+│   │   file-system.probe
+│   │
 │   ├───8.14.2
 │   │   │   gc.properties
 │   │   │
@@ -26,6 +28,10 @@ C:.
 │   │   │       md5-checksums.bin
 │   │   │       sha1-checksums.bin
 │   │   │
+│   │   ├───executionHistory
+│   │   │       executionHistory.bin
+│   │   │       executionHistory.lock
+│   │   │
 │   │   ├───expanded
 │   │   ├───fileChanges
 │   │   │       last-build.bin
@@ -33,11 +39,13 @@ C:.
 │   │   ├───fileHashes
 │   │   │       fileHashes.bin
 │   │   │       fileHashes.lock
+│   │   │       resourceHashesCache.bin
 │   │   │
 │   │   └───vcsMetadata
 │   ├───buildOutputCleanup
 │   │       buildOutputCleanup.lock
 │   │       cache.properties
+│   │       outputFiles.bin
 │   │
 │   └───vcs-1
 │           gc.properties
@@ -46,17 +54,87 @@ C:.
 │       settings.json
 │
 ├───build
+│   │   resolvedMainClassName
+│   │
 │   ├───classes
 │   │   └───java
-│   │       ├───main
-│   │       └───test
-│   ├───reports
-│   │   └───problems
-│   │           problems-report.html
+│   │       └───main
+│   │           └───com
+│   │               └───vocealuga
+│   │                   │   VoceAlugaApplication.class
+│   │                   │
+│   │                   ├───controller
+│   │                   │   │   ClienteController.class
+│   │                   │   │   EstoqueController.class
+│   │                   │   │   FilialController.class
+│   │                   │   │   FormaPagamentoController.class
+│   │                   │   │   FuncionarioController.class
+│   │                   │   │   GrupoVeiculoController.class
+│   │                   │   │   ManutencaoController.class
+│   │                   │   │   PagamentoController.class
+│   │                   │   │   ReservaController.class
+│   │                   │   │   VeiculoController.class
+│   │                   │   │
+│   │                   │   └───web
+│   │                   │           ClienteViewController.class
+│   │                   │
+│   │                   ├───dao
+│   │                   │       ClienteRepository.class
+│   │                   │       EstoqueRepository.class
+│   │                   │       FilialRepository.class
+│   │                   │       FormaPagamentoRepository.class
+│   │                   │       FuncionarioRepository.class
+│   │                   │       GrupoVeiculoRepository.class
+│   │                   │       ManutencaoRepository.class
+│   │                   │       PagamentoRepository.class
+│   │                   │       ReservaRepository.class
+│   │                   │       VeiculoRepository.class
+│   │                   │
+│   │                   ├───model
+│   │                   │       Cliente.class
+│   │                   │       Estoque.class
+│   │                   │       Filial.class
+│   │                   │       FormaPagamento.class
+│   │                   │       Funcionario.class
+│   │                   │       GrupoVeiculo.class
+│   │                   │       Manutencao.class
+│   │                   │       Pagamento.class
+│   │                   │       Reserva.class
+│   │                   │       Veiculo.class
+│   │                   │
+│   │                   └───service
+│   │                           ClienteService.class
+│   │                           EstoqueService.class
+│   │                           FilialService.class
+│   │                           FormaPagamentoService.class
+│   │                           FuncionarioService.class
+│   │                           GrupoVeiculoService.class
+│   │                           ManutencaoService.class
+│   │                           PagamentoService.class
+│   │                           ReservaService.class
+│   │                           VeiculoService.class
 │   │
-│   └───resources
-│       ├───main
-│       └───test
+│   ├───generated
+│   │   └───sources
+│   │       ├───annotationProcessor
+│   │       │   └───java
+│   │       │       └───main
+│   │       └───headers
+│   │           └───java
+│   │               └───main
+│   ├───resources
+│   │   └───main
+│   │       │   application.properties
+│   │       │
+│   │       ├───static
+│   │       └───templates
+│   │               clientes.html
+│   │               form-cliente.html
+│   │
+│   └───tmp
+│       └───compileJava
+│               previous-compilation-data.bin
+│
 ├───gradle
 │   └───wrapper
 │           gradle-wrapper.jar
@@ -70,16 +148,20 @@ C:.
     │   │           │   VoceAlugaApplication.java
     │   │           │
     │   │           ├───controller
-    │   │           │       ClienteController.java
-    │   │           │       EstoqueController.java
-    │   │           │       FilialController.java
-    │   │           │       FormaPagamentoController.java
-    │   │           │       FuncionarioController.java
-    │   │           │       GrupoVeiculoController.java
-    │   │           │       ManutencaoController.java
-    │   │           │       PagamentoController.java
-    │   │           │       ReservaController.java
-    │   │           │       VeiculoController.java
+    │   │           │   ├───api
+    │   │           │   │       ClienteController.java
+    │   │           │   │       EstoqueController.java
+    │   │           │   │       FilialController.java
+    │   │           │   │       FormaPagamentoController.java
+    │   │           │   │       FuncionarioController.java
+    │   │           │   │       GrupoVeiculoController.java
+    │   │           │   │       ManutencaoController.java
+    │   │           │   │       PagamentoController.java
+    │   │           │   │       ReservaController.java
+    │   │           │   │       VeiculoController.java
+    │   │           │   │
+    │   │           │   └───web
+    │   │           │           ClienteViewController.java
     │   │           │
     │   │           ├───dao
     │   │           │       ClienteRepository.java
@@ -122,6 +204,9 @@ C:.
     │       │
     │       ├───static
     │       └───templates
+    │               clientes.html
+    │               form-cliente.html
+    │
     └───test
         └───java
             │   Funciona.class
