@@ -2,7 +2,7 @@ package com.vocealuga.model;
 
 import jakarta.persistence.*;
 
-@Entitys
+@Entity
 @Table(name = "veiculo")
 public class Veiculo {
 
