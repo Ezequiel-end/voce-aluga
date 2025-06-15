@@ -45,4 +45,8 @@ public class FuncionarioService {
     public void deleteFuncionario(Integer id) {
         funcionarioRepository.deleteById(id);
     }
+
+    public Optional<Funcionario> login(String email, String senha) {
+        return funcionarioRepository.findByEmailAndSenha(email, senha);
+    }
 }
