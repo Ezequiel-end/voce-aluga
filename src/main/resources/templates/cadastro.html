@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cadastro - Você Aluga</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="login-container">
+      <h1>Cadastro</h1>
+
+      <form th:action="@{/cadastro}" method="post" th:object="${cliente}" class="loginForm">
+        <input type="text" th:field="*{nome}" placeholder="Nome completo" class="input" required />
+        <input type="email" th:field="*{email}" placeholder="E-mail" class="input" required />
+        <input type="password" th:field="*{senha}" placeholder="Senha" class="input" required />
+        <input type="text" th:field="*{cpf}" placeholder="CPF" class="input" required />
+        <input type="text" th:field="*{cnh}" placeholder="CNH" class="input" required />
+        <input type="date" th:field="*{dataNascimento}" placeholder="Data de Nascimento" class="input" required />
+
+        <button type="submit">Cadastrar</button>
+        <p>
+          Já tem uma conta?
+          <a th:href="@{/login}">Entrar</a>
+        </p>
+      </form>
+
+      <div th:if="${erro}" class="erro">
+        <p th:text="${erro}"></p>
+      </div>
+    </div>
+  </body>
+</html>
