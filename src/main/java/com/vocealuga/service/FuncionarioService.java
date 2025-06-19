@@ -1,6 +1,7 @@
 package com.vocealuga.service;
 
 import com.vocealuga.model.Funcionario;
+import com.vocealuga.utils.ValidationsUtils;
 import com.vocealuga.dao.FuncionarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,12 @@ import java.util.Optional;
 public class FuncionarioService {
 
     private final FuncionarioRepository funcionarioRepository;
+    private final ValidationsUtils validations;
 
     @Autowired
-    public FuncionarioService(FuncionarioRepository funcionarioRepository) {
+    public FuncionarioService(FuncionarioRepository funcionarioRepository, ValidationsUtils validations) {
         this.funcionarioRepository = funcionarioRepository;
+        this.validations = validations;
     }
 
     public List<Funcionario> getAllFuncionarios() {
@@ -27,6 +30,13 @@ public class FuncionarioService {
     }
 
     public Funcionario createFuncionario(Funcionario funcionario) {
+        if (!validations.isValidCPF(funcionario.getCpf())) {
+            throw new IllegalArgumentException("CPF inválido!");
+        }
+        if (!validations.isEmailUnique(funcionario.getEmail())) {
+            throw new IllegalArgumentException("E-mail já cadastrado!");
+        }
+
         return funcionarioRepository.save(funcionario);
     }
 

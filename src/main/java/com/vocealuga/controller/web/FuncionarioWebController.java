@@ -2,6 +2,8 @@ package com.vocealuga.controller.web;
 
 import com.vocealuga.model.*;
 import com.vocealuga.service.*;
+import com.vocealuga.utils.ValidationsUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +24,7 @@ public class FuncionarioWebController {
     private final ClienteService clienteService;
     private final FilialService filialService;
     private final GrupoVeiculoService grupoVeiculoService;
-
+    private final ValidationsUtils validations;
 
     @Autowired
     public FuncionarioWebController(FuncionarioService funcionarioService,
@@ -31,7 +33,8 @@ public class FuncionarioWebController {
                                     ReservaService reservaService,
                                     ClienteService clienteService,
                                     FilialService filialService,
-                                    GrupoVeiculoService service) {
+                                    GrupoVeiculoService service,
+                                    ValidationsUtils validations) {
         this.funcionarioService = funcionarioService;
         this.veiculoService = veiculoService;
         this.estoqueService = estoqueService;
@@ -39,6 +42,7 @@ public class FuncionarioWebController {
         this.clienteService = clienteService;
         this.filialService = filialService;
         this.grupoVeiculoService = service;
+        this.validations = validations;
     }
 
     @GetMapping("/dashboard")
@@ -61,8 +65,22 @@ public class FuncionarioWebController {
     @PostMapping("/cadastrar-funcionario")
     public String registerFuncionario(@ModelAttribute Funcionario funcionario, RedirectAttributes redirectAttributes) {
         try {
+            // Validação de CPF
+            if (!validations.isValidCPF(funcionario.getCpf())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido!");
+                return "redirect:/funcionario/cadastrar-funcionario";
+            }
+
+            // Validação de E-mail único
+            if (!validations.isEmailUnique(funcionario.getEmail())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "E-mail já cadastrado!");
+                return "redirect:/funcionario/cadastrar-funcionario";
+            }
+
+            // Se passar nas validações, salva o funcionário
             funcionarioService.createFuncionario(funcionario);
             redirectAttributes.addFlashAttribute("successMessage", "Funcionário cadastrado com sucesso!");
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar funcionário: " + e.getMessage());
         }
