@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="addVeiculoForm">
+    <div class="form-container">
+        <h2>Adicionar Novo Veículo ao Estoque</h2>
+        <form th:action="@{/funcionario/estoque/adicionar-veiculo}" th:object="${veiculo}" method="post">
+            <div class="form-group">
+                <label for="placa">Placa:</label>
+                <input type="text" id="placa" th:field="*{placa}" required>
+            </div>
+            <div class="form-group">
+                <label for="modelo">Modelo:</label>
+                <input type="text" id="modelo" th:field="*{modelo}" required>
+            </div>
+            <div class="form-group">
+                <label for="statusVeiculo">Status:</label>
+                <input type="text" id="statusVeiculo" th:field="*{status}" required>
+            </div>
+            <div class="form-group">
+                <label for="quilometragem">Quilometragem:</label>
+                <input type="number" id="quilometragem" th:field="*{quilometragem}" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="grupoVeiculo">Grupo de Veículo:</label>
+                <select id="grupoVeiculo" th:field="*{grupoVeiculo.idGrupoVeiculo}" required>
+                    <option value="">Selecione um Grupo</option>
+                    <option th:each="grupo : ${gruposVeiculo}" th:value="${grupo.idGrupoVeiculo}" th:text="${grupo.grupo}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="filialEstoque">Filial para Estoque:</label>
+                <select id="filialEstoque" name="filialId" required>
+                    <option value="">Selecione uma Filial</option>
+                    <option th:each="filial : ${filiais}" th:value="${filial.idFilial}" th:text="${filial.nome}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="funcionarioEstoque">Funcionário Responsável:</label>
+                <select id="funcionarioEstoque" name="funcionarioId" required>
+                    <option value="">Selecione um Funcionário</option>
+                    <option th:each="func : ${funcionarios}" th:value="${func.idFuncionario}" th:text="${func.nome}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Adicionar Veículo</button>
+        </form>
+    </div>
+</body>
+</html>

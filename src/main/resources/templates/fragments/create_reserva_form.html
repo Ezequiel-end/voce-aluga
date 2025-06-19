@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="createReservaForm">
+    <div class="form-container">
+        <h2>Criar Nova Reserva</h2>
+        <form th:action="@{/funcionario/reservas/criar-reserva}" th:object="${reserva}" method="post">
+            <div class="form-group">
+                <label for="funcionarioReserva">Funcionário:</label>
+                <select id="funcionarioReserva" name="funcionarioId" required>
+                    <option value="">Selecione um Funcionário</option>
+                    <option th:each="func : ${funcionarios}" th:value="${func.idFuncionario}" th:text="${func.nome}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="filialReserva">Filial:</label>
+                <select id="filialReserva" name="filialId" required>
+                    <option value="">Selecione uma Filial</option>
+                    <option th:each="filial : ${filiais}" th:value="${filial.idFilial}" th:text="${filial.nome}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="clienteReserva">Cliente:</label>
+                <select id="clienteReserva" name="clienteId" required>
+                    <option value="">Selecione um Cliente</option>
+                    <option th:each="cliente : ${clientes}" th:value="${cliente.idCliente}" th:text="${cliente.nome + ' (' + cliente.cpf + ')'}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="veiculoReserva">Veículo:</label>
+                <select id="veiculoReserva" name="veiculoId" required>
+                    <option value="">Selecione um Veículo</option>
+                    <option th:each="veiculo : ${veiculos}" th:value="${veiculo.idVeiculo}" th:text="${veiculo.modelo + ' - ' + veiculo.placa}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dataInicio">Data de Início:</label>
+                <input type="date" id="dataInicio" th:field="*{dataInicio}" required>
+            </div>
+            <div class="form-group">
+                <label for="dataFim">Data e Hora de Fim:</label>
+                <input type="datetime-local" id="dataFim" th:field="*{dataFim}" required>
+            </div>
+            <div class="form-group">
+                <label for="valor">Valor:</label>
+                <input type="number" id="valor" th:field="*{valor}" step="0.01" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Criar Reserva</button>
+        </form>
+    </div>
+</body>
+</html>

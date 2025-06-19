@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="checkAvailabilityForm">
+    <div class="content-display">
+        <h2>Veículos em Estoque</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Placa</th>
+                    <th>Modelo</th>
+                    <th>Grupo</th>
+                    <th>Filial</th>
+                    <th>Situação no Estoque</th>
+                    <th>Quilometragem</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${veiculosEmEstoque}">
+                    <td th:text="${item.veiculo.placa}"></td>
+                    <td th:text="${item.veiculo.modelo}"></td>
+                    <td th:text="${item.veiculo.grupoVeiculo.grupo}"></td>
+                    <td th:text="${item.filial.nome}"></td>
+                    <td th:text="${item.situacao}"></td>
+                    <td th:text="${item.veiculo.quilometragem}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(veiculosEmEstoque)}">
+                    <td colspan="6">Nenhum veículo encontrado no estoque.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

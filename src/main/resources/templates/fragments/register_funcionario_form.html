@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="registerFuncionarioForm">
+    <div class="form-container">
+        <h2>Cadastrar Novo Funcionário</h2>
+        <form th:action="@{/funcionario/cadastrar-funcionario}" th:object="${funcionario}" method="post">
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" th:field="*{nome}" required>
+            </div>
+            <div class="form-group">
+                <label for="cpf">CPF:</label>
+                <input type="text" id="cpf" th:field="*{cpf}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" th:field="*{email}" required>
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" th:field="*{senha}" required>
+            </div>
+            <div class="form-group">
+                <label for="filial">Filial:</label>
+                <select id="filial" th:field="*{filial.idFilial}" required>
+                    <option value="">Selecione uma Filial</option>
+                    <option th:each="filial : ${filiais}" th:value="${filial.idFilial}" th:text="${filial.nome}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </form>
+    </div>
+</body>
+</html>
