@@ -2,6 +2,8 @@ package com.vocealuga.controller.web;
 
 import com.vocealuga.model.*;
 import com.vocealuga.service.*;
+import com.vocealuga.utils.ValidationsUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +24,7 @@ public class FuncionarioWebController {
     private final ClienteService clienteService;
     private final FilialService filialService;
     private final GrupoVeiculoService grupoVeiculoService;
-
+    private final ValidationsUtils validations;
 
     @Autowired
     public FuncionarioWebController(FuncionarioService funcionarioService,
@@ -31,7 +33,8 @@ public class FuncionarioWebController {
                                     ReservaService reservaService,
                                     ClienteService clienteService,
                                     FilialService filialService,
-                                    GrupoVeiculoService service) {
+                                    GrupoVeiculoService service,
+                                    ValidationsUtils validations) {
         this.funcionarioService = funcionarioService;
         this.veiculoService = veiculoService;
         this.estoqueService = estoqueService;
@@ -39,12 +42,13 @@ public class FuncionarioWebController {
         this.clienteService = clienteService;
         this.filialService = filialService;
         this.grupoVeiculoService = service;
+        this.validations = validations;
     }
 
     @GetMapping("/dashboard")
     public String funcionarioDashboard(Model model) {
         model.addAttribute("activeContent", "home"); // Conteúdo inicial
-        return "funcionario_dashboard";
+        return "funcionario-dashboard";
     }
 
     // --- Funcionalidades do Menu ---
@@ -55,14 +59,25 @@ public class FuncionarioWebController {
         model.addAttribute("activeContent", "register_funcionario");
         model.addAttribute("funcionario", new Funcionario());
         model.addAttribute("filiais", filialService.getAllFiliais());
-        return "funcionario_dashboard";
+        return "funcionario-dashboard";
     }
 
     @PostMapping("/cadastrar-funcionario")
     public String registerFuncionario(@ModelAttribute Funcionario funcionario, RedirectAttributes redirectAttributes) {
         try {
+            if (!validations.isValidCPF(funcionario.getCpf())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido!");
+                return "redirect:/funcionario/cadastrar-funcionario";
+            }
+
+            if (!validations.isEmailGloballyUnique(funcionario.getEmail())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "E-mail já cadastrado!");
+                return "redirect:/funcionario/cadastrar-funcionario";
+            }
+
             funcionarioService.createFuncionario(funcionario);
             redirectAttributes.addFlashAttribute("successMessage", "Funcionário cadastrado com sucesso!");
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar funcionário: " + e.getMessage());
         }
@@ -77,7 +92,7 @@ public class FuncionarioWebController {
         model.addAttribute("gruposVeiculo", grupoVeiculoService.getAllGruposVeiculo());
         model.addAttribute("filiais", filialService.getAllFiliais()); // Para associar ao estoque
         model.addAttribute("funcionarios", funcionarioService.getAllFuncionarios()); // Para associar ao estoque
-        return "funcionario_dashboard";
+        return "funcionario-dashboard";
     }
 
     @PostMapping("/estoque/adicionar-veiculo")
@@ -110,7 +125,7 @@ public class FuncionarioWebController {
     public String showRemoveVeiculoForm(Model model) {
         model.addAttribute("activeContent", "remove_veiculo");
         model.addAttribute("veiculos", veiculoService.getAllVeiculos()); // Para seleção
-        return "funcionario_dashboard";
+        return "funcionario-dashboard";
     }
 
     @PostMapping("/estoque/remover-veiculo")
@@ -131,7 +146,7 @@ public class FuncionarioWebController {
         model.addAttribute("activeContent", "check_availability");
         List<Estoque> veiculosEmEstoque = estoqueService.getAllEstoques();
         model.addAttribute("veiculosEmEstoque", veiculosEmEstoque);
-        return "funcionario_dashboard";
+        return "funcionario-dashboard";
     }
 
 
@@ -144,7 +159,7 @@ public class FuncionarioWebController {
         model.addAttribute("filiais", filialService.getAllFiliais());
         model.addAttribute("clientes", clienteService.getAllClientes());
         model.addAttribute("veiculos", veiculoService.getAllVeiculos());
-        return "funcionario_dashboard";
+        return "funcionario-dashboard";
     }
 
     @PostMapping("/reservas/criar-reserva")
@@ -184,7 +199,7 @@ public class FuncionarioWebController {
     public String showCancelReservaForm(Model model) {
         model.addAttribute("activeContent", "cancel_reserva");
         model.addAttribute("reservas", reservaService.getAllReservas()); // Para seleção
-        return "funcionario_dashboard";
+        return "funcionario-dashboard";
     }
 
     @PostMapping("/reservas/cancelar-reserva")
@@ -206,6 +221,6 @@ public class FuncionarioWebController {
     public String showConsultReservasForm(Model model) {
         model.addAttribute("activeContent", "consult_reservas");
         model.addAttribute("reservas", reservaService.getAllReservas());
-        return "funcionario_dashboard";
+        return "funcionario-dashboard";
     }
 }

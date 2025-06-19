@@ -1,6 +1,7 @@
 package com.vocealuga.service;
 
 import com.vocealuga.model.Cliente;
+import com.vocealuga.utils.ValidationsUtils;
 import com.vocealuga.dao.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,12 @@ import java.util.Optional;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private final ValidationsUtils validation;
 
     @Autowired
-    public ClienteService(ClienteRepository clienteRepository) {
+    public ClienteService(ClienteRepository clienteRepository, ValidationsUtils validation) {
         this.clienteRepository = clienteRepository;
+        this.validation = validation;
     }
 
     public List<Cliente> getAllClientes() {
@@ -26,6 +29,17 @@ public class ClienteService {
     }
 
     public Cliente createCliente(Cliente cliente) {
+         if (!validation.isValidCPF(cliente.getCpf())) {
+            throw new IllegalArgumentException("CPF inválido!");
+        }
+
+         if(!validation.isValidCNH(cliente.getCnh())){
+            throw new IllegalArgumentException("CNH inválida");
+        }
+
+        if (!validation.isEmailGloballyUnique(cliente.getEmail())) {
+            throw new IllegalArgumentException("E-mail já cadastrado!");
+        }
         return clienteRepository.save(cliente);
     }
 
