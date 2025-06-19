@@ -1,0 +1,23 @@
+<nav th:fragment="funcionarioMenu">
+    <ul>
+        <li class="menu-item active-green">
+            <a href="/funcionario/cadastrar-funcionario">Cadastrar Funcionário</a>
+        </li>
+        <li class="menu-item has-submenu">
+            <a href="#">Gerenciar Estoque <span class="arrow">&#9660;</span></a>
+            <ul class="submenu">
+                <li><a href="/funcionario/estoque/adicionar-veiculo">Adicionar Veículo</a></li>
+                <li><a href="/funcionario/estoque/remover-veiculo">Remover Veículo</a></li>
+                <li><a href="/funcionario/estoque/verificar-disponibilidade">Verificar Disponibilidade</a></li>
+            </ul>
+        </li>
+        <li class="menu-item has-submenu">
+            <a href="#">Gerenciar Reservas <span class="arrow">&#9660;</span></a>
+            <ul class="submenu">
+                <li><a href="/funcionario/reservas/criar-reserva">Criar Reserva</a></li>
+                <li class="selected-submenu-item"><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
+                <li><a href="/funcionario/reservas/consultar-reservas">Consultar Reservas</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>

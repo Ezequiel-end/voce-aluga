@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="removeVeiculoForm">
+    <div class="form-container">
+        <h2>Remover Veículo do Estoque</h2>
+        <form th:action="@{/funcionario/estoque/remover-veiculo}" method="post">
+            <div class="form-group">
+                <label for="veiculoToRemove">Selecione o Veículo a Remover:</label>
+                <select id="veiculoToRemove" name="veiculoId" required>
+                    <option value="">Selecione um Veículo</option>
+                    <option th:each="veiculo : ${veiculos}" th:value="${veiculo.idVeiculo}" th:text="${veiculo.modelo + ' - ' + veiculo.placa}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-danger">Remover Veículo</button>
+        </form>
+    </div>
+</body>
+</html>

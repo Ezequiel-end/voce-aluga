@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="cancelReservaForm">
+    <div class="form-container">
+        <h2>Cancelar Reserva</h2>
+        <form th:action="@{/funcionario/reservas/cancelar-reserva}" method="post">
+            <div class="form-group">
+                <label for="reservaToCancel">Selecione a Reserva a Cancelar:</label>
+                <select id="reservaToCancel" name="reservaId" required>
+                    <option value="">Selecione uma Reserva</option>
+                    <option th:each="reserva : ${reservas}" th:value="${reserva.idReserva}" th:text="${'ID: ' + reserva.idReserva + ' - Cliente: ' + reserva.cliente.nome + ' - Veículo: ' + reserva.veiculo.modelo + ' - Status: ' + reserva.status}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-danger">Cancelar Reserva</button>
+        </form>
+    </div>
+</body>
+</html>

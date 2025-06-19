@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoceAluga - Dashboard do Funcionário</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            document.querySelectorAll('.menu-item.has-submenu > a').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault(); 
+                    const submenu = this.nextElementSibling;
+                    if (submenu) {
+                        submenu.classList.toggle('active');
+                        this.querySelector('.arrow').classList.toggle('rotate');
+                    }
+                });
+            });
+
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeForm = urlParams.get('activeContent');
+            if (activeForm) {
+                const fragmentContainer = document.getElementById('content-area');
+                if (fragmentContainer) {
+                    // Remove current fragment if exists
+                    while (fragmentContainer.firstChild) {
+                        fragmentContainer.removeChild(fragmentContainer.firstChild);
+                    }
+                    // Load the new fragment
+                    fetch(`/fragments/${activeForm}_form.html`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Fragment not found');
+                            }
+                            return response.text();
+                        })
+                        .then(html => {
+                            fragmentContainer.innerHTML = html;
+                        })
+                        .catch(error => {
+                            console.error("Error loading fragment:", error);
+                            fragmentContainer.innerHTML = "<p>Erro ao carregar o conteúdo.</p>";
+                        });
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2 class="menu-title">Menu</h2>
+            <nav>
+                <ul>
+                    <li class="menu-item active-green">
+                        <a href="/funcionario/cadastrar-funcionario">Cadastrar Funcionário</a>
+                    </li>
+                    <li class="menu-item has-submenu">
+                        <a href="#">Gerenciar Estoque <span class="arrow">&#9660;</span></a>
+                        <ul class="submenu">
+                            <li><a href="/funcionario/estoque/adicionar-veiculo">Adicionar Veículo</a></li>
+                            <li><a href="/funcionario/estoque/remover-veiculo">Remover Veículo</a></li>
+                            <li><a href="/funcionario/estoque/verificar-disponibilidade">Verificar Disponibilidade</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item has-submenu">
+                        <a href="#">Gerenciar Reservas <span class="arrow">&#9660;</span></a>
+                        <ul class="submenu">
+                            <li><a href="/funcionario/reservas/criar-reserva">Criar Reserva</a></li>
+                            <li class="selected-submenu-item"><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
+                            <li><a href="/funcionario/reservas/consultar-reservas">Consultar Reservas</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1 th:text="${activeContent == 'register_funcionario' ? 'Cadastrar Funcionário' :
+                              (activeContent == 'add_veiculo' ? 'Adicionar Veículo' :
+                              (activeContent == 'remove_veiculo' ? 'Remover Veículo' :
+                              (activeContent == 'check_availability' ? 'Verificar Disponibilidade' :
+                              (activeContent == 'create_reserva' ? 'Criar Reserva' :
+                              (activeContent == 'cancel_reserva' ? 'Cancelar Reserva' :
+                              (activeContent == 'consult_reservas' ? 'Consultar Reservas' : 'Bem-vindo!'))))))}">Bem-vindo!</h1>
+            </header>
+
+            <div class="messages">
+                <p th:if="${successMessage}" class="success-message" th:text="${successMessage}"></p>
+                <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
+            </div>
+
+            <section id="content-area">
+                                <div th:if="${activeContent == 'register_funcionario'}"
+                    th:insert="~{fragments/register_funcionario_form :: registerFuncionarioForm}"></div>
+
+                <div th:if="${activeContent == 'add_veiculo'}"
+                    th:insert="~{fragments/add_veiculo_form :: addVeiculoForm}"></div>
+
+                <div th:if="${activeContent == 'remove_veiculo'}"
+                    th:insert="~{fragments/remove_veiculo_form :: removeVeiculoForm}"></div>
+
+                <div th:if="${activeContent == 'check_availability'}"
+                    th:insert="~{fragments/check_availability_form :: checkAvailabilityForm}"></div>
+
+                <div th:if="${activeContent == 'create_reserva'}"
+                    th:insert="~{fragments/create_reserva_form :: createReservaForm}"></div>
+
+                <div th:if="${activeContent == 'cancel_reserva'}"
+                    th:insert="~{fragments/cancel_reserva_form :: cancelReservaForm}"></div>
+
+                <div th:if="${activeContent == 'consult_reservas'}"
+                    th:insert="~{fragments/consult_reservas_form :: consultReservasForm}"></div>
+
+            </section>
+        </main>
+    </div>
+</body>
+</html>

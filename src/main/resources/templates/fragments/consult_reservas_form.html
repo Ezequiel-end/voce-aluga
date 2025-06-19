@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="consultReservasForm">
+    <div class="content-display">
+        <h2>Consultar Reservas</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID Reserva</th>
+                    <th>Funcionário</th>
+                    <th>Filial</th>
+                    <th>Cliente</th>
+                    <th>Veículo</th>
+                    <th>Data Início</th>
+                    <th>Data Fim</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="reserva : ${reservas}">
+                    <td th:text="${reserva.idReserva}"></td>
+                    <td th:text="${reserva.funcionario.nome}"></td>
+                    <td th:text="${reserva.filial.nome}"></td>
+                    <td th:text="${reserva.cliente.nome}"></td>
+                    <td th:text="${reserva.veiculo.modelo + ' (' + reserva.veiculo.placa + ')'}"></td>
+                    <td th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(reserva.dataFim, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${#numbers.formatCurrency(reserva.valor)}"></td>
+                    <td th:text="${reserva.status}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(reservas)}">
+                    <td colspan="9">Nenhuma reserva encontrada.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
