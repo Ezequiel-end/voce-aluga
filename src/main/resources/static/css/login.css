@@ -6,65 +6,86 @@
     padding: 0;
 }
 
-
 body {
-    margin: 0;
-    padding: 0;
     font-family: "Poppins", sans-serif;
-    background-color: #f5f5f5;
+    background-color: #121212; /* Fundo geral */
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    color: #ffffff;
 }
 
 .login-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.3rem;
-    background-color: white;
-    padding: 40px;
+    background-color: #1e1e1e; /* Card escuro */
+    padding: 40px 30px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    width: 380px;
     text-align: center;
 }
 
 h1 {
-    color: #333;
+    margin-bottom: 25px;
+    font-size: 2em; /* Um pouco maior */
+    font-weight: 700;
+    color: #ffffff;
 }
 
 form {
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
-    font-family: "Poppins", sans-serif;
-}
-
-form input, form button {
-    width: 100%;
-    padding: 12px 24px;
-    border-radius: 1.5rem;
-    font-family: "Poppins", sans-serif;
+    gap: 20px;
 }
 
 form input {
-    border: 1px solid #ccc;
+    background-color: #2c2c2c; /* Fundo sempre escuro */
+    border: 1px solid #555555;
+    padding: 12px 15px;
+    color: #ffffff;
+    border-radius: 20px; /* Arredondado */
+    outline: none;
+    transition: border-color 0.3s, background-color 0.3s;
+    font-size: 1em;
 }
 
-form button { 
-    background-color: #000;
-    color: #fff;
+form input::placeholder {
+    color: #aaaaaa;
+}
+
+form input:focus {
+    border-color: #28a745;
+    background-color: #2c2c2c; /* Mantém escuro ao focar */
+}
+
+form button {
+    background-color: #28a745;
+    color: #ffffff;
     border: none;
+    padding: 14px;
+    border-radius: 20px; /* Botão também arredondado */
     cursor: pointer;
+    font-weight: bold;
+    font-size: 1em;
+    transition: background-color 0.3s;
 }
 
 form button:hover {
-    background-color: #333;
+    background-color: #218838;
+}
+
+a {
+    color: #6ac36a;
+    font-size: 0.9em;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 .erro {
     color: red;
+    font-size: 0.85em;
     margin-top: 10px;
-    font-size: 14px;
 }
