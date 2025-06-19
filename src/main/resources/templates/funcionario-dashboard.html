@@ -7,7 +7,6 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            
             document.querySelectorAll('.menu-item.has-submenu > a').forEach(item => {
                 item.addEventListener('click', function(e) {
                     e.preventDefault(); 
@@ -19,17 +18,14 @@
                 });
             });
 
-            
             const urlParams = new URLSearchParams(window.location.search);
             const activeForm = urlParams.get('activeContent');
             if (activeForm) {
                 const fragmentContainer = document.getElementById('content-area');
                 if (fragmentContainer) {
-                    // Remove current fragment if exists
                     while (fragmentContainer.firstChild) {
                         fragmentContainer.removeChild(fragmentContainer.firstChild);
                     }
-                    // Load the new fragment
                     fetch(`/fragments/${activeForm}_form.html`)
                         .then(response => {
                             if (!response.ok) {
@@ -55,11 +51,11 @@
             <h2 class="menu-title">Menu</h2>
             <nav>
                 <ul>
-                    <li class="menu-item active-green">
+                    <li class="menu-item">
                         <a href="/funcionario/cadastrar-funcionario">Cadastrar Funcionário</a>
                     </li>
                     <li class="menu-item has-submenu">
-                        <a href="#">Gerenciar Estoque <span class="arrow">&#9660;</span></a>
+                        <a href="#">Gerenciar Estoque <span class="arrow">▼</span></a>
                         <ul class="submenu">
                             <li><a href="/funcionario/estoque/adicionar-veiculo">Adicionar Veículo</a></li>
                             <li><a href="/funcionario/estoque/remover-veiculo">Remover Veículo</a></li>
@@ -67,10 +63,10 @@
                         </ul>
                     </li>
                     <li class="menu-item has-submenu">
-                        <a href="#">Gerenciar Reservas <span class="arrow">&#9660;</span></a>
+                        <a href="#">Gerenciar Reservas <span class="arrow">▼</span></a>
                         <ul class="submenu">
                             <li><a href="/funcionario/reservas/criar-reserva">Criar Reserva</a></li>
-                            <li class="selected-submenu-item"><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
+                            <li><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
                             <li><a href="/funcionario/reservas/consultar-reservas">Consultar Reservas</a></li>
                         </ul>
                     </li>
@@ -95,7 +91,7 @@
             </div>
 
             <section id="content-area">
-                                <div th:if="${activeContent == 'register_funcionario'}"
+                <div th:if="${activeContent == 'register_funcionario'}"
                     th:insert="~{fragments/register_funcionario_form :: registerFuncionarioForm}"></div>
 
                 <div th:if="${activeContent == 'add_veiculo'}"
@@ -115,7 +111,6 @@
 
                 <div th:if="${activeContent == 'consult_reservas'}"
                     th:insert="~{fragments/consult_reservas_form :: consultReservasForm}"></div>
-
             </section>
         </main>
     </div>

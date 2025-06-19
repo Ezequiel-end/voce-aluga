@@ -28,7 +28,7 @@ public class LoginController {
         Optional<Cliente> cliente = clienteService.login(email, senha);
 
         if (funcionario.isPresent()) {
-            return "redirect:/dashboard-funcionario";
+            return "redirect:/funcionario/dashboard";
         } else if (cliente.isPresent()) {
             return "redirect:/dashboard-cliente";
         } else {

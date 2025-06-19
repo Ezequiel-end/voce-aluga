@@ -2,8 +2,8 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #121212; /* Fundo geral do login */
+    color: #ffffff; /* Texto principal */
 }
 
 .container {
@@ -13,8 +13,8 @@ body {
 
 .sidebar {
     width: 250px;
-    background-color: #2c3e50;
-    color: white;
+    background-color: #1e1e1e; /* Fundo do card do login */
+    color: #ffffff; /* Texto principal */
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
@@ -22,7 +22,7 @@ body {
 .menu-title {
     text-align: center;
     margin-bottom: 30px;
-    color: #ecf0f1;
+    color: #aaaaaa; /* Texto secundário do login */
 }
 
 .sidebar ul {
@@ -36,7 +36,7 @@ body {
 
 .sidebar ul li a {
     display: block;
-    color: white;
+    color: #ffffff; /* Texto principal */
     text-decoration: none;
     padding: 10px 15px;
     border-radius: 5px;
@@ -44,16 +44,7 @@ body {
 }
 
 .sidebar ul li a:hover {
-    background-color: #34495e;
-}
-
-.menu-item.active-green a {
-    background-color: #27ae60; /* Verde destacado */
-    font-weight: bold;
-}
-
-.menu-item.active-green a:hover {
-    background-color: #229954;
+    background-color: #28a745; /* Verde do botão do login, aplicado apenas no hover */
 }
 
 .menu-item.has-submenu a {
@@ -76,7 +67,7 @@ body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
-    background-color: #3e566e; /* Um pouco mais claro que o fundo do menu */
+    background-color: #2c2c2c; /* Elementos secundários do login */
     border-radius: 0 0 5px 5px;
 }
 
@@ -89,34 +80,35 @@ body {
 .submenu li a {
     padding: 8px 15px;
     font-size: 0.9em;
+    color: #ffffff; /* Texto principal */
 }
 
 .submenu li a:hover {
-    background-color: #4a647d;
+    background-color: #333333; /* Levemente mais claro que o fundo do submenu */
 }
 
 .selected-submenu-item a {
-    background-color: #1abc9c; /* Cor de destaque para o item selecionado */
+    background-color: #28a745; /* Verde do login para item selecionado */
     font-weight: bold;
 }
 
 .main-content {
     flex-grow: 1;
     padding: 20px;
-    background-color: white;
+    background-color: #1e1e1e; /* Fundo do card do login */
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     margin: 20px;
     border-radius: 8px;
 }
 
 header {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #555555; /* Borda cinza médio do login */
     padding-bottom: 15px;
     margin-bottom: 20px;
 }
 
 header h1 {
-    color: #2c3e50;
+    color: #ffffff; /* Texto principal */
     font-size: 2em;
     margin: 0;
 }
@@ -126,23 +118,23 @@ header h1 {
 }
 
 .success-message {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background-color: #1e1e1e; /* Ajustado para consistência com o tema escuro */
+    color: #6ac36a; /* Verde claro do login */
+    border: 1px solid #555555; /* Borda cinza médio */
     padding: 10px;
     border-radius: 5px;
 }
 
 .error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background-color: #1e1e1e; /* Ajustado para consistência com o tema escuro */
+    color: #ffcccc; /* Vermelho claro para erro */
+    border: 1px solid #555555; /* Borda cinza médio */
     padding: 10px;
     border-radius: 5px;
 }
 
 .form-container {
-    background-color: #f9f9f9;
+    background-color: #2c2c2c; /* Elementos secundários do login */
     padding: 25px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -156,7 +148,7 @@ header h1 {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
-    color: #555;
+    color: #aaaaaa; /* Texto secundário do login */
 }
 
 .form-group input[type="text"],
@@ -168,9 +160,11 @@ header h1 {
 .form-group select {
     width: calc(100% - 22px); /* Padding + Border */
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #555555; /* Borda cinza médio do login */
     border-radius: 4px;
     font-size: 1em;
+    background-color: #333333; /* Levemente mais claro que o fundo */
+    color: #ffffff; /* Texto principal */
 }
 
 .btn {
@@ -184,17 +178,17 @@ header h1 {
 }
 
 .btn-primary {
-    background-color: #3498db;
-    color: white;
+    background-color: #28a745; /* Verde do login */
+    color: #ffffff; /* Texto principal */
 }
 
 .btn-primary:hover {
-    background-color: #2980b9;
+    background-color: #218838; /* Verde escuro no hover do login */
 }
 
 .btn-danger {
-    background-color: #e74c3c;
-    color: white;
+    background-color: #e74c3c; /* Mantido vermelho para contraste */
+    color: #ffffff; /* Texto principal */
 }
 
 .btn-danger:hover {
@@ -203,7 +197,7 @@ header h1 {
 
 .content-display {
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: #2c2c2c; /* Elementos secundários do login */
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
@@ -216,20 +210,21 @@ header h1 {
 
 .data-table th,
 .data-table td {
-    border: 1px solid #ddd;
+    border: 1px solid #555555; /* Borda cinza médio do login */
     padding: 8px;
     text-align: left;
+    color: #ffffff; /* Texto principal */
 }
 
 .data-table th {
-    background-color: #f2f2f2;
+    background-color: #1e1e1e; /* Fundo do card do login */
     font-weight: bold;
 }
 
 .data-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #2c2c2c; /* Elementos secundários do login */
 }
 
 .data-table tbody tr:hover {
-    background-color: #eef;
+    background-color: #333333; /* Levemente mais claro que o fundo */
 }
