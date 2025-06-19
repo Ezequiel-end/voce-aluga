@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Funcionário - Você Aluga</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard-funcionario.css}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li>
+                    <button onclick="showSection('cadastrarFuncionario')">Cadastrar Funcionário</button>
+                </li>
+                <li>
+                    <button onclick="toggleSubmenu('estoqueSubmenu')">Gerenciar Estoque ▼</button>
+                    <ul id="estoqueSubmenu" class="submenu">
+                        <li><button onclick="showSection('adicionarVeiculo')">Adicionar Veículo</button></li>
+                        <li><button onclick="showSection('removerVeiculo')">Remover Veículo</button></li>
+                        <li><button onclick="showSection('verificarDisponibilidade')">Verificar Disponibilidade</button></li>
+                    </ul>
+                </li>
+                <li>
+                    <button onclick="toggleSubmenu('reservaSubmenu')">Gerenciar Reservas ▼</button>
+                    <ul id="reservaSubmenu" class="submenu">
+                        <li><button onclick="showSection('criarReserva')">Criar Reserva</button></li>
+                        <li><button onclick="showSection('cancelarReserva')">Cancelar Reserva</button></li>
+                        <li><button onclick="showSection('consultarReserva')">Consultar Reservas</button></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Área de conteúdo -->
+        <div class="content-area">
+            <div id="cadastrarFuncionario" class="section" style="display:block;">
+                <h2>Cadastrar Funcionário</h2>
+                <!-- Aqui você coloca o formulário de cadastro -->
+            </div>
+
+            <div id="adicionarVeiculo" class="section" style="display:none;">
+                <h2>Adicionar Veículo</h2>
+                <!-- Formulário de adicionar veículo -->
+            </div>
+
+            <div id="removerVeiculo" class="section" style="display:none;">
+                <h2>Remover Veículo</h2>
+                <!-- Formulário de remover veículo -->
+            </div>
+
+            <div id="verificarDisponibilidade" class="section" style="display:none;">
+                <h2>Verificar Disponibilidade</h2>
+                <!-- Conteúdo da consulta -->
+            </div>
+
+            <div id="criarReserva" class="section" style="display:none;">
+                <h2>Criar Reserva</h2>
+                <!-- Formulário de criação de reserva -->
+            </div>
+
+            <div id="cancelarReserva" class="section" style="display:none;">
+                <h2>Cancelar Reserva</h2>
+                <!-- Formulário de cancelamento -->
+            </div>
+
+            <div id="consultarReserva" class="section" style="display:none;">
+                <h2>Consultar Reservas</h2>
+                <!-- Lista de reservas -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSubmenu(id) {
+            const submenu = document.getElementById(id);
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+        }
+
+        // Definir o primeiro item como ativo ao carregar
+        window.onload = function() {
+            showSection('cadastrarFuncionario');
+        };
+    </script>
+</body>
+</html>
