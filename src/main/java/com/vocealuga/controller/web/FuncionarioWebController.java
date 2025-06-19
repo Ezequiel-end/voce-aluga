@@ -65,19 +65,16 @@ public class FuncionarioWebController {
     @PostMapping("/cadastrar-funcionario")
     public String registerFuncionario(@ModelAttribute Funcionario funcionario, RedirectAttributes redirectAttributes) {
         try {
-            // Validação de CPF
             if (!validations.isValidCPF(funcionario.getCpf())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido!");
                 return "redirect:/funcionario/cadastrar-funcionario";
             }
 
-            // Validação de E-mail único
-            if (!validations.isEmailUnique(funcionario.getEmail())) {
+            if (!validations.isEmailGloballyUnique(funcionario.getEmail())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "E-mail já cadastrado!");
                 return "redirect:/funcionario/cadastrar-funcionario";
             }
 
-            // Se passar nas validações, salva o funcionário
             funcionarioService.createFuncionario(funcionario);
             redirectAttributes.addFlashAttribute("successMessage", "Funcionário cadastrado com sucesso!");
 

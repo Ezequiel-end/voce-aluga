@@ -28,9 +28,13 @@
         </p>
       </form>
 
-      <div th:if="${erro}" class="erro">
-        <p th:text="${erro}"></p>
+        <div th:if="${errorMessage}" class="erro">
+      <p th:text="${errorMessage}"></p>
+  </div>
+
+  <div th:if="${successMessage}" class="success">
+      <p th:text="${successMessage}"></p>
+  </div>
       </div>
-    </div>
   </body>
 </html>

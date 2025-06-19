@@ -1,5 +1,10 @@
 package com.vocealuga.utils;
+
+import java.time.LocalDate;
+import java.time.Period;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import com.vocealuga.dao.ClienteRepository;
 import com.vocealuga.dao.FuncionarioRepository;
 import org.springframework.stereotype.Component;
 
@@ -12,36 +17,39 @@ public class ValidationsUtils {
      * @return true se for válido, false caso contrário
      */
     public static boolean isValidCNH(String cnh) {
-        if (cnh == null || cnh.length() != 11 || !cnh.matches("\\d{11}")) {
+        if (cnh == null || !cnh.matches("\\d{11}")) {
             return false;
         }
 
-        try {
-            int[] numbers = new int[11];
-            for (int i = 0; i < 11; i++) {
-                numbers[i] = cnh.charAt(i) - '0';
-            }
-
-            int sum = 0;
-            for (int i = 0; i < 9; i++) {
-                sum += numbers[i] * (9 - i);
-            }
-            int firstDigit = 11 - (sum % 11);
-            if (firstDigit >= 10) firstDigit = 0;
-            if (firstDigit != numbers[9]) return false;
-
-            sum = 0;
-            for (int i = 0; i < 10; i++) {
-                sum += numbers[i] * (10 - i);
-            }
-            int secondDigit = 11 - (sum % 11);
-            if (secondDigit >= 10) secondDigit = 0;
-            if (secondDigit != numbers[10]) return false;
-
-            return true;
-        } catch (Exception e) {
-            return false;
+        int[] n = new int[11];
+        for (int i = 0; i < 11; i++) {
+            n[i] = cnh.charAt(i) - '0';
         }
+
+        // Primeiro dígito verificador
+        int d1 = 0;
+        for (int i = 0, j = 9; i < 9; i++, j--) {
+            d1 += n[i] * j;
+        }
+        d1 = d1 % 11;
+        d1 = (d1 >= 10) ? 0 : d1;
+
+        // Segundo dígito verificador
+        int d2 = 0;
+        for (int i = 0, j = 1; i < 9; i++, j++) {
+            d2 += n[i] * j;
+        }
+        d2 = d2 % 11;
+        if (d2 >= 10) {
+            d2 = 0;
+        }
+
+        // Regra especial DETRAN: Se d2 == 10 e d1 == 0, então d2 = 0
+        if ((d2 == 10) && (d1 == 0)) {
+            d2 = 0;
+        }
+
+        return (d1 == n[9] && d2 == n[10]);
     }
 
     /**
@@ -84,16 +92,25 @@ public class ValidationsUtils {
     @Autowired
     private FuncionarioRepository funcionarioRepository;
 
-    /**
-     * Valida se o e-mail é único (não existe no banco de dados).
-     * @param email O e-mail a ser validado
-     * @return true se o e-mail for único, false caso contrário
-     */
-    public boolean isEmailUnique(String email) {
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    public boolean isEmailGloballyUnique(String email) {
         if (email == null || email.trim().isEmpty()) {
             return false;
         }
-        return !funcionarioRepository.existsByEmail(email);
+        boolean existsInCliente = clienteRepository.existsByEmail(email);
+        boolean existsInFuncionario = funcionarioRepository.existsByEmail(email);
+        return !(existsInCliente || existsInFuncionario);
+    }
+
+    public boolean isMaiorDeIdade(LocalDate dataNascimento) {
+        if (dataNascimento == null) {
+            return false;
+        }
+        LocalDate hoje = LocalDate.now();
+        Period idade = Period.between(dataNascimento, hoje);
+        return idade.getYears() >= 18;
     }
 }
 

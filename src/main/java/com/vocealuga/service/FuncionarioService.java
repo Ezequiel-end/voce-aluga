@@ -33,10 +33,9 @@ public class FuncionarioService {
         if (!validations.isValidCPF(funcionario.getCpf())) {
             throw new IllegalArgumentException("CPF inválido!");
         }
-        if (!validations.isEmailUnique(funcionario.getEmail())) {
+        if (!validations.isEmailGloballyUnique(funcionario.getEmail())) {
             throw new IllegalArgumentException("E-mail já cadastrado!");
         }
-
         return funcionarioRepository.save(funcionario);
     }
 
