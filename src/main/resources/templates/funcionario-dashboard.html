@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VoceAluga - Dashboard do Funcionário</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.menu-item.has-submenu > a').forEach(item => {
@@ -33,7 +33,6 @@
                     } else if (activeForm === 'alterar_reserva_detalhes') {
                         fragmentPath = `/fragments/alterar_reserva_form.html`;
                     }
-
 
                     fetch(fragmentPath)
                         .then(response => {
@@ -69,17 +68,20 @@
                             <li><a href="/funcionario/estoque/adicionar-veiculo">Adicionar Veículo</a></li>
                             <li><a href="/funcionario/estoque/remover-veiculo">Remover Veículo</a></li>
                             <li><a href="/funcionario/estoque/verificar-disponibilidade">Verificar Disponibilidade</a></li>
-                            <li><a href="/funcionario/estoque/transferir-veiculo">Transferir Veículo</a></li> </ul>
+                            <li><a href="/funcionario/estoque/transferir-veiculo">Transferir Veículo</a></li>
+                        </ul>
                     </li>
                     <li class="menu-item has-submenu">
                         <a href="#">Gerenciar Reservas <span class="arrow">▼</span></a>
                         <ul class="submenu">
                             <li><a href="/funcionario/reservas/criar-reserva">Criar Reserva</a></li>
-                            <li><a href="/funcionario/reservas/alterar">Alterar Reserva</a></li> <li><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
+                            <li><a href="/funcionario/reservas/alterar">Alterar Reserva</a></li>
+                            <li><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
                             <li><a href="/funcionario/reservas/consultar-reservas">Consultar Reservas</a></li>
                         </ul>
                     </li>
-                    <li class="menu-item has-submenu"> <a href="#">Gerenciar Manutenção <span class="arrow">▼</span></a>
+                    <li class="menu-item has-submenu">
+                        <a href="#">Gerenciar Manutenção <span class="arrow">▼</span></a>
                         <ul class="submenu">
                             <li><a href="/funcionario/manutencao/cadastrar">Cadastrar Manutenção</a></li>
                             <li><a href="/funcionario/manutencao/gerenciar">Gerenciar Manutenções</a></li>
@@ -91,19 +93,21 @@
 
         <main class="main-content">
             <header>
-                <h1 th:text="${activeContent == 'register_funcionario' ? 'Cadastrar Funcionário' :
-                               (activeContent == 'add_veiculo' ? 'Adicionar Veículo' :
-                               (activeContent == 'remove_veiculo' ? 'Remover Veículo' :
-                               (activeContent == 'check_availability' ? 'Verificar Disponibilidade' :
-                               (activeContent == 'transferir_veiculo' ? 'Transferir Veículo' : /* Novo */
-                               (activeContent == 'create_reserva' ? 'Criar Reserva' :
-                               (activeContent == 'alterar_reserva' ? 'Alterar Reserva' : /* Novo */
-                               (activeContent == 'alterar_reserva_detalhes' ? 'Alterar Reserva' : /* Novo */
-                               (activeContent == 'cancel_reserva' ? 'Cancelar Reserva' :
-                               (activeContent == 'consult_reservas' ? 'Consultar Reservas' :
-                               (activeContent == 'cadastrar_manutencao' ? 'Cadastrar Manutenção' : /* Novo */
-                               (activeContent == 'gerenciar_manutencao' ? 'Gerenciar Manutenções' : /* Novo */
-                               'Bem-vindo!'))))))))))))}">Bem-vindo!</h1>
+                <h1 th:switch="${activeContent}">
+                    <span th:case="'register_funcionario'">Cadastrar Funcionário</span>
+                    <span th:case="'add_veiculo'">Adicionar Veículo</span>
+                    <span th:case="'remove_veiculo'">Remover Veículo</span>
+                    <span th:case="'check_availability'">Verificar Disponibilidade</span>
+                    <span th:case="'transferir_veiculo'">Transferir Veículo</span>
+                    <span th:case="'create_reserva'">Criar Reserva</span>
+                    <span th:case="'alterar_reserva'">Alterar Reserva</span>
+                    <span th:case="'alterar_reserva_detalhes'">Alterar Reserva</span>
+                    <span th:case="'cancel_reserva'">Cancelar Reserva</span>
+                    <span th:case="'consult_reservas'">Consultar Reservas</span>
+                    <span th:case="'cadastrar_manutencao'">Cadastrar Manutenção</span>
+                    <span th:case="'gerenciar_manutencao'">Gerenciar Manutenções</span>
+                    <span th:case="*">Bem-vindo!</span>
+                </h1>
             </header>
 
             <div class="messages">
@@ -124,14 +128,17 @@
                 <div th:if="${activeContent == 'check_availability'}"
                     th:insert="~{fragments/check_availability_form :: checkAvailabilityForm}"></div>
 
-                <div th:if="${activeContent == 'transferir_veiculo'}" th:insert="~{fragments/transferir_veiculo_form :: transferirVeiculoForm}"></div>
+                <div th:if="${activeContent == 'transferir_veiculo'}"
+                     th:insert="~{fragments/transferir_veiculo_form :: transferirVeiculoForm}"></div>
 
                 <div th:if="${activeContent == 'create_reserva'}"
                     th:insert="~{fragments/create_reserva_form :: createReservaForm}"></div>
 
-                <div th:if="${activeContent == 'alterar_reserva'}" th:insert="~{fragments/alterar_reserva_form :: alterarReservaForm}"></div>
+                <div th:if="${activeContent == 'alterar_reserva'}"
+                     th:insert="~{fragments/alterar_reserva_form :: alterarReservaForm}"></div>
 
-                <div th:if="${activeContent == 'alterar_reserva_detalhes'}" th:insert="~{fragments/alterar_reserva_form :: alterarReservaForm}"></div>
+                <div th:if="${activeContent == 'alterar_reserva_detalhes'}"
+                     th:insert="~{fragments/alterar_reserva_form :: alterarReservaForm}"></div>
 
                 <div th:if="${activeContent == 'cancel_reserva'}"
                     th:insert="~{fragments/cancel_reserva_form :: cancelReservaForm}"></div>
@@ -139,10 +146,11 @@
                 <div th:if="${activeContent == 'consult_reservas'}"
                     th:insert="~{fragments/consult_reservas_form :: consultReservasForm}"></div>
 
-                <div th:if="${activeContent == 'cadastrar_manutencao'}" th:insert="~{fragments/cadastrar_manutencao_form :: cadastrarManutencaoForm}"></div>
+                <div th:if="${activeContent == 'cadastrar_manutencao'}"
+                     th:insert="~{fragments/cadastrar_manutencao_form :: cadastrarManutencaoForm}"></div>
 
-                <div th:if="${activeContent == 'gerenciar_manutencao'}" th:insert="~{fragments/gerenciar_manutencao_form :: gerenciarManutencaoForm}"></div>
-
+                <div th:if="${activeContent == 'gerenciar_manutencao'}"
+                     th:insert="~{fragments/gerenciar_manutencao_form :: gerenciarManutencaoForm}"></div>
             </section>
         </main>
     </div>
