@@ -2,7 +2,6 @@ package com.vocealuga.service;
 
 import com.vocealuga.model.Estoque;
 import com.vocealuga.model.Filial; // Import adicionado para Filial
-import com.vocealuga.model.Veiculo; // Import adicionado para Veiculo
 import com.vocealuga.dao.EstoqueRepository;
 import com.vocealuga.dao.FilialRepository; // Injetar FilialRepository
 import com.vocealuga.dao.VeiculoRepository; // Injetar VeiculoRepository
@@ -53,15 +52,15 @@ public class EstoqueService {
         estoqueRepository.deleteById(id);
     }
 
-    
     public Estoque transferirVeiculoParaFilial(Integer veiculoId, Integer filialOrigemId, Integer filialDestinoId) {
 
         if (filialOrigemId.equals(filialDestinoId)) {
-        throw new RuntimeException("A filial de origem e destino não podem ser a mesma.");
-    	}
+            throw new RuntimeException("A filial de origem e destino não podem ser a mesma.");
+        }
 
-        // 1. Valida se o veículo existe
-        Veiculo veiculo = veiculoRepository.findById(veiculoId)
+        // 1. Valida se o veículo existe (a chamada a findById().orElseThrow() já faz a validação)
+        // A variável 'veiculo' foi removida porque não era utilizada após a validação.
+        veiculoRepository.findById(veiculoId)
                 .orElseThrow(() -> new RuntimeException("Veículo não encontrado com id " + veiculoId));
 
         // 2. Valida se a filial de destino existe
@@ -70,7 +69,7 @@ public class EstoqueService {
 
         // 3. Encontra o registro de estoque do veículo na filial de origem
         // Assumindo que um veículo só pode estar em uma filial por vez no estoque
-        Estoque estoqueAtual = estoqueRepository.findByVeiculoIdAndFilialId(veiculoId, filialOrigemId)
+        Estoque estoqueAtual = estoqueRepository.findByVeiculoAndFilial(veiculoId, filialOrigemId)
                 .orElseThrow(() -> new RuntimeException("Veículo não encontrado na filial de origem com id " + filialOrigemId));
 
         // 4. Atualiza a filial do estoque para a filial de destino
