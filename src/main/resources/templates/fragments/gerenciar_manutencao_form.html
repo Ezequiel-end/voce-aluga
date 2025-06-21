@@ -1,0 +1,35 @@
+<div th:fragment="gerenciarManutencaoForm" class="content-display">
+    <h2>Manutenções Ativas e Histórico</h2>
+
+    <div th:if="${manutencoes == null or manutencoes.isEmpty()}">
+        <p>Nenhuma manutenção encontrada.</p>
+    </div>
+    <div th:if="${manutencoes != null and not manutencoes.isEmpty()}">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Veículo</th>
+                    <th>Funcionário</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Motivo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="manutencao : ${manutencoes}">
+                    <td th:text="${manutencao.idManutencao}"></td>
+                    <td th:text="${manutencao.veiculo.placa + ' - ' + manutencao.veiculo.modelo}"></td>
+                    <td th:text="${manutencao.funcionario.nome}"></td>
+                    <td th:text="${#temporals.format(manutencao.dataInicio, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${manutencao.dataFim != null ? #temporals.format(manutencao.dataFim, 'dd/MM/yyyy HH:mm') : 'Em andamento'}"></td>
+                    <td th:text="${manutencao.motivo}"></td>
+                    <td>
+                        <a th:href="@{'/funcionario/manutencao/editar/' + ${manutencao.idManutencao}}" class="btn btn-primary btn-sm">Editar</a>
+                        </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
