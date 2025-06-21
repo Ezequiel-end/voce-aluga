@@ -13,6 +13,7 @@ import java.util.Optional;
 public class FuncionarioService {
 
     private final FuncionarioRepository funcionarioRepository;
+    // Mantido 'validations' injetado, pois 'isEmailGloballyUnique' pode não ser estático puro
     private final ValidationsUtils validations;
 
     @Autowired
@@ -30,7 +31,8 @@ public class FuncionarioService {
     }
 
     public Funcionario createFuncionario(Funcionario funcionario) {
-        if (!validations.isValidCPF(funcionario.getCpf())) {
+        // Correção: Acessando isValidCPF de forma estática
+        if (!ValidationsUtils.isValidCPF(funcionario.getCpf())) {
             throw new IllegalArgumentException("CPF inválido!");
         }
         if (!validations.isEmailGloballyUnique(funcionario.getEmail())) {
