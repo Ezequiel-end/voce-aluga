@@ -1,0 +1,43 @@
+<div th:fragment="cadastrarManutencaoForm" class="form-container">
+    <h2>Cadastrar Nova Manutenção</h2>
+    <form th:action="@{/funcionario/manutencao/cadastrar}" method="post" th:object="${manutencao}">
+        <div class="form-group">
+            <label for="funcionario">Funcionário Responsável:</label>
+            <select id="funcionario" name="funcionario.idFuncionario" class="form-control" required>
+                <option value="">Selecione um funcionário</option>
+                <option th:each="func : ${funcionarios}"
+                        th:value="${func.idFuncionario}"
+                        th:text="${func.nome}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="veiculoManutencao">Veículo (Placa - Modelo):</label>
+            <select id="veiculoManutencao" name="veiculo.idVeiculo" class="form-control" required>
+                <option value="">Selecione um veículo</option>
+                <option th:each="veiculo : ${veiculosDisponiveis}"
+                        th:value="${veiculo.idVeiculo}"
+                        th:text="${veiculo.placa + ' - ' + veiculo.modelo}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="dataInicioManutencao">Data de Início:</label>
+            <input type="datetime-local" id="dataInicioManutencao" name="dataInicio" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="dataFimManutencao">Data de Fim (Opcional):</label>
+            <input type="datetime-local" id="dataFimManutencao" name="dataFim" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="motivoManutencao">Motivo da Manutenção:</label>
+            <textarea id="motivoManutencao" name="motivo" class="form-control" rows="4" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Cadastrar Manutenção</button>
+    </form>
+</div>
