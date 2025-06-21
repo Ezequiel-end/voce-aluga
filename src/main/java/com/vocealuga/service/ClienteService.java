@@ -12,6 +12,7 @@ import java.util.Optional;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    // Mantido 'validation' injetado, pois 'isEmailGloballyUnique' pode não ser estático puro
     private final ValidationsUtils validation;
 
     @Autowired
@@ -29,11 +30,13 @@ public class ClienteService {
     }
 
     public Cliente createCliente(Cliente cliente) {
-         if (!validation.isValidCPF(cliente.getCpf())) {
+        // Correção: Acessando isValidCPF de forma estática
+        if (!ValidationsUtils.isValidCPF(cliente.getCpf())) {
             throw new IllegalArgumentException("CPF inválido!");
         }
 
-         if(!validation.isValidCNH(cliente.getCnh())){
+        // Correção: Acessando isValidCNH de forma estática
+        if (!ValidationsUtils.isValidCNH(cliente.getCnh())) {
             throw new IllegalArgumentException("CNH inválida");
         }
 
