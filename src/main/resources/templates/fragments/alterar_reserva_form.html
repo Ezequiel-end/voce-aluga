@@ -1,0 +1,60 @@
+<div th:fragment="alterarReservaForm" class="form-container">
+    <h2>Alterar Reserva</h2>
+
+    <form th:action="@{/funcionario/reservas/alterar}" method="get" class="form-group">
+        <label for="reservaIdSearch">Buscar Reserva por ID:</label>
+        <input type="number" id="reservaIdSearch" name="id" class="form-control" placeholder="ID da Reserva" required>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar Reserva</button>
+    </form>
+
+    <div th:if="${reserva != null}" class="form-container" style="margin-top: 20px;">
+        <h3>Detalhes da Reserva (ID: <span th:text="${reserva.idReserva}"></span>)</h3>
+        <form th:action="@{/funcionario/reservas/alterar}" th:object="${reserva}" method="post">
+            <input type="hidden" th:field="*{idReserva}" />
+
+            <div class="form-group">
+                <label for="cliente">Cliente:</label>
+                <input type="text" id="cliente" th:field="*{cliente.nome}" class="form-control" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="veiculo">Veículo (Placa - Modelo):</label>
+                <input type="text" id="veiculo" th:field="*{veiculo.placa}" class="form-control" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="filial">Filial:</label>
+                <input type="text" id="filial" th:field="*{filial.nome}" class="form-control" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="dataInicio">Data de Início:</label>
+                <input type="datetime-local" id="dataInicio" th:field="*{dataInicio}" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+                <label for="dataFim">Data de Fim:</label>
+                <input type="datetime-local" id="dataFim" th:field="*{dataFim}" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+                <label for="valor">Valor:</label>
+                <input type="number" id="valor" th:field="*{valor}" step="0.01" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" th:field="*{status}" class="form-control" required>
+                    <option value="PENDENTE">PENDENTE</option>
+                    <option value="CONFIRMADA">CONFIRMADA</option>
+                    <option value="CONCLUIDA">CONCLUIDA</option>
+                    <option value="CANCELADA">CANCELADA</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Atualizar Reserva</button>
+            <a th:href="@{/funcionario/reservas/alterar}" class="btn btn-secondary">Nova Busca</a>
+        </form>
+    </div>
+    <p th:if="${reserva == null and param.id != null}" class="error-message">Reserva com ID '<span th:text="${param.id}"></span>' não encontrada.</p>
+</div>
