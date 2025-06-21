@@ -1,0 +1,40 @@
+<div th:fragment="transferirVeiculoForm" class="form-container">
+    <h2>Transferir Veículo para Outra Filial</h2>
+    <form th:action="@{/funcionario/estoque/transferir-veiculo}" method="post">
+        <div class="form-group">
+            <label for="veiculoId">Veículo (Placa - Modelo):</label>
+            <select id="veiculoId" name="veiculoId" class="form-control" required>
+                <option value="">Selecione um veículo</option>
+                <th:block th:each="estoque : ${estoques}">
+                    <option th:value="${estoque.veiculo.idVeiculo}"
+                            th:text="${estoque.veiculo.placa + ' - ' + estoque.veiculo.modelo + ' (Filial: ' + estoque.filial.nome + ')'}">
+                    </option>
+                </th:block>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="filialOrigemId">Filial de Origem (Atual):</label>
+            <select id="filialOrigemId" name="filialOrigemId" class="form-control" required>
+                <option value="">Selecione a filial de origem</option>
+                <option th:each="filial : ${filiais}"
+                        th:value="${filial.idFilial}"
+                        th:text="${filial.nome}">
+                </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="filialDestinoId">Filial de Destino:</label>
+            <select id="filialDestinoId" name="filialDestinoId" class="form-control" required>
+                <option value="">Selecione a filial de destino</option>
+                <option th:each="filial : ${filiais}"
+                        th:value="${filial.idFilial}"
+                        th:text="${filial.nome}">
+                </option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Transferir Veículo</button>
+    </form>
+    <p>
+        <small><strong>Nota:</strong> A lista de veículos inclui a filial atual do veículo. Certifique-se de selecionar a filial de origem correta que corresponde ao veículo.</small>
+    </p>
+</div>
