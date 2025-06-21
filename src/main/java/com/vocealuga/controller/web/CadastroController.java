@@ -15,6 +15,7 @@ public class CadastroController {
     @Autowired
     private ClienteService clienteService;
 
+    // Mantido @Autowired para métodos de validação que podem não ser estáticos puros
     @Autowired
     private ValidationsUtils validation;
 
@@ -27,7 +28,8 @@ public class CadastroController {
     @PostMapping("/cadastro")
     public String processCadastro(@ModelAttribute Cliente cliente, Model model, RedirectAttributes redirectAttributes) {
         try {
-            if (!validation.isValidCPF(cliente.getCpf())) {
+            // Correção: Acessando isValidCPF de forma estática
+            if (!ValidationsUtils.isValidCPF(cliente.getCpf())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido!");
                 return "redirect:/cadastro";
             }
@@ -37,10 +39,11 @@ public class CadastroController {
                 return "redirect:/cadastro";
             }
 
-            if (!validation.isValidCNH(cliente.getCnh())) {
+            // Correção: Acessando isValidCNH de forma estática
+            if (!ValidationsUtils.isValidCNH(cliente.getCnh())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "CNH inválida!");
                 return "redirect:/cadastro";
-            } 
+            }
 
             if (!validation.isMaiorDeIdade(cliente.getDataNascimento())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "É necessário ter pelo menos 18 anos.");
@@ -49,7 +52,7 @@ public class CadastroController {
 
             clienteService.createCliente(cliente);
             redirectAttributes.addFlashAttribute("successMessage", "Cliente cadastrado com sucesso!");
-            
+
             return "redirect:/login";
 
         } catch (Exception e) {
