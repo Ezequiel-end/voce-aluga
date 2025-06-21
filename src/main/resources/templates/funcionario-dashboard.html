@@ -26,7 +26,16 @@
                     while (fragmentContainer.firstChild) {
                         fragmentContainer.removeChild(fragmentContainer.firstChild);
                     }
-                    fetch(`/fragments/${activeForm}_form.html`)
+                    
+                    let fragmentPath = `/fragments/${activeForm}_form.html`;
+                    if (activeForm === 'home') {
+                         fragmentPath = `/fragments/welcome_message.html`; // ou o fragmento inicial
+                    } else if (activeForm === 'alterar_reserva_detalhes') {
+                        fragmentPath = `/fragments/alterar_reserva_form.html`;
+                    }
+
+
+                    fetch(fragmentPath)
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error('Fragment not found');
@@ -60,14 +69,20 @@
                             <li><a href="/funcionario/estoque/adicionar-veiculo">Adicionar Veículo</a></li>
                             <li><a href="/funcionario/estoque/remover-veiculo">Remover Veículo</a></li>
                             <li><a href="/funcionario/estoque/verificar-disponibilidade">Verificar Disponibilidade</a></li>
-                        </ul>
+                            <li><a href="/funcionario/estoque/transferir-veiculo">Transferir Veículo</a></li> </ul>
                     </li>
                     <li class="menu-item has-submenu">
                         <a href="#">Gerenciar Reservas <span class="arrow">▼</span></a>
                         <ul class="submenu">
                             <li><a href="/funcionario/reservas/criar-reserva">Criar Reserva</a></li>
-                            <li><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
+                            <li><a href="/funcionario/reservas/alterar">Alterar Reserva</a></li> <li><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
                             <li><a href="/funcionario/reservas/consultar-reservas">Consultar Reservas</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item has-submenu"> <a href="#">Gerenciar Manutenção <span class="arrow">▼</span></a>
+                        <ul class="submenu">
+                            <li><a href="/funcionario/manutencao/cadastrar">Cadastrar Manutenção</a></li>
+                            <li><a href="/funcionario/manutencao/gerenciar">Gerenciar Manutenções</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -77,12 +92,18 @@
         <main class="main-content">
             <header>
                 <h1 th:text="${activeContent == 'register_funcionario' ? 'Cadastrar Funcionário' :
-                              (activeContent == 'add_veiculo' ? 'Adicionar Veículo' :
-                              (activeContent == 'remove_veiculo' ? 'Remover Veículo' :
-                              (activeContent == 'check_availability' ? 'Verificar Disponibilidade' :
-                              (activeContent == 'create_reserva' ? 'Criar Reserva' :
-                              (activeContent == 'cancel_reserva' ? 'Cancelar Reserva' :
-                              (activeContent == 'consult_reservas' ? 'Consultar Reservas' : 'Bem-vindo!'))))))}">Bem-vindo!</h1>
+                               (activeContent == 'add_veiculo' ? 'Adicionar Veículo' :
+                               (activeContent == 'remove_veiculo' ? 'Remover Veículo' :
+                               (activeContent == 'check_availability' ? 'Verificar Disponibilidade' :
+                               (activeContent == 'transferir_veiculo' ? 'Transferir Veículo' : /* Novo */
+                               (activeContent == 'create_reserva' ? 'Criar Reserva' :
+                               (activeContent == 'alterar_reserva' ? 'Alterar Reserva' : /* Novo */
+                               (activeContent == 'alterar_reserva_detalhes' ? 'Alterar Reserva' : /* Novo */
+                               (activeContent == 'cancel_reserva' ? 'Cancelar Reserva' :
+                               (activeContent == 'consult_reservas' ? 'Consultar Reservas' :
+                               (activeContent == 'cadastrar_manutencao' ? 'Cadastrar Manutenção' : /* Novo */
+                               (activeContent == 'gerenciar_manutencao' ? 'Gerenciar Manutenções' : /* Novo */
+                               'Bem-vindo!'))))))))))))}">Bem-vindo!</h1>
             </header>
 
             <div class="messages">
@@ -103,14 +124,25 @@
                 <div th:if="${activeContent == 'check_availability'}"
                     th:insert="~{fragments/check_availability_form :: checkAvailabilityForm}"></div>
 
+                <div th:if="${activeContent == 'transferir_veiculo'}" th:insert="~{fragments/transferir_veiculo_form :: transferirVeiculoForm}"></div>
+
                 <div th:if="${activeContent == 'create_reserva'}"
                     th:insert="~{fragments/create_reserva_form :: createReservaForm}"></div>
+
+                <div th:if="${activeContent == 'alterar_reserva'}" th:insert="~{fragments/alterar_reserva_form :: alterarReservaForm}"></div>
+
+                <div th:if="${activeContent == 'alterar_reserva_detalhes'}" th:insert="~{fragments/alterar_reserva_form :: alterarReservaForm}"></div>
 
                 <div th:if="${activeContent == 'cancel_reserva'}"
                     th:insert="~{fragments/cancel_reserva_form :: cancelReservaForm}"></div>
 
                 <div th:if="${activeContent == 'consult_reservas'}"
                     th:insert="~{fragments/consult_reservas_form :: consultReservasForm}"></div>
+
+                <div th:if="${activeContent == 'cadastrar_manutencao'}" th:insert="~{fragments/cadastrar_manutencao_form :: cadastrarManutencaoForm}"></div>
+
+                <div th:if="${activeContent == 'gerenciar_manutencao'}" th:insert="~{fragments/gerenciar_manutencao_form :: gerenciarManutencaoForm}"></div>
+
             </section>
         </main>
     </div>
