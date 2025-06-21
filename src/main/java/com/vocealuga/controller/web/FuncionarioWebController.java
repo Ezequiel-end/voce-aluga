@@ -2,7 +2,7 @@ package com.vocealuga.controller.web;
 
 import com.vocealuga.model.*;
 import com.vocealuga.service.*;
-import com.vocealuga.utils.ValidationsUtils;
+import com.vocealuga.utils.ValidationsUtils; // Mantido para isEmailGloballyUnique
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional; // Import para Optional
-import java.time.LocalDate; // Import para LocalDate, se usado em formulários de data
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/funcionario")
@@ -25,8 +24,8 @@ public class FuncionarioWebController {
     private final ClienteService clienteService;
     private final FilialService filialService;
     private final GrupoVeiculoService grupoVeiculoService;
-    private final ManutencaoService manutencaoService; // Adicionado ManutencaoService
-    private final ValidationsUtils validations;
+    private final ManutencaoService manutencaoService;
+    private final ValidationsUtils validations; 
 
     @Autowired
     public FuncionarioWebController(FuncionarioService funcionarioService,
@@ -35,8 +34,8 @@ public class FuncionarioWebController {
                                     ReservaService reservaService,
                                     ClienteService clienteService,
                                     FilialService filialService,
-                                    GrupoVeiculoService grupoVeiculoService, // Nome da variável ajustado
-                                    ManutencaoService manutencaoService, // Injetado ManutencaoService
+                                    GrupoVeiculoService grupoVeiculoService,
+                                    ManutencaoService manutencaoService,
                                     ValidationsUtils validations) {
         this.funcionarioService = funcionarioService;
         this.veiculoService = veiculoService;
@@ -45,7 +44,7 @@ public class FuncionarioWebController {
         this.clienteService = clienteService;
         this.filialService = filialService;
         this.grupoVeiculoService = grupoVeiculoService;
-        this.manutencaoService = manutencaoService; // Atribuído ManutencaoService
+        this.manutencaoService = manutencaoService;
         this.validations = validations;
     }
 
@@ -69,11 +68,13 @@ public class FuncionarioWebController {
     @PostMapping("/cadastrar-funcionario")
     public String registerFuncionario(@ModelAttribute Funcionario funcionario, RedirectAttributes redirectAttributes) {
         try {
-            if (!validations.isValidCPF(funcionario.getCpf())) {
+            // Correção: Acessando isValidCPF de forma estática
+            if (!ValidationsUtils.isValidCPF(funcionario.getCpf())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido!");
                 return "redirect:/funcionario/cadastrar-funcionario";
             }
 
+            
             if (!validations.isEmailGloballyUnique(funcionario.getEmail())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "E-mail já cadastrado!");
                 return "redirect:/funcionario/cadastrar-funcionario";
@@ -337,7 +338,6 @@ public class FuncionarioWebController {
             return "redirect:/funcionario/reservas/alterar";
         }
     }
-
 
     // Lógica para processar a Alteração da Reserva
     @PostMapping("/reservas/alterar/{id}")
