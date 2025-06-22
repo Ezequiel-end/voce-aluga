@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.13-SNAPSHOT'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.vocealuga'
@@ -34,12 +35,22 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.mockito:mockito-inline:5.2.0'
 
 	// reload do html
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
+jacocoTestReport {
+    reports {
+        xml.destination file("${buildDir}/reports/jacoco/test/xml")
+        xml.required = true
+        html.destination file("${buildDir}/reports/jacoco/test/html")
+        html.required = true
+    }
+}
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
 }
