@@ -75,32 +75,39 @@ class FuncionarioServiceTest {
 
     @Test
     void testCreateFuncionario_Sucesso() {
-        when(ValidationsUtils.isValidCPF("12345678901")).thenReturn(true);
-        when(validations.isEmailGloballyUnique("joao@email.com")).thenReturn(true);
-        when(funcionarioRepository.save(funcionario)).thenReturn(funcionario);
+        try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
+            mockedStatic.when(() -> ValidationsUtils.isValidCPF("12345678901")).thenReturn(true);
+            when(validations.isEmailGloballyUnique("joao@email.com")).thenReturn(true);
+            when(funcionarioRepository.save(funcionario)).thenReturn(funcionario);
 
-        Funcionario resultado = funcionarioService.createFuncionario(funcionario);
+            Funcionario resultado = funcionarioService.createFuncionario(funcionario);
 
-        assertNotNull(resultado);
-        assertEquals("João Silva", resultado.getNome());
-        verify(funcionarioRepository, times(1)).save(funcionario);
+            assertNotNull(resultado);
+            assertEquals("João Silva", resultado.getNome());
+            verify(funcionarioRepository, times(1)).save(funcionario);
+        }
     }
 
     @Test
     void testCreateFuncionario_CpfInvalido() {
-        when(ValidationsUtils.isValidCPF("123")).thenReturn(false);
+        try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
+            mockedStatic.when(() -> ValidationsUtils.isValidCPF("123")).thenReturn(false);
+            when(validations.isEmailGloballyUnique("joao@email.com")).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> funcionarioService.createFuncionario(funcionario),
-                "CPF inválido!");
+            assertThrows(IllegalArgumentException.class, () -> funcionarioService.createFuncionario(funcionario),
+                    "CPF inválido!");
+        }
     }
 
     @Test
     void testCreateFuncionario_EmailJaCadastrado() {
-        when(ValidationsUtils.isValidCPF("12345678901")).thenReturn(true);
-        when(validations.isEmailGloballyUnique("joao@email.com")).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> funcionarioService.createFuncionario(funcionario),
-                "E-mail já cadastrado!");
+        try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
+            mockedStatic.when(() -> ValidationsUtils.isValidCPF("12345678901")).thenReturn(true);
+            when(validations.isEmailGloballyUnique("joao@email.com")).thenReturn(false);
+            
+            assertThrows(IllegalArgumentException.class, () -> funcionarioService.createFuncionario(funcionario),
+                    "E-mail já cadastrado!");
+        }
     }
 
     @Test
@@ -157,7 +164,7 @@ class FuncionarioServiceTest {
         when(funcionarioRepository.findByEmailAndSenha("joao@email.com", "senhaerrada")).thenReturn(Optional.empty());
 
         Optional<Funcionario> resultado = funcionarioService.login("joao@email.com", "senhaerrada");
-        
+
         assertFalse(resultado.isPresent());
         verify(funcionarioRepository, times(1)).findByEmailAndSenha("joao@email.com", "senhaerrada");
     }
