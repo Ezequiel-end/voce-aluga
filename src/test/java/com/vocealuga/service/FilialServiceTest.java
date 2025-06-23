@@ -39,7 +39,9 @@ class FilialServiceTest {
     void testGetAllFiliais_Sucesso() {
         List<Filial> filiais = Arrays.asList(filial, new Filial());
         when(filialRepository.findAll()).thenReturn(filiais);
+
         List<Filial> resultado = filialService.getAllFiliais();
+
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         verify(filialRepository, times(1)).findAll();
@@ -48,7 +50,9 @@ class FilialServiceTest {
     @Test
     void testGetFilialById_Sucesso() {
         when(filialRepository.findById(1)).thenReturn(Optional.of(filial));
+
         Optional<Filial> resultado = filialService.getFilialById(1);
+
         assertTrue(resultado.isPresent());
         assertEquals("Filial Teste", resultado.get().getNome());
         verify(filialRepository, times(1)).findById(1);
@@ -57,7 +61,9 @@ class FilialServiceTest {
     @Test
     void testGetFilialById_NaoEncontrado() {
         when(filialRepository.findById(1)).thenReturn(Optional.empty());
+
         Optional<Filial> resultado = filialService.getFilialById(1);
+
         assertFalse(resultado.isPresent());
         verify(filialRepository, times(1)).findById(1);
     }
@@ -65,7 +71,9 @@ class FilialServiceTest {
     @Test
     void testCreateFilial_Sucesso() {
         when(filialRepository.save(filial)).thenReturn(filial);
+
         Filial resultado = filialService.createFilial(filial);
+
         assertNotNull(resultado);
         assertEquals("Filial Teste", resultado.getNome());
         verify(filialRepository, times(1)).save(filial);
@@ -81,6 +89,7 @@ class FilialServiceTest {
         when(filialRepository.save(filial)).thenReturn(filial);
 
         Filial resultado = filialService.updateFilial(1, novaFilial);
+
         assertNotNull(resultado);
         assertEquals("Nova Filial", resultado.getNome());
         verify(filialRepository, times(1)).findById(1);
@@ -90,7 +99,9 @@ class FilialServiceTest {
     @Test
     void testUpdateFilial_NaoEncontrado() {
         when(filialRepository.findById(1)).thenReturn(Optional.empty());
+
         Filial novaFilial = new Filial();
+
         assertThrows(RuntimeException.class, () -> filialService.updateFilial(1, novaFilial),
                 "Filial not found with id 1");
         verify(filialRepository, times(1)).findById(1);
@@ -100,6 +111,7 @@ class FilialServiceTest {
     @Test
     void testDeleteFilial_Sucesso() {
         doNothing().when(filialRepository).deleteById(1);
+        
         filialService.deleteFilial(1);
         verify(filialRepository, times(1)).deleteById(1);
     }

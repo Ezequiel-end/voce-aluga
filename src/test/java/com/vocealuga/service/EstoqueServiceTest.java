@@ -51,19 +51,23 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testGetAllEstoques() {
+    void testGetAllEstoques_Sucesso() {
         List<Estoque> estoques = Arrays.asList(estoque, new Estoque());
         when(estoqueRepository.findAll()).thenReturn(estoques);
+
         List<Estoque> resultado = estoqueService.getAllEstoques();
+
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         verify(estoqueRepository, times(1)).findAll();
     }
 
     @Test
-    void testGetEstoqueById() {
+    void testGetEstoqueById_Sucesso() {
         when(estoqueRepository.findById(1)).thenReturn(Optional.of(estoque));
+
         Optional<Estoque> resultado = estoqueService.getEstoqueById(1);
+
         assertTrue(resultado.isPresent());
         assertEquals(1, resultado.get().getIdEstoque());
         verify(estoqueRepository, times(1)).findById(1);
@@ -72,7 +76,9 @@ class EstoqueServiceTest {
     @Test
     void testGetEstoqueById_NaoEncontrado() {
         when(estoqueRepository.findById(1)).thenReturn(Optional.empty());
+
         Optional<Estoque> resultado = estoqueService.getEstoqueById(1);
+
         assertFalse(resultado.isPresent());
         verify(estoqueRepository, times(1)).findById(1);
     }
@@ -80,7 +86,9 @@ class EstoqueServiceTest {
     @Test
     void testCreateEstoque() {
         when(estoqueRepository.save(estoque)).thenReturn(estoque);
+
         Estoque resultado = estoqueService.createEstoque(estoque);
+
         assertNotNull(resultado);
         assertEquals(1, resultado.getIdEstoque());
         verify(estoqueRepository, times(1)).save(estoque);
@@ -99,6 +107,7 @@ class EstoqueServiceTest {
         when(estoqueRepository.save(estoque)).thenReturn(estoque);
 
         Estoque resultado = estoqueService.updateEstoque(1, novoEstoque);
+
         assertNotNull(resultado);
         assertEquals(2, resultado.getFilial().getIdFilial());
         verify(estoqueRepository, times(1)).findById(1);
@@ -108,7 +117,9 @@ class EstoqueServiceTest {
     @Test
     void testUpdateEstoque_NaoEncontrado() {
         when(estoqueRepository.findById(1)).thenReturn(Optional.empty());
+
         Estoque novoEstoque = new Estoque();
+
         assertThrows(RuntimeException.class, () -> estoqueService.updateEstoque(1, novoEstoque),
                 "Estoque not found with id 1");
         verify(estoqueRepository, times(1)).findById(1);
@@ -118,6 +129,7 @@ class EstoqueServiceTest {
     @Test
     void testDeleteEstoque() {
         doNothing().when(estoqueRepository).deleteById(1);
+
         estoqueService.deleteEstoque(1);
         verify(estoqueRepository, times(1)).deleteById(1);
     }
@@ -134,6 +146,7 @@ class EstoqueServiceTest {
         when(estoqueRepository.save(estoque)).thenReturn(estoque);
 
         Estoque resultado = estoqueService.transferirVeiculoParaFilial(1, 1, 2);
+        
         assertNotNull(resultado);
         assertEquals(2, resultado.getFilial().getIdFilial());
         verify(veiculoRepository, times(1)).findById(1);

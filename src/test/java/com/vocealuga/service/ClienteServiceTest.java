@@ -45,7 +45,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testGetAllCliente() {
+    void testGetAllCliente_Sucesso() {
         // Arrange
         List<Cliente> clientes = Arrays.asList(cliente, new Cliente());
         when(clienteRepository.findAll()).thenReturn(clientes);
@@ -61,7 +61,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testGetClienteById() {
+    void testGetClienteById_Sucesso() {
         // Arrange
         when(clienteRepository.findById(1)).thenReturn(Optional.of(cliente));
 
@@ -88,7 +88,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testCreateCliente() {
+    void testCreateCliente_Sucesso() {
         // Arrange
         try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
             mockedStatic.when(() -> ValidationsUtils.isValidCPF(cliente.getCpf())).thenReturn(true);
@@ -156,7 +156,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testUpdateCliente() {
+    void testUpdateCliente_Sucesso() {
         // Arrange
         Cliente clienteAtualizado = new Cliente();
         clienteAtualizado.setNome("Maria Oliveira");
@@ -195,7 +195,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testDeleteCliente() {
+    void testDeleteCliente_Sucesso() {
         // Arrange
         doNothing().when(clienteRepository).deleteById(1);
 

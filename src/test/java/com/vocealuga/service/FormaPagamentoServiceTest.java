@@ -37,7 +37,9 @@ class FormaPagamentoServiceTest {
     void testGetAllFormasPagamento_Sucesso() {
         List<FormaPagamento> formasPagamento = Arrays.asList(formaPagamento, new FormaPagamento());
         when(formaPagamentoRepository.findAll()).thenReturn(formasPagamento);
+
         List<FormaPagamento> resultado = formaPagamentoService.getAllFormasPagamento();
+
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         verify(formaPagamentoRepository, times(1)).findAll();
@@ -46,7 +48,9 @@ class FormaPagamentoServiceTest {
     @Test
     void testGetFormaPagamentoById_Sucesso() {
         when(formaPagamentoRepository.findById(1)).thenReturn(Optional.of(formaPagamento));
+
         Optional<FormaPagamento> resultado = formaPagamentoService.getFormaPagamentoById(1);
+
         assertTrue(resultado.isPresent());
         assertEquals("Cartão de Crédito", resultado.get().getFormaPagamento());
         verify(formaPagamentoRepository, times(1)).findById(1);
@@ -55,7 +59,9 @@ class FormaPagamentoServiceTest {
     @Test
     void testGetFormaPagamentoById_NaoEncontrado() {
         when(formaPagamentoRepository.findById(1)).thenReturn(Optional.empty());
+
         Optional<FormaPagamento> resultado = formaPagamentoService.getFormaPagamentoById(1);
+
         assertFalse(resultado.isPresent());
         verify(formaPagamentoRepository, times(1)).findById(1);
     }
@@ -63,7 +69,9 @@ class FormaPagamentoServiceTest {
     @Test
     void testCreateFormaPagamento_Sucesso() {
         when(formaPagamentoRepository.save(formaPagamento)).thenReturn(formaPagamento);
+
         FormaPagamento resultado = formaPagamentoService.createFormaPagamento(formaPagamento);
+
         assertNotNull(resultado);
         assertEquals("Cartão de Crédito", resultado.getFormaPagamento());
         verify(formaPagamentoRepository, times(1)).save(formaPagamento);
@@ -77,6 +85,7 @@ class FormaPagamentoServiceTest {
         when(formaPagamentoRepository.save(formaPagamento)).thenReturn(formaPagamento);
 
         FormaPagamento resultado = formaPagamentoService.updateFormaPagamento(1, novaForma);
+
         assertNotNull(resultado);
         assertEquals("Pix", resultado.getFormaPagamento());
         verify(formaPagamentoRepository, times(1)).findById(1);
@@ -86,7 +95,9 @@ class FormaPagamentoServiceTest {
     @Test
     void testUpdateFormaPagamento_NaoEncontrado() {
         when(formaPagamentoRepository.findById(1)).thenReturn(Optional.empty());
+
         FormaPagamento novaForma = new FormaPagamento();
+
         assertThrows(RuntimeException.class, () -> formaPagamentoService.updateFormaPagamento(1, novaForma),
                 "FormaPagamento not found with id 1");
         verify(formaPagamentoRepository, times(1)).findById(1);
@@ -96,6 +107,7 @@ class FormaPagamentoServiceTest {
     @Test
     void testDeleteFormaPagamento_Sucesso() {
         doNothing().when(formaPagamentoRepository).deleteById(1);
+        
         formaPagamentoService.deleteFormaPagamento(1);
         verify(formaPagamentoRepository, times(1)).deleteById(1);
     }
