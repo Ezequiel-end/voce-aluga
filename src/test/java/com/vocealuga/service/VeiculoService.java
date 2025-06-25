@@ -43,7 +43,7 @@ class VeiculoServiceTest {
     }
 
     @Test
-    void testGetAllVeiculos_Sucesso() {
+    void obterTodosVeiculosDeveRetornarListaQuandoEncontrados() {
         List<Veiculo> veiculos = Arrays.asList(veiculo, new Veiculo());
         when(veiculoRepository.findAll()).thenReturn(veiculos);
 
@@ -55,7 +55,7 @@ class VeiculoServiceTest {
     }
 
     @Test
-    void testGetVeiculoById_Sucesso() {
+    void obterVeiculoPorIdDeveRetornarVeiculoQuandoEncontrado() {
         when(veiculoRepository.findById(1)).thenReturn(Optional.of(veiculo));
 
         Optional<Veiculo> resultado = veiculoService.getVeiculoById(1);
@@ -66,7 +66,7 @@ class VeiculoServiceTest {
     }
 
     @Test
-    void testGetVeiculoById_NaoEncontrado() {
+    void obterVeiculoPorIdDeveRetornarVazioQuandoNaoEncontrado() {
         when(veiculoRepository.findById(1)).thenReturn(Optional.empty());
 
         Optional<Veiculo> resultado = veiculoService.getVeiculoById(1);
@@ -76,7 +76,7 @@ class VeiculoServiceTest {
     }
 
     @Test
-    void testCreateVeiculo_Sucesso() {
+    void criarVeiculoDeveRetornarVeiculoQuandoDadosValidos() {
         when(veiculoRepository.save(veiculo)).thenReturn(veiculo);
 
         Veiculo resultado = veiculoService.createVeiculo(veiculo);
@@ -87,7 +87,7 @@ class VeiculoServiceTest {
     }
 
     @Test
-    void testUpdateVeiculo_Sucesso() {
+    void atualizarVeiculoDeveRetornarVeiculoAtualizadoQuandoEncontrado() {
         GrupoVeiculo novoGrupoVeiculo = new GrupoVeiculo();
         novoGrupoVeiculo.setIdGrupoVeiculo(2);
         novoGrupoVeiculo.setGrupo("Sedan");
@@ -109,7 +109,7 @@ class VeiculoServiceTest {
     }
 
     @Test
-    void testUpdateVeiculo_NaoEncontrado() {
+    void atualizarVeiculoDeveLancarExcecaoQuandoNaoEncontrado() {
         when(veiculoRepository.findById(1)).thenReturn(Optional.empty());
 
         Veiculo novoVeiculo = new Veiculo();
@@ -121,7 +121,7 @@ class VeiculoServiceTest {
     }
 
     @Test
-    void testDeleteVeiculo_Sucesso() {
+    void excluirVeiculoDeveExecutarSucessoQuandoEncontrado() {
         doNothing().when(veiculoRepository).deleteById(1);
 
         veiculoService.deleteVeiculo(1);

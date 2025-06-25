@@ -41,7 +41,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testGetAllFuncionarios_Sucesso() {
+    void obterTodosFuncionariosDeveRetornarListaQuandoExistirem() {
         List<Funcionario> funcionarios = Arrays.asList(funcionario, new Funcionario());
         when(funcionarioRepository.findAll()).thenReturn(funcionarios);
 
@@ -53,7 +53,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testGetFuncionarioById_Sucesso() {
+    void obterFuncionarioPorIdDeveRetornarFuncionarioQuandoEncontrado() {
         when(funcionarioRepository.findById(1)).thenReturn(Optional.of(funcionario));
 
         Optional<Funcionario> resultado = funcionarioService.getFuncionarioById(1);
@@ -64,7 +64,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testGetFuncionarioById_NaoEncontrado() {
+    void obterFuncionarioPorIdDeveRetornarVazioQuandoNaoEncontrado() {
         when(funcionarioRepository.findById(1)).thenReturn(Optional.empty());
 
         Optional<Funcionario> resultado = funcionarioService.getFuncionarioById(1);
@@ -74,7 +74,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testCreateFuncionario_Sucesso() {
+    void criarFuncionarioDeveRetornarFuncionarioQuandoDadosValidos() {
         try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
             mockedStatic.when(() -> ValidationsUtils.isValidCPF("12345678901")).thenReturn(true);
             when(validations.isEmailGloballyUnique("joao@email.com")).thenReturn(true);
@@ -89,7 +89,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testCreateFuncionario_CpfInvalido() {
+    void criarFuncionarioDeveLancarExcecaoQuandoCpfInvalido() {
         try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
             mockedStatic.when(() -> ValidationsUtils.isValidCPF("123")).thenReturn(false);
             when(validations.isEmailGloballyUnique("joao@email.com")).thenReturn(true);
@@ -100,7 +100,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testCreateFuncionario_EmailJaCadastrado() {
+    void criarFuncionarioDeveLancarExcecaoQuandoEmailJaCadastrado() {
         try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
             mockedStatic.when(() -> ValidationsUtils.isValidCPF("12345678901")).thenReturn(true);
             when(validations.isEmailGloballyUnique("joao@email.com")).thenReturn(false);
@@ -111,7 +111,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testUpdateFuncionario_Sucesso() {
+    void atualizarFuncionarioDeveRetornarFuncionarioAtualizadoQuandoEncontrado() {
         Funcionario novoFuncionario = new Funcionario();
         novoFuncionario.setNome("Maria Oliveira");
         novoFuncionario.setCpf("98765432100");
@@ -129,7 +129,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testUpdateFuncionario_NaoEncontrado() {
+    void atualizarFuncionarioDeveLancarExcecaoQuandoNaoEncontrado() {
         when(funcionarioRepository.findById(1)).thenReturn(Optional.empty());
 
         Funcionario novoFuncionario = new Funcionario();
@@ -141,7 +141,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testDeleteFuncionario_Sucesso() {
+    void excluirFuncionarioDeveExecutarSucessoQuandoEncontrado() {
         doNothing().when(funcionarioRepository).deleteById(1);
 
         funcionarioService.deleteFuncionario(1);
@@ -149,7 +149,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testLogin_Sucesso() {
+    void fazerLoginDeveRetornarFuncionarioQuandoCredenciaisValidas() {
         when(funcionarioRepository.findByEmailAndSenha("joao@email.com", "senha123")).thenReturn(Optional.of(funcionario));
 
         Optional<Funcionario> resultado = funcionarioService.login("joao@email.com", "senha123");
@@ -160,7 +160,7 @@ class FuncionarioServiceTest {
     }
 
     @Test
-    void testLogin_Falha() {
+    void fazerLoginDeveRetornarVazioQuandoCredenciaisInvalidas() {
         when(funcionarioRepository.findByEmailAndSenha("joao@email.com", "senhaerrada")).thenReturn(Optional.empty());
 
         Optional<Funcionario> resultado = funcionarioService.login("joao@email.com", "senhaerrada");

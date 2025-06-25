@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class PagamentoServiceTest {
@@ -46,7 +47,7 @@ class PagamentoServiceTest {
     }
 
     @Test
-    void testGetAllPagamentos_Sucesso() {
+    void obterTodosPagamentosDeveRetornarListaQuandoExistirem() {
         List<Pagamento> pagamentos = Arrays.asList(pagamento, new Pagamento());
         when(pagamentoRepository.findAll()).thenReturn(pagamentos);
         List<Pagamento> resultado = pagamentoService.getAllPagamentos();
@@ -56,7 +57,7 @@ class PagamentoServiceTest {
     }
 
     @Test
-    void testGetPagamentoById_Sucesso() {
+    void obterPagamentoPorIdDeveRetornarPagamentoQuandoEncontrado() {
         when(pagamentoRepository.findById(1)).thenReturn(Optional.of(pagamento));
         Optional<Pagamento> resultado = pagamentoService.getPagamentoById(1);
         assertTrue(resultado.isPresent());
@@ -65,7 +66,7 @@ class PagamentoServiceTest {
     }
 
     @Test
-    void testGetPagamentoById_NaoEncontrado() {
+    void obterPagamentoPorIdDeveRetornarVazioQuandoNaoEncontrado() {
         when(pagamentoRepository.findById(1)).thenReturn(Optional.empty());
         Optional<Pagamento> resultado = pagamentoService.getPagamentoById(1);
         assertFalse(resultado.isPresent());
@@ -73,7 +74,7 @@ class PagamentoServiceTest {
     }
 
     @Test
-    void testCreatePagamento_Sucesso() {
+    void criarPagamentoDeveRetornarPagamentoQuandoDadosValidos() {
         when(pagamentoRepository.save(pagamento)).thenReturn(pagamento);
         Pagamento resultado = pagamentoService.createPagamento(pagamento);
         assertNotNull(resultado);
@@ -82,7 +83,7 @@ class PagamentoServiceTest {
     }
 
     @Test
-    void testUpdatePagamento_Sucesso() {
+    void atualizarPagamentoDeveRetornarPagamentoAtualizadoQuandoEncontrado() {
         FormaPagamento novaForma = new FormaPagamento();
         novaForma.setIdFormaPagamento(2);
         novaForma.setFormaPagamento("Pix");
@@ -103,7 +104,7 @@ class PagamentoServiceTest {
     }
 
     @Test
-    void testUpdatePagamento_NaoEncontrado() {
+    void atualizarPagamentoDeveLancarExcecaoQuandoNaoEncontrado() {
         when(pagamentoRepository.findById(1)).thenReturn(Optional.empty());
         Pagamento novoPagamento = new Pagamento();
         assertThrows(RuntimeException.class, () -> pagamentoService.updatePagamento(1, novoPagamento),
@@ -113,7 +114,7 @@ class PagamentoServiceTest {
     }
 
     @Test
-    void testDeletePagamento_Sucesso() {
+    void excluirPagamentoDeveExecutarSucessoQuandoEncontrado() {
         doNothing().when(pagamentoRepository).deleteById(1);
         pagamentoService.deletePagamento(1);
         verify(pagamentoRepository, times(1)).deleteById(1);

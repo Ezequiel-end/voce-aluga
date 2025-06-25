@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class FormaPagamentoServiceTest {
@@ -34,7 +35,7 @@ class FormaPagamentoServiceTest {
     }
 
     @Test
-    void testGetAllFormasPagamento_Sucesso() {
+    void obterTodasFormasPagamentoDeveRetornarListaQuandoExistirem() {
         List<FormaPagamento> formasPagamento = Arrays.asList(formaPagamento, new FormaPagamento());
         when(formaPagamentoRepository.findAll()).thenReturn(formasPagamento);
 
@@ -46,7 +47,7 @@ class FormaPagamentoServiceTest {
     }
 
     @Test
-    void testGetFormaPagamentoById_Sucesso() {
+    void obterFormaPagamentoPorIdDeveRetornarFormaPagamentoQuandoEncontrado() {
         when(formaPagamentoRepository.findById(1)).thenReturn(Optional.of(formaPagamento));
 
         Optional<FormaPagamento> resultado = formaPagamentoService.getFormaPagamentoById(1);
@@ -57,7 +58,7 @@ class FormaPagamentoServiceTest {
     }
 
     @Test
-    void testGetFormaPagamentoById_NaoEncontrado() {
+    void obterFormaPagamentoPorIdDeveRetornarVazioQuandoNaoEncontrado() {
         when(formaPagamentoRepository.findById(1)).thenReturn(Optional.empty());
 
         Optional<FormaPagamento> resultado = formaPagamentoService.getFormaPagamentoById(1);
@@ -67,7 +68,7 @@ class FormaPagamentoServiceTest {
     }
 
     @Test
-    void testCreateFormaPagamento_Sucesso() {
+    void criarFormaPagamentoDeveRetornarFormaPagamentoQuandoDadosValidos() {
         when(formaPagamentoRepository.save(formaPagamento)).thenReturn(formaPagamento);
 
         FormaPagamento resultado = formaPagamentoService.createFormaPagamento(formaPagamento);
@@ -78,7 +79,7 @@ class FormaPagamentoServiceTest {
     }
 
     @Test
-    void testUpdateFormaPagamento_Sucesso() {
+    void atualizarFormaPagamentoDeveRetornarFormaPagamentoAtualizadaQuandoEncontrado() {
         FormaPagamento novaForma = new FormaPagamento();
         novaForma.setFormaPagamento("Pix");
         when(formaPagamentoRepository.findById(1)).thenReturn(Optional.of(formaPagamento));
@@ -93,7 +94,7 @@ class FormaPagamentoServiceTest {
     }
 
     @Test
-    void testUpdateFormaPagamento_NaoEncontrado() {
+    void atualizarFormaPagamentoDeveLancarExcecaoQuandoNaoEncontrado() {
         when(formaPagamentoRepository.findById(1)).thenReturn(Optional.empty());
 
         FormaPagamento novaForma = new FormaPagamento();
@@ -105,7 +106,7 @@ class FormaPagamentoServiceTest {
     }
 
     @Test
-    void testDeleteFormaPagamento_Sucesso() {
+    void excluirFormaPagamentoDeveExecutarSucessoQuandoEncontrado() {
         doNothing().when(formaPagamentoRepository).deleteById(1);
         
         formaPagamentoService.deleteFormaPagamento(1);

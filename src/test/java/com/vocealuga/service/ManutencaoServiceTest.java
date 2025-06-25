@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class ManutencaoServiceTest {
@@ -48,7 +49,7 @@ class ManutencaoServiceTest {
     }
 
     @Test
-    void testGetAllManutencoes_Sucesso() {
+    void obterTodasManutencoesDeveRetornarListaQuandoExistirem() {
         List<Manutencao> manutencoes = Arrays.asList(manutencao, new Manutencao());
         when(manutencaoRepository.findAll()).thenReturn(manutencoes);
 
@@ -60,7 +61,7 @@ class ManutencaoServiceTest {
     }
 
     @Test
-    void testGetManutencaoById_Sucesso() {
+    void obterManutencaoPorIdDeveRetornarManutencaoQuandoEncontrado() {
         when(manutencaoRepository.findById(1)).thenReturn(Optional.of(manutencao));
 
         Optional<Manutencao> resultado = manutencaoService.getManutencaoById(1);
@@ -71,7 +72,7 @@ class ManutencaoServiceTest {
     }
 
     @Test
-    void testGetManutencaoById_NaoEncontrado() {
+    void obterManutencaoPorIdDeveRetornarVazioQuandoNaoEncontrado() {
         when(manutencaoRepository.findById(1)).thenReturn(Optional.empty());
 
         Optional<Manutencao> resultado = manutencaoService.getManutencaoById(1);
@@ -81,7 +82,7 @@ class ManutencaoServiceTest {
     }
 
     @Test
-    void testCreateManutencao_Sucesso() {
+    void criarManutencaoDeveRetornarManutencaoQuandoDadosValidos() {
         when(manutencaoRepository.save(manutencao)).thenReturn(manutencao);
 
         Manutencao resultado = manutencaoService.createManutencao(manutencao);
@@ -92,7 +93,7 @@ class ManutencaoServiceTest {
     }
 
     @Test
-    void testUpdateManutencao_Sucesso() {
+    void atualizarManutencaoDeveRetornarManutencaoAtualizadaQuandoEncontrado() {
         Manutencao novaManutencao = new Manutencao();
         Funcionario novoFuncionario = new Funcionario();
         novoFuncionario.setIdFuncionario(2);
@@ -115,7 +116,7 @@ class ManutencaoServiceTest {
     }
 
     @Test
-    void testUpdateManutencao_NaoEncontrado() {
+    void atualizarManutencaoDeveLancarExcecaoQuandoNaoEncontrado() {
         when(manutencaoRepository.findById(1)).thenReturn(Optional.empty());
 
         Manutencao novaManutencao = new Manutencao();
@@ -127,7 +128,7 @@ class ManutencaoServiceTest {
     }
 
     @Test
-    void testDeleteManutencao_Sucesso() {
+    void excluirManutencaoDeveExecutarSucessoQuandoEncontrado() {
         doNothing().when(manutencaoRepository).deleteById(1);
         
         manutencaoService.deleteManutencao(1);

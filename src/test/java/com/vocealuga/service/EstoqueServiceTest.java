@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class EstoqueServiceTest {
@@ -51,7 +52,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testGetAllEstoques_Sucesso() {
+    void obterTodosEstoquesDeveRetornarListaQuandoExistirem() {
         List<Estoque> estoques = Arrays.asList(estoque, new Estoque());
         when(estoqueRepository.findAll()).thenReturn(estoques);
 
@@ -63,7 +64,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testGetEstoqueById_Sucesso() {
+    void obterEstoquePorIdDeveRetornarEstoqueQuandoEncontrado() {
         when(estoqueRepository.findById(1)).thenReturn(Optional.of(estoque));
 
         Optional<Estoque> resultado = estoqueService.getEstoqueById(1);
@@ -74,7 +75,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testGetEstoqueById_NaoEncontrado() {
+    void obterEstoquePorIdDeveRetornarVazioQuandoNaoEncontrado() {
         when(estoqueRepository.findById(1)).thenReturn(Optional.empty());
 
         Optional<Estoque> resultado = estoqueService.getEstoqueById(1);
@@ -84,7 +85,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testCreateEstoque() {
+    void criarEstoqueDeveRetornarEstoqueQuandoDadosValidos() {
         when(estoqueRepository.save(estoque)).thenReturn(estoque);
 
         Estoque resultado = estoqueService.createEstoque(estoque);
@@ -95,7 +96,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testUpdateEstoque() {
+    void atualizarEstoqueDeveRetornarEstoqueAtualizadoQuandoEncontrado() {
         Filial novaFilial = new Filial();
         novaFilial.setIdFilial(2);
         Veiculo novoVeiculo = new Veiculo();
@@ -115,7 +116,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testUpdateEstoque_NaoEncontrado() {
+    void atualizarEstoqueDeveLancarExcecaoQuandoNaoEncontrado() {
         when(estoqueRepository.findById(1)).thenReturn(Optional.empty());
 
         Estoque novoEstoque = new Estoque();
@@ -127,7 +128,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testDeleteEstoque() {
+    void excluirEstoqueDeveExecutarSucessoQuandoEncontrado() {
         doNothing().when(estoqueRepository).deleteById(1);
 
         estoqueService.deleteEstoque(1);
@@ -135,7 +136,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testTransferirVeiculoParaFilial() {
+    void transferirVeiculoParaFilialDeveRetornarEstoqueAtualizadoQuandoSucesso() {
         Filial filialDestino = new Filial();
         filialDestino.setIdFilial(2);
         Veiculo veiculoMock = new Veiculo();
@@ -156,20 +157,20 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testTransferirVeiculoParaFilial_MesmaFilial() {
+    void transferirVeiculoParaFilialDeveLancarExcecaoQuandoMesmaFilial() {
         assertThrows(RuntimeException.class, () -> estoqueService.transferirVeiculoParaFilial(1, 1, 1),
                 "A filial de origem e destino não podem ser a mesma.");
     }
 
     @Test
-    void testTransferirVeiculoParaFilial_VeiculoNaoEncontrado() {
+    void transferirVeiculoParaFilialDeveLancarExcecaoQuandoVeiculoNaoEncontrado() {
         when(veiculoRepository.findById(1)).thenReturn(Optional.empty());
         assertThrows(RuntimeException.class, () -> estoqueService.transferirVeiculoParaFilial(1, 1, 2),
                 "Veículo não encontrado com id 1");
     }
 
     @Test
-    void testTransferirVeiculoParaFilial_FilialDestinoNaoEncontrada() {
+    void transferirVeiculoParaFilialDeveLancarExcecaoQuandoFilialDestinoNaoEncontrada() {
         Veiculo veiculoMock = new Veiculo();
         veiculoMock.setIdVeiculo(1);
         when(veiculoRepository.findById(1)).thenReturn(Optional.of(veiculoMock));
@@ -179,7 +180,7 @@ class EstoqueServiceTest {
     }
 
     @Test
-    void testTransferirVeiculoParaFilial_EstoqueNaoEncontrado() {
+    void transferirVeiculoParaFilialDeveLancarExcecaoQuandoEstoqueNaoEncontrado() {
         Veiculo veiculoMock = new Veiculo();
         veiculoMock.setIdVeiculo(1);
         when(veiculoRepository.findById(1)).thenReturn(Optional.of(veiculoMock));

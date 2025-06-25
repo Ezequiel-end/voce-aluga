@@ -15,8 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.mockStatic;
 
 class ClienteServiceTest {
 
@@ -45,7 +46,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testGetAllCliente_Sucesso() {
+    void obterTodosClientesDeveRetornarListaQuandoExistirem() {
         // Arrange
         List<Cliente> clientes = Arrays.asList(cliente, new Cliente());
         when(clienteRepository.findAll()).thenReturn(clientes);
@@ -61,7 +62,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testGetClienteById_Sucesso() {
+    void obterClientePorIdDeveRetornarClienteQuandoEncontrado() {
         // Arrange
         when(clienteRepository.findById(1)).thenReturn(Optional.of(cliente));
 
@@ -75,7 +76,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testGetClienteById_NaoEncontrado() {
+    void obterClientePorIdDeveRetornarVazioQuandoNaoEncontrado() {
         // Arrange
         when(clienteRepository.findById(1)).thenReturn(Optional.empty());
 
@@ -88,7 +89,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testCreateCliente_Sucesso() {
+    void criarClienteDeveRetornarClienteQuandoDadosValidos() {
         // Arrange
         try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
             mockedStatic.when(() -> ValidationsUtils.isValidCPF(cliente.getCpf())).thenReturn(true);
@@ -109,7 +110,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testCreateCliente_CpfInvalido() {
+    void criarClienteDeveLancarExcecaoQuandoCpfInvalido() {
         // Arrange
         try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
             mockedStatic.when(() -> ValidationsUtils.isValidCPF(cliente.getCpf())).thenReturn(false);
@@ -124,7 +125,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testCreateCliente_CnhInvalida() {
+    void criarClienteDeveLancarExcecaoQuandoCnhInvalida() {
         // Arrange
         try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
             mockedStatic.when(() -> ValidationsUtils.isValidCPF(cliente.getCpf())).thenReturn(true);
@@ -140,7 +141,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testCreateCliente_EmailJaCadastrado() {
+    void criarClienteDeveLancarExcecaoQuandoEmailJaCadastrado() {
         // Arrange
         try (var mockedStatic = mockStatic(ValidationsUtils.class)) {
             mockedStatic.when(() -> ValidationsUtils.isValidCPF(cliente.getCpf())).thenReturn(true);
@@ -156,7 +157,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testUpdateCliente_Sucesso() {
+    void atualizarClienteDeveRetornarClienteAtualizadoQuandoExistir() {
         // Arrange
         Cliente clienteAtualizado = new Cliente();
         clienteAtualizado.setNome("Maria Oliveira");
@@ -181,7 +182,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testUpdateCliente_NaoEncontrado() {
+    void atualizarClienteDeveLancarExcecaoQuandoNaoEncontrado() {
         // Arrange
         Cliente clienteAtualizado = new Cliente();
         when(clienteRepository.findById(1)).thenReturn(Optional.empty());
@@ -195,7 +196,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testDeleteCliente_Sucesso() {
+    void excluirClienteDeveExecutarSucessoQuandoEncontrado() {
         // Arrange
         doNothing().when(clienteRepository).deleteById(1);
 
@@ -207,7 +208,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testLogin_Sucesso() {
+    void fazerLoginDeveRetornarClienteQuandoCredenciaisValidas() {
         // Arrange
         String email = "joao@email.com";
         String senha = "senha123";
@@ -223,7 +224,7 @@ class ClienteServiceTest {
     }
 
     @Test
-    void testLogin_Falha() {
+    void fazerLoginDeveRetornarVazioQuandoCredenciaisInvalidas() {
         // Arrange
         String email = "joao@email.com";
         String senha = "senhaErrada";

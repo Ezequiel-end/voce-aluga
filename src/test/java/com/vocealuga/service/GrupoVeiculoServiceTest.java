@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class GrupoVeiculoServiceTest {
@@ -34,7 +35,7 @@ class GrupoVeiculoServiceTest {
     }
 
     @Test
-    void testGetAllGruposVeiculo_Sucesso() {
+    void obterTodosGruposVeiculoDeveRetornarListaQuandoExistirem() {
         List<GrupoVeiculo> grupos = Arrays.asList(grupoVeiculo, new GrupoVeiculo());
         when(grupoVeiculoRepository.findAll()).thenReturn(grupos);
 
@@ -46,7 +47,7 @@ class GrupoVeiculoServiceTest {
     }
 
     @Test
-    void testGetGrupoVeiculoById_Sucesso() {
+    void obterGrupoVeiculoPorIdDeveRetornarGrupoVeiculoQuandoEncontrado() {
         when(grupoVeiculoRepository.findById(1)).thenReturn(Optional.of(grupoVeiculo));
 
         Optional<GrupoVeiculo> resultado = grupoVeiculoService.getGrupoVeiculoById(1);
@@ -57,7 +58,7 @@ class GrupoVeiculoServiceTest {
     }
 
     @Test
-    void testGetGrupoVeiculoById_NaoEncontrado() {
+    void obterGrupoVeiculoPorIdDeveRetornarVazioQuandoNaoEncontrado() {
         when(grupoVeiculoRepository.findById(1)).thenReturn(Optional.empty());
 
         Optional<GrupoVeiculo> resultado = grupoVeiculoService.getGrupoVeiculoById(1);
@@ -67,7 +68,7 @@ class GrupoVeiculoServiceTest {
     }
 
     @Test
-    void testCreateGrupoVeiculo_Sucesso() {
+    void criarGrupoVeiculoDeveRetornarGrupoVeiculoQuandoDadosValidos() {
         when(grupoVeiculoRepository.save(grupoVeiculo)).thenReturn(grupoVeiculo);
 
         GrupoVeiculo resultado = grupoVeiculoService.createGrupoVeiculo(grupoVeiculo);
@@ -78,7 +79,7 @@ class GrupoVeiculoServiceTest {
     }
 
     @Test
-    void testUpdateGrupoVeiculo_Sucesso() {
+    void atualizarGrupoVeiculoDeveRetornarGrupoVeiculoAtualizadoQuandoEncontrado() {
         GrupoVeiculo novoGrupo = new GrupoVeiculo();
         novoGrupo.setGrupo("Sedan");
         when(grupoVeiculoRepository.findById(1)).thenReturn(Optional.of(grupoVeiculo));
@@ -93,7 +94,7 @@ class GrupoVeiculoServiceTest {
     }
 
     @Test
-    void testUpdateGrupoVeiculo_NaoEncontrado() {
+    void atualizarGrupoVeiculoDeveLancarExcecaoQuandoNaoEncontrado() {
         when(grupoVeiculoRepository.findById(1)).thenReturn(Optional.empty());
 
         GrupoVeiculo novoGrupo = new GrupoVeiculo();
@@ -105,7 +106,7 @@ class GrupoVeiculoServiceTest {
     }
 
     @Test
-    void testDeleteGrupoVeiculo_Sucesso() {
+    void excluirGrupoVeiculoDeveExecutarSucessoQuandoEncontrado() {
         doNothing().when(grupoVeiculoRepository).deleteById(1);
         
         grupoVeiculoService.deleteGrupoVeiculo(1);

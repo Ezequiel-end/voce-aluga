@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class FilialServiceTest {
@@ -36,7 +37,7 @@ class FilialServiceTest {
     }
 
     @Test
-    void testGetAllFiliais_Sucesso() {
+    void obterTodasFiliaisDeveRetornarListaQuandoExistirem() {
         List<Filial> filiais = Arrays.asList(filial, new Filial());
         when(filialRepository.findAll()).thenReturn(filiais);
 
@@ -48,7 +49,7 @@ class FilialServiceTest {
     }
 
     @Test
-    void testGetFilialById_Sucesso() {
+    void obterFilialPorIdDeveRetornarFilialQuandoEncontrado() {
         when(filialRepository.findById(1)).thenReturn(Optional.of(filial));
 
         Optional<Filial> resultado = filialService.getFilialById(1);
@@ -59,7 +60,7 @@ class FilialServiceTest {
     }
 
     @Test
-    void testGetFilialById_NaoEncontrado() {
+    void obterFilialPorIdDeveRetornarVazioQuandoNaoEncontrado() {
         when(filialRepository.findById(1)).thenReturn(Optional.empty());
 
         Optional<Filial> resultado = filialService.getFilialById(1);
@@ -69,7 +70,7 @@ class FilialServiceTest {
     }
 
     @Test
-    void testCreateFilial_Sucesso() {
+    void criarFilialDeveRetornarFilialQuandoDadosValidos() {
         when(filialRepository.save(filial)).thenReturn(filial);
 
         Filial resultado = filialService.createFilial(filial);
@@ -80,7 +81,7 @@ class FilialServiceTest {
     }
 
     @Test
-    void testUpdateFilial_Sucesso() {
+    void atualizarFilialDeveRetornarFilialAtualizadaQuandoEncontrado() {
         Filial novaFilial = new Filial();
         novaFilial.setNome("Nova Filial");
         novaFilial.setEndereco("Rua Nova, 456");
@@ -97,7 +98,7 @@ class FilialServiceTest {
     }
 
     @Test
-    void testUpdateFilial_NaoEncontrado() {
+    void atualizarFilialDeveLancarExcecaoQuandoNaoEncontrado() {
         when(filialRepository.findById(1)).thenReturn(Optional.empty());
 
         Filial novaFilial = new Filial();
@@ -109,7 +110,7 @@ class FilialServiceTest {
     }
 
     @Test
-    void testDeleteFilial_Sucesso() {
+    void excluirFilialDeveExecutarSucessoQuandoEncontrado() {
         doNothing().when(filialRepository).deleteById(1);
         
         filialService.deleteFilial(1);

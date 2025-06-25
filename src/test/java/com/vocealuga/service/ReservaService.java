@@ -59,7 +59,7 @@ class ReservaServiceTest {
     }
 
     @Test
-    void testGetAllReservas_Sucesso() {
+    void obterTodasReservasDeveRetornarListaQuandoExistirem() {
         List<Reserva> reservas = Arrays.asList(reserva, new Reserva());
         when(reservaRepository.findAll()).thenReturn(reservas);
 
@@ -71,7 +71,7 @@ class ReservaServiceTest {
     }
 
     @Test
-    void testGetReservaById_Sucesso() {
+    void obterReservaPorIdDeveRetornarReservaQuandoEncontrada() {
         when(reservaRepository.findById(1)).thenReturn(Optional.of(reserva));
 
         Optional<Reserva> resultado = reservaService.getReservaById(1);
@@ -82,7 +82,7 @@ class ReservaServiceTest {
     }
 
     @Test
-    void testGetReservaById_NaoEncontrado() {
+    void obterReservaPorIdDeveRetornarVazioQuandoNaoEncontrada() {
         when(reservaRepository.findById(1)).thenReturn(Optional.empty());
 
         Optional<Reserva> resultado = reservaService.getReservaById(1);
@@ -92,7 +92,7 @@ class ReservaServiceTest {
     }
 
     @Test
-    void testCreateReserva_Sucesso() {
+    void criarReservaDeveRetornarReservaQuandoDadosValidos() {
         when(reservaRepository.save(reserva)).thenReturn(reserva);
 
         Reserva resultado = reservaService.createReserva(reserva);
@@ -103,7 +103,7 @@ class ReservaServiceTest {
     }
 
     @Test
-    void testUpdateReserva_Sucesso() {
+    void atualizarReservaDeveRetornarReservaAtualizadaQuandoEncontrada() {
         Reserva novaReserva = new Reserva();
         Funcionario novoFuncionario = new Funcionario();
         novoFuncionario.setIdFuncionario(2);
@@ -133,7 +133,7 @@ class ReservaServiceTest {
     }
 
     @Test
-    void testUpdateReserva_NaoEncontrado() {
+    void atualizarReservaDeveLancarExcecaoQuandoNaoEncontrada() {
         when(reservaRepository.findById(1)).thenReturn(Optional.empty());
         
         Reserva novaReserva = new Reserva();
@@ -145,7 +145,7 @@ class ReservaServiceTest {
     }
 
     @Test
-    void testDeleteReserva_Sucesso() {
+    void excluirReservaDeveExecutarSucessoQuandoEncontrada() {
         doNothing().when(reservaRepository).deleteById(1);
 
         reservaService.deleteReserva(1);
