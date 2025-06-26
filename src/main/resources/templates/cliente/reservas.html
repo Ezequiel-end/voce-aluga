@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Reservas - Voce Aluga</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Minhas Reservas</h1>
+            <nav>
+                <ul>
+                    <li><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
+                    <li><a th:href="@{/cliente/reservas}">Minhas Reservas</a></li>
+                    <li><a th:href="@{/cliente/perfil/editar}">Editar Perfil</a></li>
+                    <li><a th:href="@{/cliente/logout}">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success">
+            <p th:text="${success}"></p>
+        </div>
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+
+        <h3>Lista de Suas Reservas</h3>
+        <p><a th:href="@{/cliente/reservas/nova}" class="button">Fazer Nova Reserva</a></p>
+
+        <div th:if="${#lists.isEmpty(reservas)}">
+            <p>Você não possui nenhuma reserva ainda.</p>
+        </div>
+        <div th:unless="${#lists.isEmpty(reservas)}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID da Reserva</th>
+                        <th>Veículo</th>
+                        <th>Filial</th>
+                        <th>Data Início</th>
+                        <th>Data Fim</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="reserva : ${reservas}">
+                        <td th:text="${reserva.idReserva}"></td>
+                        <td th:text="${reserva.veiculo.modelo} + ' (' + ${reserva.veiculo.placa} + ')'"></td>
+                        <td th:text="${reserva.filial.nome}"></td>
+                        <td th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#temporals.format(reserva.dataFim, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${#numbers.formatCurrency(reserva.valor)}"></td>
+                        <td th:text="${reserva.status}"></td>
+                        <td class="actions">
+                            <a th:if="${reserva.status == 'PENDENTE'}" th:href="@{/cliente/reservas/{id}/pagar(id=${reserva.idReserva})}" class="button">Pagar</a>
+                            <form th:if="${reserva.status == 'PENDENTE' || reserva.status == 'CONFIRMADA'}" th:action="@{/cliente/reservas/cancelar/{id}(id=${reserva.idReserva})}" method="post" style="display:inline;">
+                                <button type="submit" onclick="return confirm('Tem certeza que deseja cancelar esta reserva?');">Cancelar</button>
+                            </form>
+                            <span th:if="${reserva.status == 'PAGA' || reserva.status == 'CONCLUIDA' || reserva.status == 'CANCELADA_CLIENTE' || reserva.status == 'CANCELADA_ADM'}">N/A</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p><a th:href="@{/cliente/dashboard}" class="button">Voltar ao Dashboard</a></p>
+    </div>
+</body>
+</html>

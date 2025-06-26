@@ -43,6 +43,10 @@ public class ClienteService {
         if (!validation.isEmailGloballyUnique(cliente.getEmail())) {
             throw new IllegalArgumentException("E-mail já cadastrado!");
         }
+        // Garante que novos clientes comecem com 0 pontos de fidelidade
+        if (cliente.getPontosFidelidade() == null) {
+            cliente.setPontosFidelidade(0);
+        }
         return clienteRepository.save(cliente);
     }
 
@@ -52,11 +56,31 @@ public class ClienteService {
                     cliente.setCpf(clienteDetails.getCpf());
                     cliente.setNome(clienteDetails.getNome());
                     cliente.setEmail(clienteDetails.getEmail());
-                    cliente.setSenha(clienteDetails.getSenha());
+                    // A senha só deve ser atualizada se for fornecida no clienteDetails
+                    if (clienteDetails.getSenha() != null && !clienteDetails.getSenha().isEmpty()) {
+                        cliente.setSenha(clienteDetails.getSenha());
+                    }
                     cliente.setCnh(clienteDetails.getCnh());
                     cliente.setDataNascimento(clienteDetails.getDataNascimento());
+                    
                     return clienteRepository.save(cliente);
                 }).orElseThrow(() -> new RuntimeException("Cliente not found with id " + id));
+    }
+
+    /**
+     * Adiciona pontos de fidelidade a um cliente existente.
+     * @param clienteId O ID do cliente.
+     * @param pontosParaAdicionar O número de pontos a ser adicionado.
+     * @return O cliente atualizado.
+     * @throws RuntimeException se o cliente não for encontrado.
+     */
+    public Cliente addPontosFidelidade(Integer clienteId, Integer pontosParaAdicionar) {
+        return clienteRepository.findById(clienteId)
+                .map(cliente -> {
+                    Integer pontosAtuais = cliente.getPontosFidelidade();
+                    cliente.setPontosFidelidade(pontosAtuais + pontosParaAdicionar);
+                    return clienteRepository.save(cliente);
+                }).orElseThrow(() -> new RuntimeException("Cliente not found with id " + clienteId));
     }
 
     public void deleteCliente(Integer id) {

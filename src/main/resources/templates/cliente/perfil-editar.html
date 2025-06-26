@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil - Voce Aluga</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Editar Perfil</h1>
+            <nav>
+                <ul>
+                    <li><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
+                    <li><a th:href="@{/cliente/reservas}">Minhas Reservas</a></li>
+                    <li><a th:href="@{/cliente/perfil/editar}">Editar Perfil</a></li>
+                    <li><a th:href="@{/cliente/logout}">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+        <div th:if="${success}" class="alert alert-success">
+            <p th:text="${success}"></p>
+        </div>
+
+        <form th:action="@{/cliente/perfil/editar}" th:object="${cliente}" method="post">
+            <input type="hidden" th:field="*{idCliente}">
+            <div class="form-group">
+                <label for="nome">Nome Completo:</label>
+                <input type="text" id="nome" th:field="*{nome}" required>
+            </div>
+            <div class="form-group">
+                <label for="cpf">CPF:</label>
+                <input type="text" id="cpf" th:field="*{cpf}" required>
+            </div>
+            <div class="form-group">
+                <label for="cnh">CNH:</label>
+                <input type="text" id="cnh" th:field="*{cnh}" required>
+            </div>
+            <div class="form-group">
+                <label for="dataNascimento">Data de Nascimento:</label>
+                <input type="date" id="dataNascimento" th:field="*{dataNascimento}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" th:field="*{email}" required>
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" th:field="*{senha}" placeholder="Deixe em branco para não alterar a senha">
+            </div>
+            <button type="submit">Atualizar Perfil</button>
+        </form>
+        <p><a th:href="@{/cliente/dashboard}" class="button">Voltar ao Dashboard</a></p>
+    </div>
+</body>
+</html>
