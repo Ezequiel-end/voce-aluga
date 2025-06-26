@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processar Pagamento - Voce Aluga</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Processar Pagamento</h1>
+            <nav>
+                <ul>
+                    <li><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
+                    <li><a th:href="@{/cliente/reservas}">Minhas Reservas</a></li>
+                    <li><a th:href="@{/cliente/perfil/editar}">Editar Perfil</a></li>
+                    <li><a th:href="@{/cliente/logout}">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+        <div th:if="${success}" class="alert alert-success">
+            <p th:text="${success}"></p>
+        </div>
+
+        <h2>Detalhes da Reserva #<span th:text="${reserva.idReserva}"></span></h2>
+        <p><strong>Veículo:</strong> <span th:text="${reserva.veiculo.modelo} + ' (' + ${reserva.veiculo.placa} + ')'"></span></p>
+        <p><strong>Filial:</strong> <span th:text="${reserva.filial.nome}"></span></p>
+        <p><strong>Período:</strong> <span th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')}"></span> a <span th:text="${#temporals.format(reserva.dataFim, 'dd/MM/yyyy HH:mm')}"></span></p>
+        <p><strong>Valor Total:</strong> <span th:text="${#numbers.formatCurrency(reserva.valor)}"></span></p>
+        <p><strong>Status Atual:</strong> <span th:text="${reserva.status}"></span></p>
+
+        <h3>Informações de Pagamento</h3>
+        <form th:action="@{/cliente/reservas/{reservaId}/pagar(reservaId=${reserva.idReserva})}" th:object="${pagamento}" method="post">
+            <div class="form-group">
+                <label for="formaPagamento">Forma de Pagamento:</label>
+                <select id="formaPagamento" th:field="*{formaPagamento.idFormaPagamento}" required>
+                    <option value="">Selecione uma Forma de Pagamento</option>
+                    <option th:each="forma : ${formasPagamento}" th:value="${forma.idFormaPagamento}" th:text="${forma.formaPagamento}"></option>
+                </select>
+            </div>
+
+            <button type="submit">Confirmar Pagamento</button>
+        </form>
+        <p><a th:href="@{/cliente/reservas}" class="button">Voltar para Minhas Reservas</a></p>
+    </div>
+</body>
+</html>

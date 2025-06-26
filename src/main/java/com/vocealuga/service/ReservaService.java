@@ -1,4 +1,3 @@
-// src/main/java/com/vocealuga/vocealuga/service/ReservaService.java
 package com.vocealuga.service;
 
 import com.vocealuga.model.Reserva;
@@ -48,5 +47,10 @@ public class ReservaService {
 
     public void deleteReserva(Integer id) {
         reservaRepository.deleteById(id);
+    }
+
+    // NOVO MÉTODO: Busca todas as reservas associadas a um cliente específico.
+    public List<Reserva> getReservasByCliente(Integer idCliente) {
+        return reservaRepository.findByCliente_IdCliente(idCliente);
     }
 }

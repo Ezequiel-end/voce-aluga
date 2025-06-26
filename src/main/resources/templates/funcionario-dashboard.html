@@ -60,6 +60,9 @@
             <nav>
                 <ul>
                     <li class="menu-item">
+                        <a href="/funcionario/cadastrar-filial">Cadastrar Filial</a>
+                    </li>
+                    <li class="menu-item">
                         <a href="/funcionario/cadastrar-funcionario">Cadastrar Funcionário</a>
                     </li>
                     <li class="menu-item has-submenu">
@@ -112,10 +115,15 @@
 
             <div class="messages">
                 <p th:if="${successMessage}" class="success-message" th:text="${successMessage}"></p>
+                <p th:if="${reservaIdMessage}" class="success-message" th:text="${reservaIdMessage}"></p>
                 <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
             </div>
 
             <section id="content-area">
+
+                <div th:if="${activeContent == 'register_filial'}"
+                    th:insert="~{fragments/register_filial :: registerFilialForm}"></div>
+
                 <div th:if="${activeContent == 'register_funcionario'}"
                     th:insert="~{fragments/register_funcionario_form :: registerFuncionarioForm}"></div>
 

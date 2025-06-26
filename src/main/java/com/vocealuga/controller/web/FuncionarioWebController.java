@@ -190,7 +190,14 @@ public class FuncionarioWebController {
             reserva.setStatus("Ativa"); // Status inicial da reserva
 
             reservaService.createReserva(reserva);
+
+            Integer idDaNovaReserva = reserva.getIdReserva(); // Obtém o ID gerado
+
+            // Adiciona a mensagem de sucesso principal
             redirectAttributes.addFlashAttribute("successMessage", "Reserva criada com sucesso!");
+            // Adiciona a mensagem do ID separadamente
+            redirectAttributes.addFlashAttribute("reservaIdMessage", "ID da reserva: " + idDaNovaReserva);
+            
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao criar reserva: " + e.getMessage());
         }
@@ -398,4 +405,26 @@ public class FuncionarioWebController {
         }
         return "redirect:/funcionario/estoque/verificar-disponibilidade"; // Redireciona para a disponibilidade do estoque
     }
+
+    // Cadastro de Filial
+    @GetMapping("/cadastrar-filial")
+    public String showRegisterFilialForm(Model model) {
+        model.addAttribute("activeContent", "register_filial");
+        model.addAttribute("filial", new Filial());
+        return "funcionario-dashboard";
+    }
+
+    @PostMapping("/cadastrar-filial")
+    public String registerFilial(@ModelAttribute Filial filial, RedirectAttributes redirectAttributes) {
+        try {
+            filialService.createFilial(filial);
+            redirectAttributes.addFlashAttribute("successMessage", "Filial cadastrada com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar filial: " + e.getMessage());
+        }
+        return "redirect:/funcionario/cadastrar-filial?activeContent=register_filial";
+    }
+
+
+
 }

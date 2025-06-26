@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Reserva - Voce Aluga</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Fazer Nova Reserva</h1>
+            <nav>
+                <ul>
+                    <li><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
+                    <li><a th:href="@{/cliente/reservas}">Minhas Reservas</a></li>
+                    <li><a th:href="@{/cliente/perfil/editar}">Editar Perfil</a></li>
+                    <li><a th:href="@{/cliente/logout}">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+        <div th:if="${success}" class="alert alert-success">
+            <p th:text="${success}"></p>
+        </div>
+
+        <form th:action="@{/cliente/reservas/nova}" th:object="${reserva}" method="post">
+            <div class="form-group">
+                <label for="filial">Filial para Retirada:</label>
+                <select id="filial" th:field="*{filial.idFilial}" required>
+                    <option value="">Selecione uma Filial</option>
+                    <option th:each="filial : ${filiais}" th:value="${filial.idFilial}" th:text="${filial.nome}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="grupoVeiculo">Grupo de Veículo (Opcional para filtro):</label>
+                <select id="grupoVeiculo" onchange="filterVehicles()">
+                    <option value="">Todos os Grupos</option>
+                    <option th:each="grupo : ${gruposVeiculo}" th:value="${grupo.idGrupoVeiculo}" th:text="${grupo.grupo}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="veiculo">Veículo:</label>
+                <select id="veiculo" th:field="*{veiculo.idVeiculo}" required>
+                    <option value="">Selecione um Veículo</option>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dataInicio">Data de Início:</label>
+                <input type="date" id="dataInicio" th:field="*{dataInicio}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dataFim">Data e Hora de Fim:</label>
+                <input type="datetime-local" id="dataFim" th:field="*{dataFim}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="valor">Valor Estimado:</label>
+                <input type="number" id="valor" th:field="*{valor}" step="0.01" readonly required placeholder="Calculado após a seleção de datas/veículo">
+            </div>
+
+            <button type="submit">Confirmar Reserva</button>
+        </form>
+        <p><a th:href="@{/cliente/reservas}" class="button">Voltar para Minhas Reservas</a></p>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        // Carrega a lista de veículos do modelo para uma variável JavaScript
+        // Usamos JSON.parse(JSON.stringify()) para criar uma cópia independente e garantir que é um objeto JSON válido
+        const allVeiculos = /*[[${veiculos}]]*/ [];
+
+        // Função para filtrar veículos com base no grupo selecionado
+        function filterVehicles() {
+            const grupoVeiculoSelect = document.getElementById('grupoVeiculo');
+            const veiculoSelect = document.getElementById('veiculo');
+            const selectedGrupoId = grupoVeiculoSelect.value;
+
+            // Limpa as opções atuais (exceto a primeira "Selecione um Veículo")
+            // Começa do final para evitar problemas com índices ao remover elementos
+            for (let i = veiculoSelect.options.length - 1; i >= 0; i--) {
+                if (i > 0) { // Não remove a primeira opção "Selecione um Veículo"
+                    veiculoSelect.remove(i);
+                }
+            }
+            // Se a opção padrão "Selecione um Veículo" não existir, adicione-a
+            if (veiculoSelect.options[0] && veiculoSelect.options[0].value !== "") {
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.textContent = "Selecione um Veículo";
+                veiculoSelect.prepend(defaultOption);
+            } else if (!veiculoSelect.options[0]) { // Se não há nenhuma opção
+                 const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.textContent = "Selecione um Veículo";
+                veiculoSelect.appendChild(defaultOption);
+            }
+
+
+            // Adiciona de volta os veículos filtrados
+            allVeiculos.forEach(function(veiculo) {
+                // Certifique-se de que veiculo.grupoVeiculo existe e tem idGrupoVeiculo
+                const veiculoGrupoId = veiculo.grupoVeiculo ? veiculo.grupoVeiculo.idGrupoVeiculo : null;
+
+                if (veiculo.status === 'DISPONIVEL' &&
+                    (selectedGrupoId === '' || veiculoGrupoId == selectedGrupoId)) { // Compara com == para permitir string/number
+                    const option = document.createElement('option');
+                    option.value = veiculo.idVeiculo;
+                    option.textContent = `${veiculo.modelo} (${veiculo.placa}) - Grupo: ${veiculo.grupoVeiculo ? veiculo.grupoVeiculo.grupo : 'N/A'}`;
+                    veiculoSelect.appendChild(option);
+                }
+            });
+        }
+
+        // Adiciona um listener para atualizar o valor estimado
+        const dataInicioInput = document.getElementById('dataInicio');
+        const dataFimInput = document.getElementById('dataFim');
+        const valorInput = document.getElementById('valor');
+
+        function calculateEstimatedValue() {
+            const dataInicio = dataInicioInput.value;
+            const dataFim = dataFimInput.value;
+
+            if (dataInicio && dataFim) {
+                const start = new Date(dataInicio);
+                const end = new Date(dataFim);
+
+                // Diferença em milissegundos
+                const diffTime = Math.abs(end.getTime() - start.getTime());
+                // Diferença em dias (considerando horas para uma contagem mais precisa se necessário)
+                // Se a diferença for menor que 24 horas, ainda conta como 1 dia de aluguel.
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                // Exemplo de cálculo: 100 por dia (ajuste sua lógica de preço real aqui)
+                const valorCalculado = diffDays > 0 ? (diffDays * 100).toFixed(2) : (1 * 100).toFixed(2); // Mínimo de 1 dia
+                valorInput.value = valorCalculado;
+            } else {
+                valorInput.value = '';
+            }
+        }
+
+        dataInicioInput.addEventListener('change', calculateEstimatedValue);
+        dataFimInput.addEventListener('change', calculateEstimatedValue);
+
+        // Inicializa o filtro e o cálculo ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            filterVehicles(); // Filtra os veículos inicialmente
+            calculateEstimatedValue(); // Calcula o valor inicial se as datas já estiverem preenchidas
+        });
+
+        /*]]>*/
+    </script>
+</body>
+</html>

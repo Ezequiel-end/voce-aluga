@@ -30,7 +30,13 @@ public class Cliente {
     @Column(name = "DataNascimento", nullable = false)
     private LocalDate dataNascimento;
 
+    // NOVO CAMPO PARA FIDELIDADE
+    @Column(name = "PontosFidelidade", nullable = false)
+    private Integer pontosFidelidade;
+
     public Cliente() {
+        // Inicializa pontos de fidelidade para 0 por padrão para novos clientes
+        this.pontosFidelidade = 0;
     }
 
     public Cliente(String cpf, String nome, String email, String senha, String cnh, LocalDate dataNascimento) {
@@ -40,9 +46,11 @@ public class Cliente {
         this.senha = senha;
         this.cnh = cnh;
         this.dataNascimento = dataNascimento;
+        // Inicializa pontos de fidelidade para 0 para novos clientes
+        this.pontosFidelidade = 0;
     }
 
-    // Getters and Setters
+    // Getters and Setters existentes...
     public Integer getIdCliente() { return idCliente; }
     public void setIdCliente(Integer idCliente) { this.idCliente = idCliente; }
     public String getCpf() { return cpf; }
@@ -58,6 +66,10 @@ public class Cliente {
     public LocalDate getDataNascimento() { return dataNascimento; }
     public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
 
+    // NOVOS GETTER E SETTER PARA FIDELIDADE
+    public Integer getPontosFidelidade() { return pontosFidelidade; }
+    public void setPontosFidelidade(Integer pontosFidelidade) { this.pontosFidelidade = pontosFidelidade; }
+
     @Override
     public String toString() {
         return "Cliente{" +
@@ -65,8 +77,10 @@ public class Cliente {
                ", cpf='" + cpf + '\'' +
                ", nome='" + nome + '\'' +
                ", email='" + email + '\'' +
+               ", senha='" + senha + '\'' +
                ", cnh='" + cnh + '\'' +
                ", dataNascimento=" + dataNascimento +
+               ", pontosFidelidade=" + pontosFidelidade + // Adicionado ao toString
                '}';
     }
 }
