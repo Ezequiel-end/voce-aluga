@@ -5,6 +5,7 @@ import com.vocealuga.model.Cliente;
 import com.vocealuga.model.Reserva;
 import com.vocealuga.model.Pagamento;
 
+
 import com.vocealuga.service.ClienteService;
 import com.vocealuga.service.ReservaService;
 import com.vocealuga.service.VeiculoService;
@@ -13,13 +14,15 @@ import com.vocealuga.service.GrupoVeiculoService;
 import com.vocealuga.service.PagamentoService;
 import com.vocealuga.service.FormaPagamentoService;
 
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession; // Import adicionado para HttpSession
+import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -35,12 +38,17 @@ public class ClienteWebController {
     private final GrupoVeiculoService grupoVeiculoService;
     private final PagamentoService pagamentoService;
     private final FormaPagamentoService formaPagamentoService;
+    // O FuncionarioService não é estritamente necessário aqui, a menos que você precise
+    // autenticar funcionários ou redirecionar para o dashboard de funcionário.
+    // Mantenha apenas se for realmente utilizado nesta classe.
+    // private final FuncionarioService funcionarioService;
+
 
     @Autowired
     public ClienteWebController(ClienteService clienteService, ReservaService reservaService,
                                 VeiculoService veiculoService, FilialService filialService,
                                 GrupoVeiculoService grupoVeiculoService, PagamentoService pagamentoService,
-                                FormaPagamentoService formaPagamentoService) {
+                                FormaPagamentoService formaPagamentoService /*, FuncionarioService funcionarioService */) {
         this.clienteService = clienteService;
         this.reservaService = reservaService;
         this.veiculoService = veiculoService;
@@ -48,45 +56,7 @@ public class ClienteWebController {
         this.grupoVeiculoService = grupoVeiculoService;
         this.pagamentoService = pagamentoService;
         this.formaPagamentoService = formaPagamentoService;
-    }
-
-    // --- Login e Cadastro ---
-    @GetMapping("/login")
-    public String showLoginForm(Model model) {
-        model.addAttribute("cliente", new Cliente());
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String login(@ModelAttribute Cliente cliente, HttpSession session, RedirectAttributes redirectAttributes) {
-        Optional<Cliente> foundCliente = clienteService.login(cliente.getEmail(), cliente.getSenha());
-        if (foundCliente.isPresent()) {
-            session.setAttribute("loggedInClient", foundCliente.get());
-            redirectAttributes.addFlashAttribute("success", "Login realizado com sucesso!");
-            return "redirect:/cliente/dashboard";
-        } else {
-            redirectAttributes.addFlashAttribute("error", "E-mail ou senha inválidos.");
-            return "redirect:/cliente/login";
-        }
-    }
-
-    @GetMapping("/cadastro")
-    public String showRegistrationForm(Model model) {
-        model.addAttribute("cliente", new Cliente());
-        return "cadastro";
-    }
-
-    @PostMapping("/cadastro")
-    public String registerCliente(@ModelAttribute Cliente cliente, RedirectAttributes redirectAttributes) {
-        try {
-            // Ao criar um novo cliente, os pontos de fidelidade já são inicializados em 0 no ClienteService
-            clienteService.createCliente(cliente);
-            redirectAttributes.addFlashAttribute("success", "Cadastro realizado com sucesso! Faça login para continuar.");
-            return "redirect:/cliente/login";
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/cliente/cadastro";
-        }
+        // this.funcionarioService = funcionarioService;
     }
 
     // --- Dashboard ---
@@ -95,7 +65,7 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para acessar o dashboard.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
         // Recarrega o cliente do banco de dados para garantir que os dados, incluindo pontos, estejam atualizados
         Optional<Cliente> updatedClient = clienteService.getClienteById(loggedInClient.getIdCliente());
@@ -104,9 +74,9 @@ public class ClienteWebController {
             session.setAttribute("loggedInClient", updatedClient.get()); // Atualiza a sessão
         } else {
             redirectAttributes.addFlashAttribute("error", "Erro ao carregar dados do cliente.");
-            return "redirect:/cliente/logout"; // Força logout se o cliente não for encontrado
+            return "redirect:/logout"; // Força logout se o cliente não for encontrado
         }
-        return "dashboard";
+        return "cliente/dashboard"; // CORRIGIDO
     }
 
     // --- Perfil ---
@@ -115,10 +85,10 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para editar o perfil.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
         model.addAttribute("cliente", loggedInClient);
-        return "perfil-editar";
+        return "cliente/perfil-editar"; // CORRIGIDO
     }
 
     @PostMapping("/perfil/editar")
@@ -126,7 +96,7 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para editar o perfil.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
         try {
             // O updateCliente no serviço já lida com a lógica de não alterar a senha se vazia
@@ -146,11 +116,11 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para ver suas reservas.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
         List<Reserva> reservas = reservaService.getReservasByCliente(loggedInClient.getIdCliente());
         model.addAttribute("reservas", reservas);
-        return "reservas";
+        return "cliente/reservas"; // CORRIGIDO
     }
 
     @GetMapping("/reservas/nova")
@@ -158,14 +128,14 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para fazer uma reserva.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
 
         model.addAttribute("reserva", new Reserva());
         model.addAttribute("veiculos", veiculoService.getAllVeiculos());
         model.addAttribute("filiais", filialService.getAllFiliais());
         model.addAttribute("gruposVeiculo", grupoVeiculoService.getAllGruposVeiculo());
-        return "reserva-form";
+        return "cliente/reserva-form"; // CORRIGIDO
     }
 
     @PostMapping("/reservas/nova")
@@ -173,13 +143,11 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para fazer uma reserva.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
 
         try {
             reserva.setCliente(loggedInClient); // Associa o cliente logado à reserva
-            // O funcionário e o status inicial da reserva devem ser definidos pelo sistema ou por um admin
-            // Para simplicidade, vamos definir um funcionário mock ou null e status PENDENTE
             reserva.setFuncionario(null); // Pode ser definido por um admin posteriormente ou via lógica de negócio
             reserva.setStatus("PENDENTE"); // Status inicial
 
@@ -212,7 +180,7 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para acessar esta página.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
 
         Optional<Reserva> reservaOptional = reservaService.getReservaById(reservaId);
@@ -238,7 +206,7 @@ public class ClienteWebController {
         model.addAttribute("reserva", reserva);
         model.addAttribute("pagamento", new Pagamento());
         model.addAttribute("formasPagamento", formaPagamentoService.getAllFormasPagamento());
-        return "pagamento-form";
+        return "cliente/pagamento-form"; // CORRIGIDO
     }
 
     @PostMapping("/reservas/{reservaId}/pagar")
@@ -247,7 +215,7 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para processar o pagamento.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
 
         try {
@@ -308,13 +276,13 @@ public class ClienteWebController {
         }
     }
 
-    // --- Cancelar Reserva (mantido como estava) ---
+    // --- Cancelar Reserva ---
     @PostMapping("/reservas/cancelar/{id}")
     public String cancelarReserva(@PathVariable Integer id, HttpSession session, RedirectAttributes redirectAttributes) {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para cancelar uma reserva.");
-            return "redirect:/cliente/login";
+            return "redirect:/login"; // Redireciona para o login genérico
         }
 
         try {
@@ -351,6 +319,6 @@ public class ClienteWebController {
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         session.removeAttribute("loggedInClient"); // Remove o atributo da sessão
         redirectAttributes.addFlashAttribute("success", "Você foi desconectado com sucesso.");
-        return "redirect:/cliente/login";
+        return "redirect:/cliente/login"; // Redireciona para a página de login genérica
     }
 }

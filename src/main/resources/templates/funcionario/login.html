@@ -3,23 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Voce Aluga</title>
+    <title>Login do Funcionário - Voce Aluga</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Login do Cliente</h1>
+            <h1>Login do Funcionário</h1>
         </div>
 
-        <div th:if="${error}" class="alert alert-danger">
-            <p th:text="${error}"></p>
-        </div>
-        <div th:if="${success}" class="alert alert-success">
-            <p th:text="${success}"></p>
+        <div th:if="${erro}" class="alert alert-danger">
+            <p th:text="${erro}"></p>
         </div>
 
-        <form th:action="@{/cliente/login}" th:object="${cliente}" method="post">
+        <form th:action="@{/funcionario/login}" th:object="${funcionario}" method="post">
             <div class="form-group">
                 <label for="email">E-mail:</label>
                 <input type="email" id="email" th:field="*{email}" required>
@@ -30,7 +27,7 @@
             </div>
             <button type="submit">Entrar</button>
         </form>
-        <p>Não tem uma conta? <a th:href="@{/cliente/cadastro}">Cadastre-se aqui</a>.</p>
+        <p>Voltar para o login do cliente? <a th:href="@{/cliente/login}">Clique aqui</a></p>
     </div>
 </body>
 </html>
