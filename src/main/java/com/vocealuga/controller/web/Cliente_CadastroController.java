@@ -10,55 +10,58 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-public class CadastroController {
+@RequestMapping("/cliente") 
+public class Cliente_CadastroController {
 
     @Autowired
     private ClienteService clienteService;
 
-    // Mantido @Autowired para métodos de validação que podem não ser estáticos puros
     @Autowired
     private ValidationsUtils validation;
 
     @GetMapping("/cadastro")
     public String showCadastroForm(Model model) {
         model.addAttribute("cliente", new Cliente());
-        return "cadastro";
+        return "cliente/cadastro";
     }
 
     @PostMapping("/cadastro")
     public String processCadastro(@ModelAttribute Cliente cliente, Model model, RedirectAttributes redirectAttributes) {
         try {
-            // Correção: Acessando isValidCPF de forma estática
+            String cpfLimpo = cliente.getCpf().replaceAll("[^0-9]", "");
+            cliente.setCpf(cpfLimpo);
+
             if (!ValidationsUtils.isValidCPF(cliente.getCpf())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido!");
-                return "redirect:/cadastro";
+                redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido! Digite apenas números ou um CPF válido.");
+                return "redirect:/cliente/cadastro"; // ATUALIZADO
             }
 
             if (!validation.isEmailGloballyUnique(cliente.getEmail())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "E-mail já cadastrado!");
-                return "redirect:/cadastro";
+                return "redirect:/cliente/cadastro"; // ATUALIZADO
             }
 
-            // Correção: Acessando isValidCNH de forma estática
+            String cnhLimpa = cliente.getCnh().replaceAll("[^0-9]", "");
+            cliente.setCnh(cnhLimpa);
+
             if (!ValidationsUtils.isValidCNH(cliente.getCnh())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "CNH inválida!");
-                return "redirect:/cadastro";
+                return "redirect:/cliente/cadastro"; // ATUALIZADO
             }
 
             if (!validation.isMaiorDeIdade(cliente.getDataNascimento())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "É necessário ter pelo menos 18 anos.");
-                return "redirect:/cadastro";
+                return "redirect:/cliente/cadastro"; // ATUALIZADO
             }
 
             clienteService.createCliente(cliente);
             redirectAttributes.addFlashAttribute("successMessage", "Cliente cadastrado com sucesso!");
 
-            return "redirect:/login";
+            return "redirect:/cliente/login"; // ATUALIZADO: Redireciona para o login do cliente
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar Cliente: " + e.getMessage());
-            return "redirect:/cadastro";
+            return "redirect:/cliente/cadastro"; // ATUALIZADO
         }
     }
-
 }
