@@ -38,6 +38,7 @@ public class ManutencaoService {
                     manutencao.setDataInicio(manutencaoDetails.getDataInicio());
                     manutencao.setDataFim(manutencaoDetails.getDataFim());
                     manutencao.setMotivo(manutencaoDetails.getMotivo());
+                    manutencao.setStatus(manutencaoDetails.getStatus());
                     return manutencaoRepository.save(manutencao);
                 }).orElseThrow(() -> new RuntimeException("Manutencao not found with id " + id));
     }

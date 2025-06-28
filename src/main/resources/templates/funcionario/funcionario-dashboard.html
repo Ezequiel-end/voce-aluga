@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VoceAluga - Dashboard do Funcionário</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Você Aluga - Dashboard do Funcionário</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.menu-item.has-submenu > a').forEach(item => {
                 item.addEventListener('click', function(e) {
-                    e.preventDefault(); 
+                    e.preventDefault();
                     const submenu = this.nextElementSibling;
                     if (submenu) {
                         submenu.classList.toggle('active');
@@ -26,24 +26,20 @@
                     while (fragmentContainer.firstChild) {
                         fragmentContainer.removeChild(fragmentContainer.firstChild);
                     }
-                    
+
                     let fragmentPath = `/fragments/${activeForm}_form.html`;
                     if (activeForm === 'home') {
-                         fragmentPath = `/fragments/welcome_message.html`; // ou o fragmento inicial
+                        fragmentPath = `/fragments/welcome_message.html`;
                     } else if (activeForm === 'alterar_reserva_detalhes') {
                         fragmentPath = `/fragments/alterar_reserva_form.html`;
                     }
 
                     fetch(fragmentPath)
                         .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Fragment not found');
-                            }
+                            if (!response.ok) throw new Error('Fragment not found');
                             return response.text();
                         })
-                        .then(html => {
-                            fragmentContainer.innerHTML = html;
-                        })
+                        .then(html => fragmentContainer.innerHTML = html)
                         .catch(error => {
                             console.error("Error loading fragment:", error);
                             fragmentContainer.innerHTML = "<p>Erro ao carregar o conteúdo.</p>";
@@ -55,6 +51,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- Sidebar Menu -->
         <aside class="sidebar">
             <h2 class="menu-title">Você Aluga</h2>
             <nav>
@@ -95,9 +92,11 @@
             </nav>
         </aside>
 
+        <!-- Main Content Area -->
         <main class="main-content">
             <header>
                 <h1 th:switch="${activeContent}">
+                    <span th:case="'register_filial'">Cadastrar Filial</span>
                     <span th:case="'register_funcionario'">Cadastrar Funcionário</span>
                     <span th:case="'add_veiculo'">Adicionar Veículo</span>
                     <span th:case="'remove_veiculo'">Remover Veículo</span>
@@ -110,39 +109,40 @@
                     <span th:case="'consult_reservas'">Consultar Reservas</span>
                     <span th:case="'cadastrar_manutencao'">Abrir Ordem de Manutenção</span>
                     <span th:case="'suspender_manutencao'">Suspender Manutenção</span>
-                    <span th:case="'gerenciar_manutencao'">Manutenções</span>
+                    <span th:case="'gerenciar_manutencao'">Gerenciar Manutenções</span>
                     <span th:case="*">Bem-vindo!</span>
                 </h1>
             </header>
 
+            <!-- Feedback Messages -->
             <div class="messages">
                 <p th:if="${successMessage}" class="success-message" th:text="${successMessage}"></p>
                 <p th:if="${reservaIdMessage}" class="success-message" th:text="${reservaIdMessage}"></p>
                 <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
             </div>
 
+            <!-- Dynamic Content Area -->
             <section id="content-area">
-
                 <div th:if="${activeContent == 'register_filial'}"
-                    th:insert="~{fragments/register_filial :: registerFilialForm}"></div>
+                     th:insert="~{fragments/register_filial :: registerFilialForm}"></div>
 
                 <div th:if="${activeContent == 'register_funcionario'}"
-                    th:insert="~{fragments/register_funcionario_form :: registerFuncionarioForm}"></div>
+                     th:insert="~{fragments/register_funcionario_form :: registerFuncionarioForm}"></div>
 
                 <div th:if="${activeContent == 'add_veiculo'}"
-                    th:insert="~{fragments/add_veiculo_form :: addVeiculoForm}"></div>
+                     th:insert="~{fragments/add_veiculo_form :: addVeiculoForm}"></div>
 
                 <div th:if="${activeContent == 'remove_veiculo'}"
-                    th:insert="~{fragments/remove_veiculo_form :: removeVeiculoForm}"></div>
+                     th:insert="~{fragments/remove_veiculo_form :: removeVeiculoForm}"></div>
 
                 <div th:if="${activeContent == 'check_availability'}"
-                    th:insert="~{fragments/check_availability_form :: checkAvailabilityForm}"></div>
+                     th:insert="~{fragments/check_availability_form :: checkAvailabilityForm}"></div>
 
                 <div th:if="${activeContent == 'transferir_veiculo'}"
                      th:insert="~{fragments/transferir_veiculo_form :: transferirVeiculoForm}"></div>
 
                 <div th:if="${activeContent == 'create_reserva'}"
-                    th:insert="~{fragments/create_reserva_form :: createReservaForm}"></div>
+                     th:insert="~{fragments/create_reserva_form :: createReservaForm}"></div>
 
                 <div th:if="${activeContent == 'alterar_reserva'}"
                      th:insert="~{fragments/alterar_reserva_form :: alterarReservaForm}"></div>
@@ -151,13 +151,16 @@
                      th:insert="~{fragments/alterar_reserva_form :: alterarReservaForm}"></div>
 
                 <div th:if="${activeContent == 'cancel_reserva'}"
-                    th:insert="~{fragments/cancel_reserva_form :: cancelReservaForm}"></div>
+                     th:insert="~{fragments/cancel_reserva_form :: cancelReservaForm}"></div>
 
                 <div th:if="${activeContent == 'consult_reservas'}"
-                    th:insert="~{fragments/consult_reservas_form :: consultReservasForm}"></div>
+                     th:insert="~{fragments/consult_reservas_form :: consultReservasForm}"></div>
 
                 <div th:if="${activeContent == 'cadastrar_manutencao'}"
                      th:insert="~{fragments/cadastrar_manutencao_form :: cadastrarManutencaoForm}"></div>
+
+                <div th:if="${activeContent == 'suspender_manutencao'}"
+                     th:insert="~{fragments/suspender_manutencao_form :: suspenderManutencaoForm}"></div>
 
                 <div th:if="${activeContent == 'gerenciar_manutencao'}"
                      th:insert="~{fragments/gerenciar_manutencao_form :: gerenciarManutencaoForm}"></div>

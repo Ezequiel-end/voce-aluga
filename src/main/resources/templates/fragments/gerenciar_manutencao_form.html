@@ -14,6 +14,7 @@
                     <th>Início</th>
                     <th>Fim</th>
                     <th>Motivo</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -24,6 +25,7 @@
                     <td th:text="${#temporals.format(manutencao.dataInicio, 'dd/MM/yyyy HH:mm')}"></td>
                     <td th:text="${manutencao.dataFim != null ? #temporals.format(manutencao.dataFim, 'dd/MM/yyyy HH:mm') : 'Em andamento'}"></td>
                     <td th:text="${manutencao.motivo}"></td>
+                    <td th:text="${manutencao.status}"></td>
                 </tr>
             </tbody>
         </table>

@@ -228,3 +228,53 @@ header h1 {
 .data-table tbody tr:hover {
     background-color: #333333; /* Levemente mais claro que o fundo */
 }
+
+
+.suspender-manutencao-form {
+    background-color: #2c2c2c; /* Elementos secundários do login */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.suspender-manutencao-form h2 {
+    color: #ffffff; /* Texto principal */
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.suspender-manutencao-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #aaaaaa; /* Texto secundário */
+}
+
+.suspender-manutencao-form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555555; /* Borda cinza médio */
+    border-radius: 4px;
+    background-color: #333333; /* Fundo de input */
+    color: #ffffff; /* Texto principal */
+    font-size: 1em;
+    margin-bottom: 15px;
+}
+
+.suspender-manutencao-form button {
+    background-color: #28a745; /* Verde do login */
+    color: #ffffff; /* Texto principal */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.suspender-manutencao-form button:hover {
+    background-color: #218838; /* Verde escuro no hover */
+}

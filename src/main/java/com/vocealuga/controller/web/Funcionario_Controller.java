@@ -294,12 +294,42 @@ public class Funcionario_Controller {
             if (manutencao.getDataInicio() == null) {
                 manutencao.setDataInicio(LocalDateTime.now()); // Define data atual se não fornecida
             }
+
+            // Status padrão para nova manutenção
+            manutencao.setStatus("Em Curso");
+
             manutencaoService.createManutencao(manutencao);
             redirectAttributes.addFlashAttribute("successMessage", "Manutenção cadastrada com sucesso!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar manutenção: " + e.getMessage());
         }
         return "redirect:/funcionario/manutencao/cadastrar";
+    }
+
+    @GetMapping("/manutencao/suspender")
+    public String showSuspenderManutencaoForm(Model model) {
+        model.addAttribute("activeContent", "suspender_manutencao");
+        return "funcionario/funcionario-dashboard";
+    }
+
+    @PostMapping("/manutencao/suspender")
+    public String suspenderManutencao(@RequestParam Integer manutencaoId, RedirectAttributes redirectAttributes) {
+        try {
+            Optional<Manutencao> manutencaoOptional = manutencaoService.getManutencaoById(manutencaoId);
+
+            if (manutencaoOptional.isPresent()) {
+                Manutencao manutencao = manutencaoOptional.get();
+                manutencao.setStatus("Suspensa");
+                manutencaoService.updateManutencao(manutencaoId, manutencao);
+                redirectAttributes.addFlashAttribute("successMessage", "Manutenção suspensa com sucesso!");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Manutenção não encontrada com o ID: " + manutencaoId);
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao suspender manutenção: " + e.getMessage());
+        }
+
+        return "redirect:/funcionario/manutencao/suspender";
     }
 
     // Formulário para Listar e Gerenciar Manutenções (Atualizar/Excluir)
