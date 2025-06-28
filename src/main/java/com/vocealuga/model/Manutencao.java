@@ -22,9 +22,9 @@ public class Manutencao {
     private Veiculo veiculo; // FK to veiculo
 
     @Column(name = "DataInicio", nullable = false)
-    private LocalDate dataInicio;
+    private LocalDateTime dataInicio;
 
-    @Column(name = "DataFim", nullable = false)
+    @Column(name = "DataFim", nullable = true)
     private LocalDateTime dataFim;
 
     @Column(name = "Motivo", nullable = false, length = 255)
@@ -33,7 +33,7 @@ public class Manutencao {
     public Manutencao() {
     }
 
-    public Manutencao(Funcionario funcionario, Veiculo veiculo, LocalDate dataInicio, LocalDateTime dataFim, String motivo) {
+    public Manutencao(Funcionario funcionario, Veiculo veiculo, LocalDateTime dataInicio, LocalDateTime dataFim, String motivo) {
         this.funcionario = funcionario;
         this.veiculo = veiculo;
         this.dataInicio = dataInicio;
@@ -48,8 +48,8 @@ public class Manutencao {
     public void setFuncionario(Funcionario funcionario) { this.funcionario = funcionario; }
     public Veiculo getVeiculo() { return veiculo; }
     public void setVeiculo(Veiculo veiculo) { this.veiculo = veiculo; }
-    public LocalDate getDataInicio() { return dataInicio; }
-    public void setDataInicio(LocalDate dataInicio) { this.dataInicio = dataInicio; }
+    public LocalDateTime getDataInicio() { return dataInicio; }
+    public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
     public void setDataFim(LocalDateTime dataFim) { this.dataFim = dataFim; }
     public String getMotivo() { return motivo; }

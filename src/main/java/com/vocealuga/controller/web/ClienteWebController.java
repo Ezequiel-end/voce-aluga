@@ -103,7 +103,7 @@ public class ClienteWebController {
             Cliente updatedClient = clienteService.updateCliente(loggedInClient.getIdCliente(), clienteDetails);
             session.setAttribute("loggedInClient", updatedClient); // Atualiza o cliente na sessão
             redirectAttributes.addFlashAttribute("success", "Perfil atualizado com sucesso!");
-            return "redirect:/cliente/dashboard";
+            return "redirect:/cliente/perfil/editar";
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", "Erro ao atualizar perfil: " + e.getMessage());
             return "redirect:/cliente/perfil/editar";

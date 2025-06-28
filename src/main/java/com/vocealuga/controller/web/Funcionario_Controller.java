@@ -7,10 +7,12 @@ import com.vocealuga.utils.ValidationsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -267,20 +269,31 @@ public class Funcionario_Controller {
         return "funcionario/funcionario-dashboard";
     }
 
-    // Lógica para Cadastrar Manutenção
     @PostMapping("/manutencao/cadastrar")
-    public String cadastrarManutencao(@ModelAttribute Manutencao manutencao,
-                                      @RequestParam Integer veiculoId,
-                                      @RequestParam Integer funcionarioId,
-                                      RedirectAttributes redirectAttributes) {
-        try {
-            Veiculo veiculo = veiculoService.getVeiculoById(veiculoId)
-                    .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
-            Funcionario funcionario = funcionarioService.getFuncionarioById(funcionarioId)
-                    .orElseThrow(() -> new RuntimeException("Funcionário não encontrado."));
+    public String cadastrarManutencao(@ModelAttribute Manutencao manutencao, // Adicione @Valid se usar validação
+                                    BindingResult bindingResult,
+                                    RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erro de validação: " + bindingResult.getAllErrors().get(0).getDefaultMessage());
+            return "redirect:/funcionario/manutencao/cadastrar";
+        }
 
-            manutencao.setVeiculo(veiculo);
-            manutencao.setFuncionario(funcionario);
+        try {
+            // O veiculo e funcionario já estão mapeados via @ModelAttribute
+            if (manutencao.getVeiculo() == null || manutencao.getVeiculo().getIdVeiculo() == null) {
+                throw new RuntimeException("Veículo não selecionado.");
+            }
+            if (manutencao.getFuncionario() == null || manutencao.getFuncionario().getIdFuncionario() == null) {
+                throw new RuntimeException("Funcionário não selecionado.");
+            }
+
+            // Ajuste para dataFim opcional
+            if (manutencao.getDataFim() == null) {
+                manutencao.setDataFim(null); // Deixa como nulo se não fornecido
+            }
+            if (manutencao.getDataInicio() == null) {
+                manutencao.setDataInicio(LocalDateTime.now()); // Define data atual se não fornecida
+            }
             manutencaoService.createManutencao(manutencao);
             redirectAttributes.addFlashAttribute("successMessage", "Manutenção cadastrada com sucesso!");
         } catch (Exception e) {

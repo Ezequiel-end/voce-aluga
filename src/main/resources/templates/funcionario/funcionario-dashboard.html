@@ -86,7 +86,8 @@
                     <li class="menu-item has-submenu">
                         <a href="#">Gerenciar Manutenção <span class="arrow">▼</span></a>
                         <ul class="submenu">
-                            <li><a href="/funcionario/manutencao/cadastrar">Cadastrar Manutenção</a></li>
+                            <li><a href="/funcionario/manutencao/cadastrar">Abrir Ordem de Manutenção</a></li>
+                            <li><a href="/funcionario/manutencao/suspender">Suspender Manutenção</a></li>
                             <li><a href="/funcionario/manutencao/gerenciar">Gerenciar Manutenções</a></li>
                         </ul>
                     </li>
@@ -107,8 +108,9 @@
                     <span th:case="'alterar_reserva_detalhes'">Alterar Reserva</span>
                     <span th:case="'cancel_reserva'">Cancelar Reserva</span>
                     <span th:case="'consult_reservas'">Consultar Reservas</span>
-                    <span th:case="'cadastrar_manutencao'">Cadastrar Manutenção</span>
-                    <span th:case="'gerenciar_manutencao'">Gerenciar Manutenções</span>
+                    <span th:case="'cadastrar_manutencao'">Abrir Ordem de Manutenção</span>
+                    <span th:case="'suspender_manutencao'">Suspender Manutenção</span>
+                    <span th:case="'gerenciar_manutencao'">Manutenções</span>
                     <span th:case="*">Bem-vindo!</span>
                 </h1>
             </header>
