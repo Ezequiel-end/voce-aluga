@@ -78,4 +78,8 @@ public class EstoqueService {
         // 5. Salva a atualização
         return estoqueRepository.save(estoqueAtual);
     }
+
+    public Optional<Estoque> getEstoqueByVeiculoId(Integer veiculoId) {
+        return estoqueRepository.findByVeiculo_IdVeiculo(veiculoId);
+    }
 }

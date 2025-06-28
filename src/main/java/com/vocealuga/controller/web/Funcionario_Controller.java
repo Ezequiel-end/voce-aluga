@@ -130,10 +130,12 @@ public class Funcionario_Controller {
 
     @PostMapping("/estoque/adicionar-veiculo")
     public String addVeiculo(@ModelAttribute Veiculo veiculo,
-                             @RequestParam Integer filialId,
-                             @RequestParam Integer funcionarioId,
-                             RedirectAttributes redirectAttributes) {
+                            @RequestParam Integer filialId,
+                            @RequestParam Integer funcionarioId,
+                            RedirectAttributes redirectAttributes) {
         try {
+            veiculo.setStatus("Disponível");
+
             Veiculo savedVeiculo = veiculoService.createVeiculo(veiculo);
 
             Filial filial = filialService.getFilialById(filialId)
@@ -144,7 +146,8 @@ public class Funcionario_Controller {
             Estoque estoque = new Estoque(filial, savedVeiculo, funcionario, "Disponível");
             estoqueService.createEstoque(estoque);
 
-            redirectAttributes.addFlashAttribute("successMessage", "Veículo e estoque atualizados com sucesso!");
+            redirectAttributes.addFlashAttribute("successMessage", "Veículo adicionado com sucesso!");
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao adicionar veículo: " + e.getMessage());
         }
@@ -193,11 +196,11 @@ public class Funcionario_Controller {
 
     @PostMapping("/reservas/criar-reserva")
     public String createReserva(@ModelAttribute Reserva reserva,
-                                 @RequestParam Integer funcionarioId,
-                                 @RequestParam Integer filialId,
-                                 @RequestParam Integer clienteId,
-                                 @RequestParam Integer veiculoId,
-                                 RedirectAttributes redirectAttributes) {
+                                @RequestParam Integer funcionarioId,
+                                @RequestParam Integer filialId,
+                                @RequestParam Integer clienteId,
+                                @RequestParam Integer veiculoId,
+                                RedirectAttributes redirectAttributes) {
         try {
             Funcionario funcionario = funcionarioService.getFuncionarioById(funcionarioId)
                     .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
@@ -208,6 +211,21 @@ public class Funcionario_Controller {
             Veiculo veiculo = veiculoService.getVeiculoById(veiculoId)
                     .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
 
+            // Atualizar status do veículo
+            veiculo.setStatus("Em Reserva");
+            veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
+
+            // Atualizar situação do estoque para "Indisponível"
+            Optional<Estoque> estoqueOptional = estoqueService.getEstoqueByVeiculoId(veiculoId);
+            if (estoqueOptional.isPresent()) {
+                Estoque estoque = estoqueOptional.get();
+                estoque.setSituacao("Indisponível");
+                estoqueService.updateEstoque(estoque.getIdEstoque(), estoque);
+            } else {
+                throw new RuntimeException("Estoque do veículo não encontrado");
+            }
+
+            // Preencher a reserva
             reserva.setFuncionario(funcionario);
             reserva.setFilial(filial);
             reserva.setCliente(cliente);
@@ -216,16 +234,14 @@ public class Funcionario_Controller {
 
             reservaService.createReserva(reserva);
 
-            Integer idDaNovaReserva = reserva.getIdReserva();
-
             redirectAttributes.addFlashAttribute("successMessage", "Reserva criada com sucesso!");
-            redirectAttributes.addFlashAttribute("reservaIdMessage", "ID da reserva: " + idDaNovaReserva);
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao criar reserva: " + e.getMessage());
         }
         return "redirect:/funcionario/reservas/criar-reserva";
     }
+
 
     // Gerenciar Reservas - Cancelar Reserva
     @GetMapping("/reservas/cancelar-reserva")
