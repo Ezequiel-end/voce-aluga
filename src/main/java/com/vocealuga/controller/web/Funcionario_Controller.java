@@ -52,21 +52,22 @@ public class Funcionario_Controller {
     // --- Login Funcionario ---
     @GetMapping("/login")
     public String showLoginForm(Model model) {
-        model.addAttribute("funcionario", new Funcionario());
+        if (!model.containsAttribute("funcionario")){
+            model.addAttribute("funcionario", new Funcionario());
+        }
         return "funcionario/login";
     }
 
     @PostMapping("/login")
-    public String processLogin(@RequestParam String email, @RequestParam String senha, Model model, HttpSession session) {
+    public String processLogin(@RequestParam String email, @RequestParam String senha, Model model, HttpSession session, RedirectAttributes redirectAtributes) {
         Optional<Funcionario> funcionario = funcionarioService.login(email, senha);
 
         if (funcionario.isPresent()) {
             session.setAttribute("loggedInFuncionario", funcionario.get());
             return "redirect:/funcionario/dashboard";
         } else {
-            model.addAttribute("erro", "E-mail ou senha inválidos.");
-            model.addAttribute("funcionario", new Funcionario());
-            return "funcionario/login";
+            redirectAtributes.addFlashAttribute("erro", "E-mail ou senha inválidos.");
+            return "redirect:/funcionario/login";
         }
     }
 
