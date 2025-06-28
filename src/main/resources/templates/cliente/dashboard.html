@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard do Cliente - Voce Aluga</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/telaCliente.css}">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Cliente Logado, <span th:text="${cliente.nome}"></span>!</h1>
+            <h2>Você Aluga</h2>
             <nav>
                 <ul>
                     <li><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
@@ -19,33 +19,30 @@
                 </ul>
             </nav>
         </div>
-
-        <div th:if="${error}" class="alert alert-danger">
-            <p th:text="${error}"></p>
-        </div>
-        <div th:if="${success}" class="alert alert-success">
-            <p th:text="${success}"></p>
-        </div>
-
-        <div class="dashboard-section">
-            <h2>Informações do Cliente</h2>
-            <p><strong>Email:</strong> <span th:text="${cliente.email}"></span></p>
-            <p><strong>CPF:</strong> <span th:text="${cliente.cpf}"></span></p>
-            <p><strong>CNH:</strong> <span th:text="${cliente.cnh}"></span></p>
-            <p><strong>Data de Nascimento:</strong> <span th:text="${#temporals.format(cliente.dataNascimento, 'dd/MM/yyyy')}"></span></p>
-            
-            <div class="loyalty-section">
-                <h3>Programa de Fidelidade</h3>
-                <p><strong>Pontos Acumulados:</strong> <span th:text="${cliente.pontosFidelidade}">0</span> pontos</p>
-                <p>Acumule pontos a cada reserva paga e troque por benefícios futuros!</p>
+        <div class="main-content">
+            <div class="dashboard-header">
+                <h1>Bem-vindo, <span th:text="${cliente.nome}"></span>!</h1>
             </div>
+            <div class="content-columns">
+                <div class="dashboard-section">
+                    <h2>Informações do Cliente</h2>
+                    <p><strong>Email:</strong> <span th:text="${cliente.email}"></span></p>
+                    <p><strong>CPF:</strong> <span th:text="${cliente.cpf}"></span></p>
+                    <p><strong>CNH:</strong> <span th:text="${cliente.cnh}"></span></p>
+                    <p><strong>Data de Nascimento:</strong> <span th:text="${#temporals.format(cliente.dataNascimento, 'dd/MM/yyyy')}"></span></p>
+                    <div class="loyalty-section">
+                        <h3>Programa de Fidelidade</h3>
+                        <p><strong>Pontos Acumulados:</strong> <span th:text="${cliente.pontosFidelidade}">0</span> pontos</p>
+                        <p>Acumule pontos a cada reserva paga e troque por benefícios futuros!</p>
+                    </div>
+                </div>
+                <div class="dashboard-actions">
+                    <h2>Ações Rápidas</h2>
+                    <a th:href="@{/cliente/reservas/nova}" class="button">Fazer Nova Reserva</a>
+                    <a th:href="@{/cliente/reservas}" class="button">Ver Minhas Reservas</a>
+                    <a th:href="@{/cliente/perfil/editar}" class="button">Editar Perfil</a>
+                </div>
             </div>
-
-        <div class="dashboard-actions">
-            <h2>Ações Rápidas</h2>
-            <a th:href="@{/cliente/reservas/nova}" class="button">Fazer Nova Reserva</a>
-            <a th:href="@{/cliente/reservas}" class="button">Ver Minhas Reservas</a>
-            <a th:href="@{/cliente/perfil/editar}" class="button">Editar Perfil</a>
         </div>
     </div>
 </body>

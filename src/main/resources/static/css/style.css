@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #121212; /* Fundo geral do login */
+    background-color: #121212; /* Fundo geral */
     color: #ffffff; /* Texto principal */
 }
 
@@ -14,7 +14,7 @@ body {
 .sidebar {
     width: 250px;
     background-color: #1e1e1e; /* Fundo do card do login */
-    color: #ffffff; /* Texto principal */
+    color: #aaaaaa; /* Texto principal */
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
@@ -22,7 +22,7 @@ body {
 .menu-title {
     text-align: center;
     margin-bottom: 30px;
-    color: #aaaaaa; /* Texto secundário do login */
+    color: #aaaaaa; /* Texto secundário */
 }
 
 .sidebar ul {
@@ -80,7 +80,7 @@ body {
 .submenu li a {
     padding: 8px 15px;
     font-size: 0.9em;
-    color: #ffffff; /* Texto principal */
+    color: #aaaaaa; /* Texto principal */
 }
 
 .submenu li a:hover {
