@@ -53,15 +53,15 @@ public class ClienteService {
     public Cliente updateCliente(Integer id, Cliente clienteDetails) {
         return clienteRepository.findById(id)
                 .map(cliente -> {
-                    cliente.setCpf(clienteDetails.getCpf());
+                    //cliente.setCpf(clienteDetails.getCpf());
                     cliente.setNome(clienteDetails.getNome());
                     cliente.setEmail(clienteDetails.getEmail());
                     // A senha só deve ser atualizada se for fornecida no clienteDetails
                     if (clienteDetails.getSenha() != null && !clienteDetails.getSenha().isEmpty()) {
                         cliente.setSenha(clienteDetails.getSenha());
                     }
-                    cliente.setCnh(clienteDetails.getCnh());
-                    cliente.setDataNascimento(clienteDetails.getDataNascimento());
+                    //cliente.setCnh(clienteDetails.getCnh());
+                    //cliente.setDataNascimento(clienteDetails.getDataNascimento());
                     
                     return clienteRepository.save(cliente);
                 }).orElseThrow(() -> new RuntimeException("Cliente not found with id " + id));

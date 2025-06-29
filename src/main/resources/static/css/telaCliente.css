@@ -1,0 +1,167 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; /* Fundo geral */
+    color: #ffffff; /* Texto principal */
+}
+
+/* Container geral */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar esquerda */
+.header {
+    background-color: #1e1e1e; /* Fundo do card do login */
+    padding: 20px;
+    width: 250px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Garante que a sidebar ocupe toda a altura da viewport */
+}
+
+.header h2 {
+    color: #aaaaaa; /* Texto secundário */
+    margin-bottom: 30px; /* Aumentado para maior espaçamento antes da navegação */
+    text-align: center; /* Garante que o texto fique centralizado */
+    margin-top: 20px; /* Adicionado para mover "Você Aluga" mais abaixo */
+}
+
+.header nav ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.header nav ul li a {
+    text-decoration: none;
+    color: #ffffff; /* Texto principal */
+    padding: 10px;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.header nav ul li a:hover {
+    background-color: #28a745; /* Verde do botão do login, aplicado apenas no hover */
+}
+
+/* Área de conteúdo (Dashboard) */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #1e1e1e; /* Fundo do card do login */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin: 20px;
+    border-radius: 8px;
+}
+
+.dashboard-header {
+    background-color: #2c2c2c; /* Elementos secundários do login */
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.dashboard-header h1 {
+    color: #ffffff; /* Texto principal */
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.content-columns {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.dashboard-section,
+.dashboard-actions {
+    padding: 20px;
+    background-color: #2c2c2c; /* Elementos secundários do login */
+    margin: 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    flex: 1;
+}
+
+.dashboard-section h2,
+.dashboard-actions h2 {
+    color: #ffffff; /* Texto principal */
+    margin-bottom: 20px; /* Aumentado de 10px para 20px para maior espaçamento antes das informações */
+}
+
+.dashboard-section p,
+.dashboard-actions p {
+    margin-bottom: 10px;
+    color: #aaaaaa; /* Texto secundário do login */
+}
+
+/* Botões */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745; /* Verde do login */
+    color: #ffffff; /* Texto principal */
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    margin-right: 10px;
+}
+
+.button:hover {
+    background-color: #218838; /* Verde escuro no hover do login */
+}
+
+/* Alerts */
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin: 15px 20px;
+    border: 1px solid #555555; /* Borda cinza médio do login */
+}
+
+.alert-danger {
+    background-color: #1e1e1e; /* Ajustado para consistência com o tema escuro */
+    color: #ffcccc; /* Vermelho claro para erro */
+}
+
+.alert-success {
+    background-color: #1e1e1e; /* Ajustado para consistência com o tema escuro */
+    color: #6ac36a; /* Verde claro do login */
+}
+
+/* Fidelidade */
+.loyalty-section {
+    background-color: #2c2c2c; /* Elementos secundários do login */
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+    padding-left: 0; /* Remove qualquer indentação à esquerda */
+    margin-left: 0; /* Garante que não haja margem à esquerda */
+}
+
+.loyalty-section h3 {
+    color: #ffffff; /* Texto principal */
+    margin-bottom: 8px;
+}
+
+.loyalty-section p {
+    color: #aaaaaa; /* Texto secundário do login */
+}
+
+/* Formatação extra para links dentro da dashboard */
+.dashboard-section a,
+.dashboard-actions a {
+    text-decoration: none;
+}

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="suspenderManutencaoForm">
+    <div class="form-container">
+        <h2>Suspender Manutenção</h2>
+        <form th:action="@{/funcionario/manutencao/suspender}" method="post">
+            <div class="form-group">
+                <label for="manutencaoId">ID da Manutenção:</label>
+                <input type="text" id="manutencaoId" name="manutencaoId" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Suspender</button>
+        </form>
+    </div>
+</body>
+</html>

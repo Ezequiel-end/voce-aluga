@@ -16,7 +16,7 @@
             <label for="veiculoManutencao">Veículo (Placa - Modelo):</label>
             <select id="veiculoManutencao" name="veiculo.idVeiculo" class="form-control" required>
                 <option value="">Selecione um veículo</option>
-                <option th:each="veiculo : ${veiculosDisponiveis}"
+                <option th:each="veiculo : ${veiculos}"
                         th:value="${veiculo.idVeiculo}"
                         th:text="${veiculo.placa + ' - ' + veiculo.modelo}">
                 </option>
