@@ -130,9 +130,9 @@ public class Funcionario_Controller {
 
     @PostMapping("/estoque/adicionar-veiculo")
     public String addVeiculo(@ModelAttribute Veiculo veiculo,
-                            @RequestParam Integer filialId,
-                            @RequestParam Integer funcionarioId,
-                            RedirectAttributes redirectAttributes) {
+                             @RequestParam Integer filialId,
+                             @RequestParam Integer funcionarioId,
+                             RedirectAttributes redirectAttributes) {
         try {
             veiculo.setStatus("Disponível");
 
@@ -196,11 +196,11 @@ public class Funcionario_Controller {
 
     @PostMapping("/reservas/criar-reserva")
     public String createReserva(@ModelAttribute Reserva reserva,
-                                @RequestParam Integer funcionarioId,
-                                @RequestParam Integer filialId,
-                                @RequestParam Integer clienteId,
-                                @RequestParam Integer veiculoId,
-                                RedirectAttributes redirectAttributes) {
+                                 @RequestParam Integer funcionarioId,
+                                 @RequestParam Integer filialId,
+                                 @RequestParam Integer clienteId,
+                                 @RequestParam Integer veiculoId,
+                                 RedirectAttributes redirectAttributes) {
         try {
             Funcionario funcionario = funcionarioService.getFuncionarioById(funcionarioId)
                     .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
@@ -304,8 +304,8 @@ public class Funcionario_Controller {
 
     @PostMapping("/manutencao/cadastrar")
     public String cadastrarManutencao(@ModelAttribute Manutencao manutencao,
-                                    BindingResult bindingResult,
-                                    RedirectAttributes redirectAttributes) {
+                                      BindingResult bindingResult,
+                                      RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro de validação: " + bindingResult.getAllErrors().get(0).getDefaultMessage());
             return "redirect:/funcionario/manutencao/cadastrar";
@@ -443,19 +443,38 @@ public class Funcionario_Controller {
 
     // --- Alterar Reserva ---
 
-    // Formulário para Alterar Reserva
+    // Formulário para Alterar Reserva (TRATA A BUSCA POR ID)
     @GetMapping("/reservas/alterar")
-    public String showAlterarReservaForm(Model model) {
+    public String showAlterarReservaForm(@RequestParam(value = "id", required = false) Integer id, Model model) {
         model.addAttribute("activeContent", "alterar_reserva");
-        model.addAttribute("reservas", reservaService.getAllReservas());
+
+        
         model.addAttribute("funcionarios", funcionarioService.getAllFuncionarios());
         model.addAttribute("filiais", filialService.getAllFiliais());
         model.addAttribute("clientes", clienteService.getAllClientes());
         model.addAttribute("veiculos", veiculoService.getAllVeiculos());
+
+        if (id != null) {
+            
+            Optional<Reserva> reservaOptional = reservaService.getReservaById(id);
+            if (reservaOptional.isPresent()) {
+                model.addAttribute("reserva", reservaOptional.get());
+                model.addAttribute("activeContent", "alterar_reserva_detalhes"); 
+            } else {
+                
+                model.addAttribute("errorMessage", "Reserva com ID '" + id + "' não encontrada.");
+            }
+        } else {
+            
+            model.addAttribute("reservas", reservaService.getAllReservas());
+        }
+
         return "funcionario/funcionario-dashboard";
     }
 
-    // Lógica para carregar detalhes da reserva para edição (via AJAX ou GET com ID)
+    // O método @GetMapping("/reservas/alterar/{id}") (loadReservaForEdit) pode ser REMOVIDO ou COMENTADO
+    // pois sua funcionalidade foi absorvida pelo método showAlterarReservaForm acima
+    /*
     @GetMapping("/reservas/alterar/{id}")
     public String loadReservaForEdit(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         Optional<Reserva> reservaOptional = reservaService.getReservaById(id);
@@ -472,6 +491,7 @@ public class Funcionario_Controller {
             return "redirect:/funcionario/reservas/alterar";
         }
     }
+    */
 
     // Lógica para processar a Alteração da Reserva
     @PostMapping("/reservas/alterar/{id}")
@@ -502,7 +522,9 @@ public class Funcionario_Controller {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao alterar reserva: " + e.getMessage());
         }
-        return "redirect:/funcionario/reservas/consultar-reservas";
+        
+        return "redirect:/funcionario/reservas/alterar?id=" + id;
+        
     }
 
     // --- Transferir Veículo de Filial ---
@@ -519,9 +541,9 @@ public class Funcionario_Controller {
     // Lógica para Transferir Veículo
     @PostMapping("/estoque/transferir-veiculo")
     public String transferirVeiculo(@RequestParam Integer veiculoId,
-                                    @RequestParam Integer filialOrigemId,
-                                    @RequestParam Integer filialDestinoId,
-                                    RedirectAttributes redirectAttributes) {
+                                     @RequestParam Integer filialOrigemId,
+                                     @RequestParam Integer filialDestinoId,
+                                     RedirectAttributes redirectAttributes) {
         try {
             estoqueService.transferirVeiculoParaFilial(veiculoId, filialOrigemId, filialDestinoId);
             redirectAttributes.addFlashAttribute("successMessage", "Veículo transferido com sucesso!");
