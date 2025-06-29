@@ -256,12 +256,29 @@ public class Funcionario_Controller {
         try {
             Reserva reserva = reservaService.getReservaById(reservaId)
                     .orElseThrow(() -> new RuntimeException("Reserva não encontrada com o ID: " + reservaId));
+
+            // Cancelar a reserva
             reserva.setStatus("Cancelada");
             reservaService.updateReserva(reservaId, reserva);
-            redirectAttributes.addFlashAttribute("successMessage", "Reserva cancelada com sucesso!");
+
+            // Liberar o veículo
+            Veiculo veiculo = veiculoService.getVeiculoById(reserva.getVeiculo().getIdVeiculo())
+                    .orElseThrow(() -> new RuntimeException("Veículo da reserva não encontrado."));
+            veiculo.setStatus("Disponível");
+            veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
+
+            // Liberar o estoque
+            Estoque estoque = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo())
+                    .orElseThrow(() -> new RuntimeException("Estoque do veículo não encontrado."));
+            estoque.setSituacao("Disponível");
+            estoqueService.updateEstoque(estoque.getIdEstoque(), estoque);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Reserva cancelada e veículo disponível novamente!");
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cancelar reserva: " + e.getMessage());
         }
+
         return "redirect:/funcionario/reservas/cancelar-reserva";
     }
 
@@ -286,7 +303,7 @@ public class Funcionario_Controller {
     }
 
     @PostMapping("/manutencao/cadastrar")
-    public String cadastrarManutencao(@ModelAttribute Manutencao manutencao, // Adicione @Valid se usar validação
+    public String cadastrarManutencao(@ModelAttribute Manutencao manutencao,
                                     BindingResult bindingResult,
                                     RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
@@ -295,7 +312,6 @@ public class Funcionario_Controller {
         }
 
         try {
-            // O veiculo e funcionario já estão mapeados via @ModelAttribute
             if (manutencao.getVeiculo() == null || manutencao.getVeiculo().getIdVeiculo() == null) {
                 throw new RuntimeException("Veículo não selecionado.");
             }
@@ -303,24 +319,44 @@ public class Funcionario_Controller {
                 throw new RuntimeException("Funcionário não selecionado.");
             }
 
-            // Ajuste para dataFim opcional
             if (manutencao.getDataFim() == null) {
-                manutencao.setDataFim(null); // Deixa como nulo se não fornecido
+                manutencao.setDataFim(null);
             }
             if (manutencao.getDataInicio() == null) {
-                manutencao.setDataInicio(LocalDateTime.now()); // Define data atual se não fornecida
+                manutencao.setDataInicio(LocalDateTime.now());
             }
 
-            // Status padrão para nova manutenção
             manutencao.setStatus("Em Curso");
 
+            // Buscar o veículo original
+            Veiculo veiculo = veiculoService.getVeiculoById(manutencao.getVeiculo().getIdVeiculo())
+                    .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
+
+            // Alterar o status do veículo
+            veiculo.setStatus("Em Manutenção");
+            veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
+
+            // Buscar o estoque pelo id do veículo
+            Estoque estoque = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo())
+                    .orElseThrow(() -> new RuntimeException("Estoque do veículo não encontrado."));
+
+            // Alterar a situação do estoque
+            estoque.setSituacao("Em Manutenção");
+            estoqueService.updateEstoque(estoque.getIdEstoque(), estoque);
+
+            // Criar a manutenção
             manutencaoService.createManutencao(manutencao);
+
             redirectAttributes.addFlashAttribute("successMessage", "Manutenção cadastrada com sucesso!");
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar manutenção: " + e.getMessage());
         }
+
         return "redirect:/funcionario/manutencao/cadastrar";
     }
+
+
 
     @GetMapping("/manutencao/suspender")
     public String showSuspenderManutencaoForm(Model model) {
@@ -331,16 +367,27 @@ public class Funcionario_Controller {
     @PostMapping("/manutencao/suspender")
     public String suspenderManutencao(@RequestParam Integer manutencaoId, RedirectAttributes redirectAttributes) {
         try {
-            Optional<Manutencao> manutencaoOptional = manutencaoService.getManutencaoById(manutencaoId);
+            Manutencao manutencao = manutencaoService.getManutencaoById(manutencaoId)
+                    .orElseThrow(() -> new RuntimeException("Manutenção não encontrada com o ID: " + manutencaoId));
 
-            if (manutencaoOptional.isPresent()) {
-                Manutencao manutencao = manutencaoOptional.get();
-                manutencao.setStatus("Suspensa");
-                manutencaoService.updateManutencao(manutencaoId, manutencao);
-                redirectAttributes.addFlashAttribute("successMessage", "Manutenção suspensa com sucesso!");
-            } else {
-                redirectAttributes.addFlashAttribute("errorMessage", "Manutenção não encontrada com o ID: " + manutencaoId);
-            }
+            // Suspender a manutenção
+            manutencao.setStatus("Suspensa");
+            manutencaoService.updateManutencao(manutencaoId, manutencao);
+
+            // Liberar o veículo
+            Veiculo veiculo = veiculoService.getVeiculoById(manutencao.getVeiculo().getIdVeiculo())
+                    .orElseThrow(() -> new RuntimeException("Veículo da manutenção não encontrado."));
+            veiculo.setStatus("Disponível");
+            veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
+
+            // Liberar o estoque
+            Estoque estoque = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo())
+                    .orElseThrow(() -> new RuntimeException("Estoque do veículo não encontrado."));
+            estoque.setSituacao("Disponível");
+            estoqueService.updateEstoque(estoque.getIdEstoque(), estoque);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Manutenção suspensa e veículo disponível novamente!");
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao suspender manutenção: " + e.getMessage());
         }
