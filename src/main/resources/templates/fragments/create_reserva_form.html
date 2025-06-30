@@ -29,7 +29,10 @@
                 <label for="veiculoReserva">Veículo:</label>
                 <select id="veiculoReserva" name="veiculoId" required>
                     <option value="">Selecione um Veículo</option>
-                    <option th:each="veiculo : ${veiculos}" th:value="${veiculo.idVeiculo}" th:text="${veiculo.modelo + ' - ' + veiculo.placa}"></option>
+                    <option th:each="veiculo : ${veiculos}" 
+                            th:value="${veiculo.idVeiculo}" 
+                            th:text="${veiculo.modelo + ' - ' + veiculo.placa + ' (' + veiculo.grupoVeiculo.grupo + ')'}">
+                    </option>
                 </select>
             </div>
             <div class="form-group">
