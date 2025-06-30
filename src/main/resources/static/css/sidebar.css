@@ -1,0 +1,35 @@
+.sidebar {
+    width: 300px;
+    background-color: #1e1e1e; /* Fundo do card do login */
+    color: #aaaaaa; /* Texto principal */
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.menu-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #aaaaaa; /* Texto secundário */
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    display: block;
+    color: #ffffff; /* Texto principal */
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar ul li a:hover {
+    background-color: #28a745; /* Verde do botão do login, aplicado apenas no hover */
+}

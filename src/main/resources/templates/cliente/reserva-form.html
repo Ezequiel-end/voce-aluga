@@ -4,71 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova Reserva - Voce Aluga</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/telaCliente.css}">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Fazer Nova Reserva</h1>
+        <!-- Sidebar Menu -->
+        <aside class="sidebar">
+            <h2 class="menu-title">Você Aluga</h2>
+
             <nav>
                 <ul>
-                    <li><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
-                    <li><a th:href="@{/cliente/reservas}">Minhas Reservas</a></li>
-                    <li><a th:href="@{/cliente/perfil/editar}">Editar Perfil</a></li>
-                    <li><a th:href="@{/cliente/logout}">Sair</a></li>
+                    <li class="menu-item"><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
+                    <li class="menu-item"><a th:href="@{/cliente/reservas}">Minhas Reservas</a></li>
+                    <li class="menu-item"><a th:href="@{/cliente/perfil/editar}">Editar Perfil</a></li>
+                    <li class="menu-item"><a th:href="@{/cliente/logout}">Sair</a></li>
                 </ul>
             </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <header>
+                <h1>
+                    <span>Fazer Nova Reserva</span>
+                </h1>
+            </header>
+
+            <!-- Feedback Messages -->
+            <div class="messages">
+                <p th:if="${success}" class="success-message" th:text="${success}"></p>
+                <p th:if="${error}" class="error-message" th:text="${error}"></p>
+            </div>
+
+            <!-- Content Area -->
+            <section id="content-area">
+                <div class="form-container">
+                    <h2>Criar Nova Reserva</h2>
+
+                    <form th:action="@{/cliente/reservas/nova}" th:object="${reserva}" method="post">
+                        <div class="form-group">
+                            <label for="filial">Filial para Retirada:</label>
+                            <select id="filial" th:field="*{filial.idFilial}" required>
+                                <option value="">Selecione uma Filial</option>
+                                <option th:each="filial : ${filiais}" th:value="${filial.idFilial}" th:text="${filial.nome}"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="grupoVeiculo">Grupo de Veículo (Opcional para filtro):</label>
+                            <select id="grupoVeiculo" onchange="filterVehicles()">
+                                <option value="">Todos os Grupos</option>
+                                <option th:each="grupo : ${gruposVeiculo}" th:value="${grupo.idGrupoVeiculo}" th:text="${grupo.grupo}"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="veiculo">Veículo:</label>
+                            <select id="veiculo" th:field="*{veiculo.idVeiculo}" required>
+                                <option value="">Selecione um Veículo</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dataInicio">Data e Hora de Início:</label>
+                            <input type="datetime-local" id="dataInicio" th:field="*{dataInicio}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dataFim">Data e Hora de Fim:</label>
+                            <input type="datetime-local" id="dataFim" th:field="*{dataFim}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="valor">Valor Estimado:</label>
+                            <input type="number" id="valor" th:field="*{valor}" step="0.01" readonly required placeholder="Calculado após a seleção de datas/veículo">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Criar Reserva</button>
+                    </form>
+                </div>
+            </section>
         </div>
-
-        <div th:if="${error}" class="alert alert-danger">
-            <p th:text="${error}"></p>
-        </div>
-        <div th:if="${success}" class="alert alert-success">
-            <p th:text="${success}"></p>
-        </div>
-
-        <form th:action="@{/cliente/reservas/nova}" th:object="${reserva}" method="post">
-            <div class="form-group">
-                <label for="filial">Filial para Retirada:</label>
-                <select id="filial" th:field="*{filial.idFilial}" required>
-                    <option value="">Selecione uma Filial</option>
-                    <option th:each="filial : ${filiais}" th:value="${filial.idFilial}" th:text="${filial.nome}"></option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="grupoVeiculo">Grupo de Veículo (Opcional para filtro):</label>
-                <select id="grupoVeiculo" onchange="filterVehicles()">
-                    <option value="">Todos os Grupos</option>
-                    <option th:each="grupo : ${gruposVeiculo}" th:value="${grupo.idGrupoVeiculo}" th:text="${grupo.grupo}"></option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="veiculo">Veículo:</label>
-                <select id="veiculo" th:field="*{veiculo.idVeiculo}" required>
-                    <option value="">Selecione um Veículo</option>
-                    </select>
-            </div>
-
-            <div class="form-group">
-                <label for="dataInicio">Data de Início:</label>
-                <input type="date" id="dataInicio" th:field="*{dataInicio}" required>
-            </div>
-
-            <div class="form-group">
-                <label for="dataFim">Data e Hora de Fim:</label>
-                <input type="datetime-local" id="dataFim" th:field="*{dataFim}" required>
-            </div>
-
-            <div class="form-group">
-                <label for="valor">Valor Estimado:</label>
-                <input type="number" id="valor" th:field="*{valor}" step="0.01" readonly required placeholder="Calculado após a seleção de datas/veículo">
-            </div>
-
-            <button type="submit">Confirmar Reserva</button>
-        </form>
-        <p><a th:href="@{/cliente/reservas}" class="button">Voltar para Minhas Reservas</a></p>
     </div>
 
     <script th:inline="javascript">
@@ -110,7 +127,7 @@
                 // Certifique-se de que veiculo.grupoVeiculo existe e tem idGrupoVeiculo
                 const veiculoGrupoId = veiculo.grupoVeiculo ? veiculo.grupoVeiculo.idGrupoVeiculo : null;
 
-                if (veiculo.status === 'DISPONIVEL' &&
+                if (veiculo.status === 'Disponível' &&
                     (selectedGrupoId === '' || veiculoGrupoId == selectedGrupoId)) { // Compara com == para permitir string/number
                     const option = document.createElement('option');
                     option.value = veiculo.idVeiculo;
