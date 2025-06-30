@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -184,13 +185,24 @@ public class Funcionario_Controller {
 
     // Gerenciar Reservas - Criar Reserva
     @GetMapping("/reservas/criar-reserva")
-    public String showCreateReservaForm(Model model) {
+    public String showCreateReservaForm(
+        @RequestParam(value = "filialId", required = false) Integer filialId,
+        Model model) {
+
         model.addAttribute("activeContent", "create_reserva");
         model.addAttribute("reserva", new Reserva());
         model.addAttribute("funcionarios", funcionarioService.getAllFuncionarios());
         model.addAttribute("filiais", filialService.getAllFiliais());
         model.addAttribute("clientes", clienteService.getAllClientes());
-        model.addAttribute("veiculos", veiculoService.getAllVeiculos());
+
+        if (filialId != null) {
+            List<Veiculo> veiculosDisponiveis = estoqueService.getVeiculosDisponiveisPorFilial(filialId);
+            model.addAttribute("veiculos", veiculosDisponiveis);
+            model.addAttribute("selectedFilialId", filialId);
+        } else {
+            model.addAttribute("veiculos", Collections.emptyList());
+        }
+
         return "funcionario/funcionario-dashboard";
     }
 

@@ -2,6 +2,7 @@ package com.vocealuga.service;
 
 import com.vocealuga.model.Estoque;
 import com.vocealuga.model.Filial; // Import adicionado para Filial
+import com.vocealuga.model.Veiculo;
 import com.vocealuga.dao.EstoqueRepository;
 import com.vocealuga.dao.FilialRepository; // Injetar FilialRepository
 import com.vocealuga.dao.VeiculoRepository; // Injetar VeiculoRepository
@@ -81,5 +82,9 @@ public class EstoqueService {
 
     public Optional<Estoque> getEstoqueByVeiculoId(Integer veiculoId) {
         return estoqueRepository.findByVeiculo_IdVeiculo(veiculoId);
+    }
+
+    public List<Veiculo> getVeiculosDisponiveisPorFilial(Integer filialId) {
+        return estoqueRepository.findVeiculosDisponiveisPorFilial(filialId);
     }
 }

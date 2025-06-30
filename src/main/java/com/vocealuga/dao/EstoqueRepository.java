@@ -1,6 +1,7 @@
 package com.vocealuga.dao;
 
 import com.vocealuga.model.Estoque;
+import com.vocealuga.model.Veiculo;
 
 import jakarta.transaction.Transactional;
 
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,5 +26,8 @@ public interface EstoqueRepository extends JpaRepository<Estoque, Integer> {
     @Modifying
     @Query("DELETE FROM Estoque e WHERE e.veiculo.idVeiculo = :veiculoId")
     void deleteByVeiculoId(@Param("veiculoId") Integer veiculoId);
+
+    @Query("SELECT e.veiculo FROM Estoque e WHERE e.filial.idFilial = :filialId AND e.situacao = 'Disponível'")
+    List<Veiculo> findVeiculosDisponiveisPorFilial(@Param("filialId") Integer filialId);
 }                                                                                              
 
