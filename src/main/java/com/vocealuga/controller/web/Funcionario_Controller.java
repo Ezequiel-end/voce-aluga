@@ -556,7 +556,7 @@ public class Funcionario_Controller {
     }
 
     // Cadastro de Filial
-    @GetMapping("/cadastrar-filial")
+   @GetMapping("/cadastrar-filial")
     public String showRegisterFilialForm(Model model) {
         model.addAttribute("activeContent", "register_filial");
         model.addAttribute("filial", new Filial());
@@ -571,6 +571,6 @@ public class Funcionario_Controller {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar filial: " + e.getMessage());
         }
-        return "redirect:/funcionario/cadastrar-filial?activeContent=register_filial";
+        return "redirect:/funcionario/cadastrar-filial";
     }
 }

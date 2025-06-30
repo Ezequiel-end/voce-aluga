@@ -30,12 +30,18 @@
 
             <div class="form-group">
                 <label for="dataInicio">Data de Início:</label>
-                <input type="datetime-local" id="dataInicio" th:field="*{dataInicio}" class="form-control" required />
+                <input type="datetime-local" id="dataInicio"
+                    th:value="${#temporals.format(reserva.dataInicio, 'yyyy-MM-dd''T''HH:mm')}"
+                    name="dataInicio"
+                    class="form-control" required />
             </div>
 
             <div class="form-group">
                 <label for="dataFim">Data de Fim:</label>
-                <input type="datetime-local" id="dataFim" th:field="*{dataFim}" class="form-control" required />
+                <input type="datetime-local" id="dataFim"
+                    th:value="${#temporals.format(reserva.dataFim, 'yyyy-MM-dd''T''HH:mm')}"
+                    name="dataFim"
+                    class="form-control" required />
             </div>
 
             <div class="form-group">
@@ -46,10 +52,8 @@
             <div class="form-group">
                 <label for="status">Status:</label>
                 <select id="status" th:field="*{status}" class="form-control" required>
-                    <option value="PENDENTE">PENDENTE</option>
-                    <option value="CONFIRMADA">CONFIRMADA</option>
-                    <option value="CONCLUIDA">CONCLUIDA</option>
-                    <option value="CANCELADA">CANCELADA</option>
+                    <option value="PENDENTE">Ativa</option>
+                    <option value="CONFIRMADA">Cancelada</option>
                 </select>
             </div>
 
