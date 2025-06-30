@@ -1,7 +1,6 @@
 package com.vocealuga.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime; // For DataFim which is DATETIME
 
 @Entity
@@ -22,23 +21,27 @@ public class Manutencao {
     private Veiculo veiculo; // FK to veiculo
 
     @Column(name = "DataInicio", nullable = false)
-    private LocalDate dataInicio;
+    private LocalDateTime dataInicio;
 
-    @Column(name = "DataFim", nullable = false)
+    @Column(name = "DataFim", nullable = true)
     private LocalDateTime dataFim;
 
     @Column(name = "Motivo", nullable = false, length = 255)
     private String motivo;
 
+    @Column(name = "Status", nullable = false)
+    private String status;
+
     public Manutencao() {
     }
 
-    public Manutencao(Funcionario funcionario, Veiculo veiculo, LocalDate dataInicio, LocalDateTime dataFim, String motivo) {
+    public Manutencao(Funcionario funcionario, Veiculo veiculo, LocalDateTime dataInicio, LocalDateTime dataFim, String motivo, String status) {
         this.funcionario = funcionario;
         this.veiculo = veiculo;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
         this.motivo = motivo;
+        this.status = status;
     }
 
     // Getters and Setters
@@ -48,22 +51,25 @@ public class Manutencao {
     public void setFuncionario(Funcionario funcionario) { this.funcionario = funcionario; }
     public Veiculo getVeiculo() { return veiculo; }
     public void setVeiculo(Veiculo veiculo) { this.veiculo = veiculo; }
-    public LocalDate getDataInicio() { return dataInicio; }
-    public void setDataInicio(LocalDate dataInicio) { this.dataInicio = dataInicio; }
+    public LocalDateTime getDataInicio() { return dataInicio; }
+    public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
     public void setDataFim(LocalDateTime dataFim) { this.dataFim = dataFim; }
     public String getMotivo() { return motivo; }
     public void setMotivo(String motivo) { this.motivo = motivo; }
+    public String getStatus() { return status;}
+    public void setStatus(String status) {this.status = status;}
 
     @Override
     public String toString() {
         return "Manutencao{" +
-               "idManutencao=" + idManutencao +
-               ", funcionario=" + (funcionario != null ? funcionario.getIdFuncionario() : "null") +
-               ", veiculo=" + (veiculo != null ? veiculo.getIdVeiculo() : "null") +
-               ", dataInicio=" + dataInicio +
-               ", dataFim=" + dataFim +
-               ", motivo='" + motivo + '\'' +
-               '}';
+            "idManutencao=" + idManutencao +
+            ", funcionario=" + (funcionario != null ? funcionario.getIdFuncionario() : "null") +
+            ", veiculo=" + (veiculo != null ? veiculo.getIdVeiculo() : "null") +
+            ", dataInicio=" + dataInicio +
+            ", dataFim=" + dataFim +
+            ", motivo='" + motivo + '\'' +
+            ", status='" + status + '\'' +
+            '}';
     }
 }
