@@ -1,5 +1,5 @@
 <div th:fragment="alterarReservaForm" class="form-container">
-    <h2>Alterar Reserva</h2>
+    <h2>Buscar Reserva</h2>
 
     <form th:action="@{/funcionario/reservas/alterar}" method="get" class="form-group">
         <label for="reservaIdSearch">Buscar Reserva por ID:</label>
@@ -7,8 +7,9 @@
         <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar Reserva</button>
     </form>
 
-    <div th:if="${reserva != null}" class="form-container" style="margin-top: 20px;">
+    <div th:if="${reserva != null}" class="form-container detalhes_reserva">
         <h3>Detalhes da Reserva (ID: <span th:text="${reserva.idReserva}"></span>)</h3>
+
         <form th:action="@{/funcionario/reservas/alterar}" th:object="${reserva}" method="post">
             <input type="hidden" th:field="*{idReserva}" />
 
@@ -53,8 +54,6 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Atualizar Reserva</button>
-            <a th:href="@{/funcionario/reservas/alterar}" class="btn btn-secondary">Nova Busca</a>
         </form>
     </div>
-    <p th:if="${reserva == null and param.id != null}" class="error-message">Reserva com ID '<span th:text="${param.id}"></span>' não encontrada.</p>
 </div>

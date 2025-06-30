@@ -5,20 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Processar Pagamento - Voce Aluga</title>
     <link rel="stylesheet" th:href="@{/css/telaCliente.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Processar Pagamento</h1>
+        <!-- Sidebar Menu -->
+        <aside class="sidebar">
+            <h2 class="menu-title">Você Aluga</h2>
+
             <nav>
                 <ul>
-                    <li><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
-                    <li><a th:href="@{/cliente/reservas}">Minhas Reservas</a></li>
-                    <li><a th:href="@{/cliente/perfil/editar}">Editar Perfil</a></li>
-                    <li><a th:href="@{/cliente/logout}">Sair</a></li>
+                    <li class="menu-item"><a th:href="@{/cliente/dashboard}">Dashboard</a></li>
+                    <li class="menu-item"><a th:href="@{/cliente/reservas}">Minhas Reservas</a></li>
+                    <li class="menu-item"><a th:href="@{/cliente/perfil/editar}">Editar Perfil</a></li>
+                    <li class="menu-item"><a th:href="@{/cliente/logout}">Sair</a></li>
                 </ul>
             </nav>
-        </div>
+        </aside>
 
         <div th:if="${error}" class="alert alert-danger">
             <p th:text="${error}"></p>
