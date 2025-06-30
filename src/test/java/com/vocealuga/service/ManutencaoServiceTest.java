@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +42,7 @@ class ManutencaoServiceTest {
         manutencao.setIdManutencao(1);
         manutencao.setFuncionario(funcionario);
         manutencao.setVeiculo(veiculo);
-        manutencao.setDataInicio(LocalDate.now());
+        manutencao.setDataInicio(LocalDateTime.now());
         manutencao.setDataFim(LocalDateTime.now().plusDays(1));
         manutencao.setMotivo("Troca de óleo");
     }
@@ -101,7 +100,7 @@ class ManutencaoServiceTest {
         novoVeiculo.setIdVeiculo(2);
         novaManutencao.setFuncionario(novoFuncionario);
         novaManutencao.setVeiculo(novoVeiculo);
-        novaManutencao.setDataInicio(LocalDate.now().plusDays(2));
+        novaManutencao.setDataInicio(LocalDateTime.now().plusDays(2));
         novaManutencao.setDataFim(LocalDateTime.now().plusDays(3));
         novaManutencao.setMotivo("Reparo de freios");
         when(manutencaoRepository.findById(1)).thenReturn(Optional.of(manutencao));
