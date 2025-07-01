@@ -41,7 +41,7 @@
                 </select>
             </div>
 
-            <!-- Cliente -->
+            <!-- Cliente 
             <div class="form-group">
                 <label for="clienteReserva">Cliente:</label>
                 <select id="clienteReserva" name="clienteId" required>
@@ -50,6 +50,13 @@
                             th:value="${cliente.idCliente}" 
                             th:text="${cliente.nome + ' (' + cliente.cpf + ')'}"></option>
                 </select>
+            </div>
+            -->
+
+            <!-- Cliente (Substituído por campo CPF) -->
+            <div class="form-group">
+                <label for="clienteCpf">CPF do Cliente:</label>
+                <input type="text" id="clienteCpf" name="clienteCpf" placeholder="Digite o CPF" required pattern="\d{11}" title="Digite um CPF válido (11 dígitos)">
             </div>
 
             <!-- Datas -->

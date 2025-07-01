@@ -8,15 +8,18 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import com.vocealuga.utils.ValidationsUtils;
 
 @Service
 public class ReservaService {
 
     private final ReservaRepository reservaRepository;
+    private final ValidationsUtils validation;
 
     @Autowired
-    public ReservaService(ReservaRepository reservaRepository) {
+    public ReservaService(ReservaRepository reservaRepository, ValidationsUtils validation) {
         this.reservaRepository = reservaRepository;
+        this.validation = validation;
     }
 
     public List<Reserva> getAllReservas() {
