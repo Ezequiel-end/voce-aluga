@@ -13,6 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -158,7 +160,7 @@ public class Funcionario_Controller {
     @GetMapping("/estoque/remover-veiculo")
     public String showRemoveVeiculoForm(Model model) {
         model.addAttribute("activeContent", "remove_veiculo");
-        model.addAttribute("veiculos", veiculoService.getAllVeiculos());
+        model.addAttribute("veiculos", veiculoService.getAllVeiculosAtivos());
         return "funcionario/funcionario-dashboard";
     }
 
@@ -167,8 +169,8 @@ public class Funcionario_Controller {
         try {
             veiculoService.deleteVeiculo(veiculoId);
             redirectAttributes.addFlashAttribute("successMessage", "Veículo removido com sucesso!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao remover veículo: " + e.getMessage());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/funcionario/estoque/remover-veiculo";
     }
@@ -184,32 +186,43 @@ public class Funcionario_Controller {
 
     // Gerenciar Reservas - Criar Reserva
     @GetMapping("/reservas/criar-reserva")
-    public String showCreateReservaForm(Model model) {
+    public String showCreateReservaForm(
+        @RequestParam(value = "filialId", required = false) Integer filialId,
+        Model model) {
+
         model.addAttribute("activeContent", "create_reserva");
         model.addAttribute("reserva", new Reserva());
         model.addAttribute("funcionarios", funcionarioService.getAllFuncionarios());
         model.addAttribute("filiais", filialService.getAllFiliais());
-        model.addAttribute("clientes", clienteService.getAllClientes());
-        model.addAttribute("veiculos", veiculoService.getAllVeiculos());
+
+        if (filialId != null) {
+            List<Veiculo> veiculosDisponiveis = estoqueService.getVeiculosDisponiveisPorFilial(filialId);
+            model.addAttribute("veiculos", veiculosDisponiveis);
+            model.addAttribute("selectedFilialId", filialId);
+        } else {
+            model.addAttribute("veiculos", Collections.emptyList());
+        }
+
         return "funcionario/funcionario-dashboard";
     }
 
     @PostMapping("/reservas/criar-reserva")
     public String createReserva(@ModelAttribute Reserva reserva,
-                                 @RequestParam Integer funcionarioId,
-                                 @RequestParam Integer filialId,
-                                 @RequestParam Integer clienteId,
-                                 @RequestParam Integer veiculoId,
-                                 RedirectAttributes redirectAttributes) {
+                                @RequestParam Integer funcionarioId,
+                                @RequestParam Integer filialId,
+                                @RequestParam String clienteCpf,
+                                @RequestParam Integer veiculoId,
+                                RedirectAttributes redirectAttributes) {
         try {
             Funcionario funcionario = funcionarioService.getFuncionarioById(funcionarioId)
                     .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
             Filial filial = filialService.getFilialById(filialId)
                     .orElseThrow(() -> new RuntimeException("Filial não encontrada"));
-            Cliente cliente = clienteService.getClienteById(clienteId)
-                    .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
             Veiculo veiculo = veiculoService.getVeiculoById(veiculoId)
                     .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
+
+            Cliente cliente = clienteService.findClienteByCpf(clienteCpf)
+                    .orElseThrow(() -> new RuntimeException("Cliente não registrado com CPF: " + clienteCpf));
 
             // Atualizar status do veículo
             veiculo.setStatus("Em Reserva");
@@ -247,7 +260,7 @@ public class Funcionario_Controller {
     @GetMapping("/reservas/cancelar-reserva")
     public String showCancelReservaForm(Model model) {
         model.addAttribute("activeContent", "cancel_reserva");
-        model.addAttribute("reservas", reservaService.getAllReservas());
+        model.addAttribute("reservas", reservaService.getAllReservasAtivas());
         return "funcionario/funcionario-dashboard";
     }
 
@@ -444,90 +457,61 @@ public class Funcionario_Controller {
     // --- Alterar Reserva ---
 
     // Formulário para Alterar Reserva (TRATA A BUSCA POR ID)
+    
     @GetMapping("/reservas/alterar")
     public String showAlterarReservaForm(@RequestParam(value = "id", required = false) Integer id, Model model) {
         model.addAttribute("activeContent", "alterar_reserva");
 
-        
-        model.addAttribute("funcionarios", funcionarioService.getAllFuncionarios());
-        model.addAttribute("filiais", filialService.getAllFiliais());
-        model.addAttribute("clientes", clienteService.getAllClientes());
-        model.addAttribute("veiculos", veiculoService.getAllVeiculos());
-
         if (id != null) {
-            
             Optional<Reserva> reservaOptional = reservaService.getReservaById(id);
             if (reservaOptional.isPresent()) {
                 model.addAttribute("reserva", reservaOptional.get());
-                model.addAttribute("activeContent", "alterar_reserva_detalhes"); 
+                model.addAttribute("activeContent", "alterar_reserva_detalhes");
             } else {
-                
                 model.addAttribute("errorMessage", "Reserva com ID '" + id + "' não encontrada.");
             }
         } else {
-            
-            model.addAttribute("reservas", reservaService.getAllReservas());
+            // Caso id não seja fornecido, exibe o formulário de busca ou uma lista (ajuste conforme necessário)
+            model.addAttribute("reservas", reservaService.getAllReservas()); // Opcional: lista todas as reservas
         }
 
         return "funcionario/funcionario-dashboard";
     }
 
-    // O método @GetMapping("/reservas/alterar/{id}") (loadReservaForEdit) pode ser REMOVIDO ou COMENTADO
-    // pois sua funcionalidade foi absorvida pelo método showAlterarReservaForm acima
-    /*
-    @GetMapping("/reservas/alterar/{id}")
-    public String loadReservaForEdit(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
-        Optional<Reserva> reservaOptional = reservaService.getReservaById(id);
-        if (reservaOptional.isPresent()) {
-            model.addAttribute("activeContent", "alterar_reserva_detalhes");
-            model.addAttribute("reserva", reservaOptional.get());
-            model.addAttribute("funcionarios", funcionarioService.getAllFuncionarios());
-            model.addAttribute("filiais", filialService.getAllFiliais());
-            model.addAttribute("clientes", clienteService.getAllClientes());
-            model.addAttribute("veiculos", veiculoService.getAllVeiculos());
-            return "funcionario/funcionario-dashboard";
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Reserva não encontrada para alteração.");
-            return "redirect:/funcionario/reservas/alterar";
-        }
-    }
-    */
-
     // Lógica para processar a Alteração da Reserva
     @PostMapping("/reservas/alterar/{id}")
     public String alterarReserva(@PathVariable Integer id,
-                                 @ModelAttribute Reserva reservaDetails,
-                                 @RequestParam Integer funcionarioId,
-                                 @RequestParam Integer filialId,
-                                 @RequestParam Integer clienteId,
-                                 @RequestParam Integer veiculoId,
-                                 RedirectAttributes redirectAttributes) {
+                                @ModelAttribute Reserva reserva,
+                                RedirectAttributes redirectAttributes) {
         try {
-            Funcionario funcionario = funcionarioService.getFuncionarioById(funcionarioId)
-                    .orElseThrow(() -> new RuntimeException("Funcionário não encontrado."));
-            Filial filial = filialService.getFilialById(filialId)
-                    .orElseThrow(() -> new RuntimeException("Filial não encontrada."));
-            Cliente cliente = clienteService.getClienteById(clienteId)
-                    .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
-            Veiculo veiculo = veiculoService.getVeiculoById(veiculoId)
-                    .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
+            Reserva reservaExistente = reservaService.getReservaById(id)
+                    .orElseThrow(() -> new RuntimeException("Reserva não encontrada com id " + id));
 
-            reservaDetails.setFuncionario(funcionario);
-            reservaDetails.setFilial(filial);
-            reservaDetails.setCliente(cliente);
-            reservaDetails.setVeiculo(veiculo);
+            if (reserva.getDataInicio() == null || reserva.getDataFim() == null) {
+                throw new RuntimeException("Datas de início e fim são obrigatórias.");
+            }
+            if (reserva.getDataInicio().isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("A data de início não pode ser anterior ao momento atual.");
+            }
+            if (reserva.getDataFim().isBefore(reserva.getDataInicio().plusDays(1))) {
+                throw new RuntimeException("A data de fim deve ser pelo menos 1 dia após a data de início.");
+            }
 
-            reservaService.updateReserva(id, reservaDetails);
-            redirectAttributes.addFlashAttribute("successMessage", "Reserva alterada com sucesso!");
+            reserva.setFuncionario(reservaExistente.getFuncionario());
+            reserva.setFilial(reservaExistente.getFilial());
+            reserva.setCliente(reservaExistente.getCliente());
+            reserva.setVeiculo(reservaExistente.getVeiculo());
+            reserva.setStatus(reservaExistente.getStatus());
+
+            reservaService.updateReserva(id, reserva);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Reserva alterada com sucesso! Valor alterado: R$" + String.format("%.2f", reserva.getValor()));
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao alterar reserva: " + e.getMessage());
         }
-        
-        return "redirect:/funcionario/reservas/alterar?id=" + id;
-        
-    }
 
-    // --- Transferir Veículo de Filial ---
+        return "redirect:/funcionario/reservas/alterar?id=" + id;
+    }
 
     // Formulário para Transferir Veículo
     @GetMapping("/estoque/transferir-veiculo")
@@ -556,7 +540,7 @@ public class Funcionario_Controller {
     }
 
     // Cadastro de Filial
-    @GetMapping("/cadastrar-filial")
+   @GetMapping("/cadastrar-filial")
     public String showRegisterFilialForm(Model model) {
         model.addAttribute("activeContent", "register_filial");
         model.addAttribute("filial", new Filial());
@@ -571,6 +555,6 @@ public class Funcionario_Controller {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar filial: " + e.getMessage());
         }
-        return "redirect:/funcionario/cadastrar-filial?activeContent=register_filial";
+        return "redirect:/funcionario/cadastrar-filial";
     }
 }

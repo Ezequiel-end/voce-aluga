@@ -1,11 +1,13 @@
 package com.vocealuga.dao;
 
 import com.vocealuga.model.Estoque;
+import com.vocealuga.model.Veiculo;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,5 +17,15 @@ public interface EstoqueRepository extends JpaRepository<Estoque, Integer> {
     Optional<Estoque> findByVeiculoAndFilial(@Param("veiculoId") Integer veiculoId,
                                               @Param("filialId") Integer filialId);
     Optional<Estoque> findByVeiculo_IdVeiculo(Integer idVeiculo);
+
+    @Query("SELECT e FROM Estoque e WHERE e.veiculo.idVeiculo = :veiculoId")
+    Optional<Estoque> findByVeiculoId(@Param("veiculoId") Integer veiculoId);
+
+    @Modifying
+    @Query("DELETE FROM Estoque e WHERE e.veiculo.idVeiculo = :veiculoId")
+    void deleteByVeiculoId(@Param("veiculoId") Integer veiculoId);
+
+    @Query("SELECT e.veiculo FROM Estoque e WHERE e.filial.idFilial = :filialId AND e.situacao = 'Disponível'")
+    List<Veiculo> findVeiculosDisponiveisPorFilial(@Param("filialId") Integer filialId);
 }                                                                                              
 

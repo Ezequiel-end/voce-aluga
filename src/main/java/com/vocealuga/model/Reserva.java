@@ -30,7 +30,7 @@ public class Reserva {
     private Veiculo veiculo; // FK to veiculo
 
     @Column(name = "DataInicio", nullable = false)
-    private LocalDate dataInicio;
+    private LocalDateTime dataInicio;
 
     @Column(name = "DataFim", nullable = false)
     private LocalDateTime dataFim;
@@ -44,7 +44,7 @@ public class Reserva {
     public Reserva() {
     }
 
-    public Reserva(Funcionario funcionario, Filial filial, Cliente cliente, Veiculo veiculo, LocalDate dataInicio, LocalDateTime dataFim, Float valor, String status) {
+    public Reserva(Funcionario funcionario, Filial filial, Cliente cliente, Veiculo veiculo, LocalDateTime dataInicio, LocalDateTime dataFim, Float valor, String status) {
         this.funcionario = funcionario;
         this.filial = filial;
         this.cliente = cliente;
@@ -66,8 +66,8 @@ public class Reserva {
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
     public Veiculo getVeiculo() { return veiculo; }
     public void setVeiculo(Veiculo veiculo) { this.veiculo = veiculo; }
-    public LocalDate getDataInicio() { return dataInicio; }
-    public void setDataInicio(LocalDate dataInicio) { this.dataInicio = dataInicio; }
+    public LocalDateTime getDataInicio() { return dataInicio; }
+    public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
     public void setDataFim(LocalDateTime dataFim) { this.dataFim = dataFim; }
     public Float getValor() { return valor; }

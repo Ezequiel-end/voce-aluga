@@ -24,7 +24,7 @@ public class Manutencao {
     @Column(name = "DataInicio", nullable = false)
     private LocalDateTime dataInicio;
 
-    @Column(name = "DataFim", nullable = true)
+    @Column(name = "DataFim", nullable = false)
     private LocalDateTime dataFim;
 
     @Column(name = "Motivo", nullable = false, length = 255)

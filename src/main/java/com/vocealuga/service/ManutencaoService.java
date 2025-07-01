@@ -5,6 +5,7 @@ import com.vocealuga.dao.ManutencaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,14 @@ public class ManutencaoService {
     }
 
     public Manutencao createManutencao(Manutencao manutencao) {
+
+        if (manutencao.getDataInicio().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("A data de início não pode ser anterior ao momento atual.");
+        }
+        if (manutencao.getDataFim().isBefore(manutencao.getDataInicio().plusDays(1))) {
+            throw new RuntimeException("A data de fim deve ser pelo menos 1 dia após a data de início.");
+        }
+
         return manutencaoRepository.save(manutencao);
     }
 

@@ -5,17 +5,21 @@ import com.vocealuga.dao.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import com.vocealuga.utils.ValidationsUtils;
 
 @Service
 public class ReservaService {
 
     private final ReservaRepository reservaRepository;
+    private final ValidationsUtils validation;
 
     @Autowired
-    public ReservaService(ReservaRepository reservaRepository) {
+    public ReservaService(ReservaRepository reservaRepository, ValidationsUtils validation) {
         this.reservaRepository = reservaRepository;
+        this.validation = validation;
     }
 
     public List<Reserva> getAllReservas() {
@@ -27,6 +31,12 @@ public class ReservaService {
     }
 
     public Reserva createReserva(Reserva reserva) {
+        if (reserva.getDataInicio().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("A data de início não pode ser anterior ao momento atual.");
+        }
+        if (reserva.getDataFim().isBefore(reserva.getDataInicio().plusDays(1))) {
+            throw new RuntimeException("A data de fim deve ser pelo menos 1 dia após a data de início.");
+        }
         return reservaRepository.save(reserva);
     }
 
@@ -42,15 +52,18 @@ public class ReservaService {
                     reserva.setValor(reservaDetails.getValor());
                     reserva.setStatus(reservaDetails.getStatus());
                     return reservaRepository.save(reserva);
-                }).orElseThrow(() -> new RuntimeException("Reserva not found with id " + id));
+                }).orElseThrow(() -> new RuntimeException("Reserva nao encontrada com id " + id));
     }
 
     public void deleteReserva(Integer id) {
         reservaRepository.deleteById(id);
     }
 
-    // NOVO MÉTODO: Busca todas as reservas associadas a um cliente específico.
     public List<Reserva> getReservasByCliente(Integer idCliente) {
         return reservaRepository.findByCliente_IdCliente(idCliente);
+    }
+
+    public List<Reserva> getAllReservasAtivas() {
+        return reservaRepository.findByStatusNot("Cancelada");
     }
 }

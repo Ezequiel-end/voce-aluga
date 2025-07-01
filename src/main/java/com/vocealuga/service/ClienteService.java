@@ -91,4 +91,16 @@ public class ClienteService {
         return clienteRepository.findByEmailAndSenha(email, senha);
     }
 
+    public Optional<Cliente> findClienteByCpf(String cpf) {
+        String cleanCpf = cpf.replaceAll("[^0-9]", "");
+
+        if (!ValidationsUtils.isValidCPF(cleanCpf)) {
+            throw new IllegalArgumentException("CPF inválido: " + cleanCpf);
+        }
+        return clienteRepository.findByCpf(cleanCpf)
+                .or(() -> {
+                    throw new RuntimeException("Cliente não registrado com CPF: " + cleanCpf);
+                });
+    }
+
 }

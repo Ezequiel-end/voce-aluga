@@ -1,59 +1,97 @@
 <div th:fragment="alterarReservaForm" class="form-container">
     <h2>Buscar Reserva</h2>
 
+    <!-- Formulário de busca por ID -->
     <form th:action="@{/funcionario/reservas/alterar}" method="get" class="form-group">
         <label for="reservaIdSearch">Buscar Reserva por ID:</label>
         <input type="number" id="reservaIdSearch" name="id" class="form-control" placeholder="ID da Reserva" required>
         <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar Reserva</button>
     </form>
 
+    <!-- Detalhes da reserva para alteração -->
     <div th:if="${reserva != null}" class="form-container detalhes_reserva">
         <h3>Detalhes da Reserva (ID: <span th:text="${reserva.idReserva}"></span>)</h3>
+        <p>Cliente: <span th:text="${reserva.cliente.nome}"></span></p>
+        <!-- Aqui o grupo A/B/C agora aparece no texto do veículo -->
+        <p>Veículo: <span th:text="${reserva.veiculo.modelo + ' - ' + reserva.veiculo.placa + ' (' + reserva.veiculo.grupoVeiculo.grupo + ')'}"></span></p>
+        <p>Filial: <span th:text="${reserva.filial.nome}"></span></p>
+        <p>Valor Atual: R$ <span th:text="${#numbers.formatDecimal(reserva.valor, 2, 2)}"></span></p>
+        <p>Status: <span th:text="${reserva.status}"></span></p>
 
-        <form th:action="@{/funcionario/reservas/alterar}" th:object="${reserva}" method="post">
+        <!-- Formulário de alteração -->
+        <form th:action="@{/funcionario/reservas/alterar/__${reserva.idReserva}__}" th:object="${reserva}" method="post" id="alterarReservaForm">
             <input type="hidden" th:field="*{idReserva}" />
 
-            <div class="form-group">
-                <label for="cliente">Cliente:</label>
-                <input type="text" id="cliente" th:field="*{cliente.nome}" class="form-control" readonly />
-            </div>
-
-            <div class="form-group">
-                <label for="veiculo">Veículo (Placa - Modelo):</label>
-                <input type="text" id="veiculo" th:field="*{veiculo.placa}" class="form-control" readonly />
-            </div>
-
-            <div class="form-group">
-                <label for="filial">Filial:</label>
-                <input type="text" id="filial" th:field="*{filial.nome}" class="form-control" readonly />
-            </div>
-
+            <!-- Data de Início -->
             <div class="form-group">
                 <label for="dataInicio">Data de Início:</label>
-                <input type="datetime-local" id="dataInicio" th:field="*{dataInicio}" class="form-control" required />
+                <input type="datetime-local" id="dataInicio"
+                       th:value="${#temporals.format(reserva.dataInicio, 'yyyy-MM-dd''T''HH:mm')}"
+                       th:field="*{dataInicio}"
+                       class="form-control" required />
             </div>
 
+            <!-- Data de Fim -->
             <div class="form-group">
                 <label for="dataFim">Data de Fim:</label>
-                <input type="datetime-local" id="dataFim" th:field="*{dataFim}" class="form-control" required />
+                <input type="datetime-local" id="dataFim"
+                       th:value="${#temporals.format(reserva.dataFim, 'yyyy-MM-dd''T''HH:mm')}"
+                       th:field="*{dataFim}"
+                       class="form-control" required />
             </div>
 
+            <!-- Valor Recalculado -->
             <div class="form-group">
-                <label for="valor">Valor:</label>
-                <input type="number" id="valor" th:field="*{valor}" step="0.01" class="form-control" required />
+                <label for="valor">Valor (Recalculado):</label>
+                <input type="number" id="valor" th:field="*{valor}" step="0.01" class="form-control" readonly required />
             </div>
 
-            <div class="form-group">
-                <label for="status">Status:</label>
-                <select id="status" th:field="*{status}" class="form-control" required>
-                    <option value="PENDENTE">PENDENTE</option>
-                    <option value="CONFIRMADA">CONFIRMADA</option>
-                    <option value="CONCLUIDA">CONCLUIDA</option>
-                    <option value="CANCELADA">CANCELADA</option>
-                </select>
-            </div>
-
+            <!-- Botão de Atualizar -->
             <button type="submit" class="btn btn-primary">Atualizar Reserva</button>
         </form>
     </div>
+
+    <!-- Script de cálculo de valor -->
+    <script>
+        function calcularValor() {
+            const dataInicio = document.getElementById('dataInicio').value;
+            const dataFim = document.getElementById('dataFim').value;
+            const valorInput = document.getElementById('valor');
+
+            if (dataInicio && dataFim) {
+                const inicio = new Date(dataInicio);
+                const fim = new Date(dataFim);
+                const diffTempo = fim - inicio;
+                const dias = Math.ceil(diffTempo / (1000 * 60 * 60 * 24));
+
+                const veiculoText = document.querySelector('p:nth-child(2)').textContent;
+                const grupoMatch = veiculoText.match(/\((A|B|C)\)/);
+                const grupo = grupoMatch ? grupoMatch[1] : 'C';
+                const taxaPorDia = {
+                    'A': 1000,
+                    'B': 500,
+                    'C': 250
+                }[grupo];
+
+                if (dias > 0) {
+                    const valorTotal = taxaPorDia * dias;
+                    valorInput.value = valorTotal.toFixed(2);
+                } else {
+                    valorInput.value = '0.00';
+                }
+            } else {
+                valorInput.value = '0.00';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataInicio = document.getElementById('dataInicio');
+            const dataFim = document.getElementById('dataFim');
+
+            if (dataInicio && dataFim) {
+                dataInicio.addEventListener('change', calcularValor);
+                dataFim.addEventListener('change', calcularValor);
+                calcularValor();
+            }
+        });
+    </script>
 </div>
