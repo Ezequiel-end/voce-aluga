@@ -49,15 +49,18 @@ public class ReservaService {
                     reserva.setValor(reservaDetails.getValor());
                     reserva.setStatus(reservaDetails.getStatus());
                     return reservaRepository.save(reserva);
-                }).orElseThrow(() -> new RuntimeException("Reserva not found with id " + id));
+                }).orElseThrow(() -> new RuntimeException("Reserva nao encontrada com id " + id));
     }
 
     public void deleteReserva(Integer id) {
         reservaRepository.deleteById(id);
     }
 
-    // NOVO MÉTODO: Busca todas as reservas associadas a um cliente específico.
     public List<Reserva> getReservasByCliente(Integer idCliente) {
         return reservaRepository.findByCliente_IdCliente(idCliente);
+    }
+
+    public List<Reserva> getAllReservasAtivas() {
+        return reservaRepository.findByStatusNot("Cancelada");
     }
 }

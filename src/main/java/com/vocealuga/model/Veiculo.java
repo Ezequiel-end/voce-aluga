@@ -27,6 +27,9 @@
         @Column(name = "Quilometragem", nullable = false)
         private Float quilometragem;
 
+        @Column(name = "ativo", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+        private Boolean ativo = true;
+
         public Veiculo() {
         }
 
@@ -51,6 +54,8 @@
         public void setStatus(String status) { this.status = status; }
         public Float getQuilometragem() { return quilometragem; }
         public void setQuilometragem(Float quilometragem) { this.quilometragem = quilometragem; }
+        public Boolean getAtivo() {return ativo;}
+        public void setAtivo(Boolean ativo) {this.ativo = ativo;}
 
         @Override
         public String toString() {
@@ -61,6 +66,9 @@
                 ", modelo='" + modelo + '\'' +
                 ", status='" + status + '\'' +
                 ", quilometragem=" + quilometragem +
-                '}';
+                ", ativo=" + ativo +
+                '}';    
         }
+
+        
     }

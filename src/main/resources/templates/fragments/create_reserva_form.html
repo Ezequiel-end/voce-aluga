@@ -77,14 +77,12 @@
 
     <!-- Script para trocar o método do form ao mudar a filial e calcular valor -->
     <script>
-        // Função para recarregar a página ao mudar a filial
         function submitFilialChange() {
             const form = document.getElementById('reservaForm');
             form.method = 'get';
             form.submit();
         }
 
-        // Função para calcular o valor
         function calcularValor() {
             const veiculoSelect = document.getElementById('veiculoReserva');
             const dataInicio = document.getElementById('dataInicio');
@@ -122,8 +120,6 @@
                 valorInput.value = '0.00';
             }
         }
-
-        // Eventos para recalcular o valor
         document.getElementById('veiculoReserva').addEventListener('change', calcularValor);
         document.getElementById('dataInicio').addEventListener('change', calcularValor);
         document.getElementById('dataFim').addEventListener('change', calcularValor);

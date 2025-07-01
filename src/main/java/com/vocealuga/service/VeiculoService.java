@@ -4,6 +4,9 @@ import com.vocealuga.dao.EstoqueRepository;
 import com.vocealuga.dao.ManutencaoRepository;
 import com.vocealuga.dao.ReservaRepository;
 import com.vocealuga.dao.VeiculoRepository;
+import com.vocealuga.model.Estoque;
+import com.vocealuga.model.Manutencao;
+import com.vocealuga.model.Reserva;
 import com.vocealuga.model.Veiculo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,16 +64,44 @@ public class VeiculoService {
 
     @Transactional
     public void deleteVeiculo(Integer veiculoId) {
-        // 1. Remover manutenções associadas
-        manutencaoRepository.deleteByVeiculoId(veiculoId);
+        // 1. Buscar o veículo
+        Veiculo veiculo = veiculoRepository.findById(veiculoId)
+                .orElseThrow(() -> new RuntimeException("Veículo não encontrado"));
 
-        // 2. Remover estoque associado
-        estoqueRepository.deleteByVeiculoId(veiculoId);
+        // 2. Validar se há reservas ativas
+        List<Reserva> reservasAtivas = reservaRepository.findByVeiculoIdAndStatusNot(veiculoId, "Cancelada");
+        if (!reservasAtivas.isEmpty()) {
+            throw new RuntimeException("Não pode remover, veículo reservado");
+        }
 
-        // 3. Por fim, remover o veículo
-        veiculoRepository.deleteById(veiculoId);
+        // 3. Marcar o veículo como inativo (soft delete)
+        veiculo.setAtivo(false);
+        veiculoRepository.save(veiculo);
 
-        // 4. Remover reservas associadas
-        reservaRepository.deleteByVeiculoId(veiculoId);
+        // 4. Atualizar reservas associadas (marcar como canceladas)
+        List<Reserva> reservas = reservaRepository.findByVeiculoId(veiculoId);
+        for (Reserva reserva : reservas) {
+            reserva.setStatus("Cancelada");
+            //reserva.setVeiculo(null); // Desassociar o veículo
+            reservaRepository.save(reserva);
+        }
+
+        // 5. Atualizar manutenções (desassociar o veículo)
+        List<Manutencao> manutencoes = manutencaoRepository.findByVeiculoId(veiculoId);
+        for (Manutencao manutencao : manutencoes) {
+           // manutencao.setVeiculo(null);  Desassociar o veículo
+            manutencaoRepository.save(manutencao);
+        }
+
+        // 6. Remover estoque associado (deletar o registro)
+        Optional<Estoque> estoque = estoqueRepository.findByVeiculoId(veiculoId);
+        if (estoque.isPresent()) {
+            estoqueRepository.delete(estoque.get()); // Deleta o registro de estoque
+        }
+    }
+
+    // Método para listar apenas veículos ativos
+    public List<Veiculo> getAllVeiculosAtivos() {
+        return veiculoRepository.findByAtivoTrue();
     }
 }

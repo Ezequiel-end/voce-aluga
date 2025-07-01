@@ -159,7 +159,7 @@ public class Funcionario_Controller {
     @GetMapping("/estoque/remover-veiculo")
     public String showRemoveVeiculoForm(Model model) {
         model.addAttribute("activeContent", "remove_veiculo");
-        model.addAttribute("veiculos", veiculoService.getAllVeiculos());
+        model.addAttribute("veiculos", veiculoService.getAllVeiculosAtivos());
         return "funcionario/funcionario-dashboard";
     }
 
@@ -168,8 +168,8 @@ public class Funcionario_Controller {
         try {
             veiculoService.deleteVeiculo(veiculoId);
             redirectAttributes.addFlashAttribute("successMessage", "Veículo removido com sucesso!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao remover veículo: " + e.getMessage());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/funcionario/estoque/remover-veiculo";
     }
@@ -259,7 +259,7 @@ public class Funcionario_Controller {
     @GetMapping("/reservas/cancelar-reserva")
     public String showCancelReservaForm(Model model) {
         model.addAttribute("activeContent", "cancel_reserva");
-        model.addAttribute("reservas", reservaService.getAllReservas());
+        model.addAttribute("reservas", reservaService.getAllReservasAtivas());
         return "funcionario/funcionario-dashboard";
     }
 
