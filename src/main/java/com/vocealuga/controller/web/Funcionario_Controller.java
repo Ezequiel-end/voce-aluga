@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -556,5 +556,36 @@ public class Funcionario_Controller {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar filial: " + e.getMessage());
         }
         return "redirect:/funcionario/cadastrar-filial";
+    }
+
+    // Aprovar Reserva - GET
+    @GetMapping("/reservas/aprovar-reserva")
+    public String showAprovarReservaForm(Model model) {
+        // Filtra reservas que não estão ativas nem canceladas
+        List<Reserva> reservasParaAprovar = reservaService.getAllReservas().stream()
+            .filter(r -> !"Ativa".equalsIgnoreCase(r.getStatus()) && !"Cancelada".equalsIgnoreCase(r.getStatus()))
+            .toList();
+        model.addAttribute("reservas", reservasParaAprovar);
+        model.addAttribute("activeContent", "aprovar_reserva");
+        return "funcionario/funcionario-dashboard";
+    }
+
+    // Aprovar Reserva - POST
+    @PostMapping("/reservas/aprovar-reserva")
+    public String aprovarReserva(@RequestParam Integer reservaId, RedirectAttributes redirectAttributes) {
+        try {
+            Reserva reserva = reservaService.getReservaById(reservaId)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada com o ID: " + reservaId));
+            if (!"Ativa".equalsIgnoreCase(reserva.getStatus())) {
+                reserva.setStatus("Ativa");
+                reservaService.updateReserva(reservaId, reserva);
+                redirectAttributes.addFlashAttribute("successMessage", "Reserva aprovada com sucesso!");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Reserva já está ativa.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erro ao aprovar reserva: " + e.getMessage());
+        }
+        return "redirect:/funcionario/reservas/aprovar-reserva";
     }
 }

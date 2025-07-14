@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="aprovarReservaForm">
+    <div class="form-container">
+        <h2>Aprovar Reserva</h2>
+        <form th:action="@{/funcionario/reservas/aprovar-reserva}" method="post">
+            <div class="form-group">
+                <label for="reservaToApprove">Selecione a Reserva para Aprovar:</label>
+                <select id="reservaToApprove" name="reservaId" required>
+                    <option value="">Selecione uma Reserva</option>
+                    <option th:each="reserva : ${reservas}" th:value="${reserva.idReserva}" th:text="${'ID: ' + reserva.idReserva + ' - Cliente: ' + reserva.cliente.nome + ' - Veículo: ' + reserva.veiculo.modelo + ' - Status: ' + reserva.status}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success">Aprovar Reserva</button>
+        </form>
+    </div>
+</body>
+</html> 

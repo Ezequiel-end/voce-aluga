@@ -52,17 +52,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="grupoVeiculo">Grupo de Veículo (Opcional para filtro):</label>
-                            <select id="grupoVeiculo" onchange="filterVehicles()">
-                                <option value="">Todos os Grupos</option>
-                                <option th:each="grupo : ${gruposVeiculo}" th:value="${grupo.idGrupoVeiculo}" th:text="${grupo.grupo}"></option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
                             <label for="veiculo">Veículo:</label>
                             <select id="veiculo" th:field="*{veiculo.idVeiculo}" required>
                                 <option value="">Selecione um Veículo</option>
+                                <!-- As opções serão preenchidas via JavaScript -->
                             </select>
                         </div>
 
@@ -90,54 +83,27 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-
-        // Carrega a lista de veículos do modelo para uma variável JavaScript
-        // Usamos JSON.parse(JSON.stringify()) para criar uma cópia independente e garantir que é um objeto JSON válido
-        const allVeiculos = /*[[${veiculos}]]*/ [];
-
-        // Função para filtrar veículos com base no grupo selecionado
-        function filterVehicles() {
-            const grupoVeiculoSelect = document.getElementById('grupoVeiculo');
+        // Atualiza o campo de veículos ao selecionar uma filial
+        document.getElementById('filial').addEventListener('change', function() {
+            const filialId = this.value;
             const veiculoSelect = document.getElementById('veiculo');
-            const selectedGrupoId = grupoVeiculoSelect.value;
-
-            // Limpa as opções atuais (exceto a primeira "Selecione um Veículo")
-            // Começa do final para evitar problemas com índices ao remover elementos
-            for (let i = veiculoSelect.options.length - 1; i >= 0; i--) {
-                if (i > 0) { // Não remove a primeira opção "Selecione um Veículo"
-                    veiculoSelect.remove(i);
-                }
+            // Limpa as opções atuais
+            veiculoSelect.innerHTML = '<option value="">Selecione um Veículo</option>';
+            if (filialId) {
+                fetch(`/cliente/veiculos-por-filial?filialId=${filialId}`)
+                    .then(response => response.json())
+                    .then(veiculos => {
+                        veiculos.forEach(veiculo => {
+                            const option = document.createElement('option');
+                            option.value = veiculo.idVeiculo;
+                            option.textContent = `${veiculo.modelo} (${veiculo.placa}) - Grupo: ${veiculo.grupo}`;
+                            veiculoSelect.appendChild(option);
+                        });
+                    });
             }
-            // Se a opção padrão "Selecione um Veículo" não existir, adicione-a
-            if (veiculoSelect.options[0] && veiculoSelect.options[0].value !== "") {
-                const defaultOption = document.createElement('option');
-                defaultOption.value = "";
-                defaultOption.textContent = "Selecione um Veículo";
-                veiculoSelect.prepend(defaultOption);
-            } else if (!veiculoSelect.options[0]) { // Se não há nenhuma opção
-                 const defaultOption = document.createElement('option');
-                defaultOption.value = "";
-                defaultOption.textContent = "Selecione um Veículo";
-                veiculoSelect.appendChild(defaultOption);
-            }
+        });
 
-
-            // Adiciona de volta os veículos filtrados
-            allVeiculos.forEach(function(veiculo) {
-                // Certifique-se de que veiculo.grupoVeiculo existe e tem idGrupoVeiculo
-                const veiculoGrupoId = veiculo.grupoVeiculo ? veiculo.grupoVeiculo.idGrupoVeiculo : null;
-
-                if (veiculo.status === 'Disponível' &&
-                    (selectedGrupoId === '' || veiculoGrupoId == selectedGrupoId)) { // Compara com == para permitir string/number
-                    const option = document.createElement('option');
-                    option.value = veiculo.idVeiculo;
-                    option.textContent = `${veiculo.modelo} (${veiculo.placa}) - Grupo: ${veiculo.grupoVeiculo ? veiculo.grupoVeiculo.grupo : 'N/A'}`;
-                    veiculoSelect.appendChild(option);
-                }
-            });
-        }
-
-        // Adiciona um listener para atualizar o valor estimado
+        // Mantém apenas a lógica de cálculo de valor estimado
         const dataInicioInput = document.getElementById('dataInicio');
         const dataFimInput = document.getElementById('dataFim');
         const valorInput = document.getElementById('valor');
@@ -167,12 +133,10 @@
         dataInicioInput.addEventListener('change', calculateEstimatedValue);
         dataFimInput.addEventListener('change', calculateEstimatedValue);
 
-        // Inicializa o filtro e o cálculo ao carregar a página
+        // Inicializa o cálculo ao carregar a página
         document.addEventListener('DOMContentLoaded', () => {
-            filterVehicles(); // Filtra os veículos inicialmente
             calculateEstimatedValue(); // Calcula o valor inicial se as datas já estiverem preenchidas
         });
-
         /*]]>*/
     </script>
 </body>

@@ -4,7 +4,7 @@ package com.vocealuga.controller.web;
 import com.vocealuga.model.Cliente;
 import com.vocealuga.model.Reserva;
 import com.vocealuga.model.Pagamento;
-
+import com.vocealuga.model.Veiculo;
 
 import com.vocealuga.service.ClienteService;
 import com.vocealuga.service.ReservaService;
@@ -13,8 +13,8 @@ import com.vocealuga.service.FilialService;
 import com.vocealuga.service.GrupoVeiculoService;
 import com.vocealuga.service.PagamentoService;
 import com.vocealuga.service.FormaPagamentoService;
-
-
+import com.vocealuga.service.FuncionarioService;
+import com.vocealuga.service.EstoqueService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,10 +26,14 @@ import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Controller
 @RequestMapping("/cliente")
 public class ClienteWebController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClienteWebController.class);
 
     private final ClienteService clienteService;
     private final ReservaService reservaService;
@@ -38,17 +42,15 @@ public class ClienteWebController {
     private final GrupoVeiculoService grupoVeiculoService;
     private final PagamentoService pagamentoService;
     private final FormaPagamentoService formaPagamentoService;
-    // O FuncionarioService não é estritamente necessário aqui, a menos que você precise
-    // autenticar funcionários ou redirecionar para o dashboard de funcionário.
-    // Mantenha apenas se for realmente utilizado nesta classe.
-    // private final FuncionarioService funcionarioService;
+    private final FuncionarioService funcionarioService;
+    private final EstoqueService estoqueService;
 
 
     @Autowired
     public ClienteWebController(ClienteService clienteService, ReservaService reservaService,
                                 VeiculoService veiculoService, FilialService filialService,
                                 GrupoVeiculoService grupoVeiculoService, PagamentoService pagamentoService,
-                                FormaPagamentoService formaPagamentoService /*, FuncionarioService funcionarioService */) {
+                                FormaPagamentoService formaPagamentoService, FuncionarioService funcionarioService, EstoqueService estoqueService) {
         this.clienteService = clienteService;
         this.reservaService = reservaService;
         this.veiculoService = veiculoService;
@@ -56,7 +58,8 @@ public class ClienteWebController {
         this.grupoVeiculoService = grupoVeiculoService;
         this.pagamentoService = pagamentoService;
         this.formaPagamentoService = formaPagamentoService;
-        // this.funcionarioService = funcionarioService;
+        this.funcionarioService = funcionarioService;
+        this.estoqueService = estoqueService;
     }
 
     // --- Dashboard ---
@@ -132,7 +135,7 @@ public class ClienteWebController {
         }
 
         model.addAttribute("reserva", new Reserva());
-        model.addAttribute("veiculos", veiculoService.getAllVeiculos());
+        model.addAttribute("veiculos", veiculoService.getVeiculosAtivosDisponiveis());
         model.addAttribute("filiais", filialService.getAllFiliais());
         model.addAttribute("gruposVeiculo", grupoVeiculoService.getAllGruposVeiculo());
         return "cliente/reserva-form"; // CORRIGIDO
@@ -148,7 +151,12 @@ public class ClienteWebController {
 
         try {
             reserva.setCliente(loggedInClient); // Associa o cliente logado à reserva
-            reserva.setFuncionario(null); // Pode ser definido por um admin posteriormente ou via lógica de negócio
+            // Seleciona um funcionário qualquer do banco
+            List<com.vocealuga.model.Funcionario> funcionarios = funcionarioService.getAllFuncionarios();
+            if (funcionarios.isEmpty()) {
+                throw new RuntimeException("Nenhum funcionário cadastrado no sistema.");
+            }
+            reserva.setFuncionario(funcionarios.get(0)); // Pega o primeiro funcionário encontrado
             reserva.setStatus("PENDENTE"); // Status inicial
 
             // Carregar entidades relacionadas para evitar transient errors
@@ -159,8 +167,21 @@ public class ClienteWebController {
                 throw new IllegalArgumentException("Filial é obrigatória para a reserva.");
             }
             if (reserva.getVeiculo() != null && reserva.getVeiculo().getIdVeiculo() != null) {
-                reserva.setVeiculo(veiculoService.getVeiculoById(reserva.getVeiculo().getIdVeiculo())
-                    .orElseThrow(() -> new RuntimeException("Veículo não encontrado.")));
+                Veiculo veiculo = veiculoService.getVeiculoById(reserva.getVeiculo().getIdVeiculo())
+                    .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
+                // Atualizar status do veículo
+                veiculo.setStatus("Em Reserva");
+                veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
+                // Atualizar situação do estoque para "Indisponível"
+                Optional<com.vocealuga.model.Estoque> estoqueOptional = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo());
+                if (estoqueOptional.isPresent()) {
+                    com.vocealuga.model.Estoque estoque = estoqueOptional.get();
+                    estoque.setSituacao("Indisponível");
+                    estoqueService.updateEstoque(estoque.getIdEstoque(), estoque);
+                } else {
+                    throw new RuntimeException("Estoque do veículo não encontrado");
+                }
+                reserva.setVeiculo(veiculo);
             } else {
                 throw new IllegalArgumentException("Veículo é obrigatório para a reserva.");
             }
@@ -304,6 +325,25 @@ public class ClienteWebController {
             if ("PENDENTE".equalsIgnoreCase(reserva.getStatus()) || "CONFIRMADA".equalsIgnoreCase(reserva.getStatus())) {
                 reserva.setStatus("CANCELADA_CLIENTE");
                 reservaService.updateReserva(reserva.getIdReserva(), reserva);
+
+                // Liberar o veículo e o estoque, igual ao fluxo do funcionário
+                try {
+                    Veiculo veiculo = veiculoService.getVeiculoById(reserva.getVeiculo().getIdVeiculo())
+                        .orElseThrow(() -> new RuntimeException("Veículo da reserva não encontrado."));
+                    veiculo.setStatus("Disponível");
+                    veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
+
+                    Optional<com.vocealuga.model.Estoque> estoqueOptional = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo());
+                    if (estoqueOptional.isPresent()) {
+                        com.vocealuga.model.Estoque estoque = estoqueOptional.get();
+                        estoque.setSituacao("Disponível");
+                        estoqueService.updateEstoque(estoque.getIdEstoque(), estoque);
+                    } // Se não existir estoque, não lança erro, apenas ignora
+                } catch (Exception e) {
+                    // Loga o erro mas não impede o cancelamento da reserva
+                    logger.error("Erro ao liberar veículo/estoque no cancelamento pelo cliente: " + e.getMessage(), e);
+                }
+
                 redirectAttributes.addFlashAttribute("success", "Reserva #" + id + " cancelada com sucesso!");
             } else {
                 redirectAttributes.addFlashAttribute("error", "Não é possível cancelar a reserva #" + id + ". Status atual: " + reserva.getStatus());
@@ -320,5 +360,65 @@ public class ClienteWebController {
         session.removeAttribute("loggedInClient"); // Remove o atributo da sessão
         redirectAttributes.addFlashAttribute("success", "Você foi desconectado com sucesso.");
         return "redirect:/cliente/login"; // Redireciona para a página de login genérica
+    }
+
+    // DTO para resposta segura
+    public static class VeiculoDTO {
+        public Integer idVeiculo;
+        public String modelo;
+        public String placa;
+        public String status;
+        public VeiculoDTO(com.vocealuga.model.Veiculo v) {
+            try {
+                this.idVeiculo = v.getIdVeiculo();
+            } catch (Exception e) { this.idVeiculo = null; }
+            try {
+                this.modelo = v.getModelo();
+            } catch (Exception e) { this.modelo = null; }
+            try {
+                this.placa = v.getPlaca();
+            } catch (Exception e) { this.placa = null; }
+            try {
+                this.status = v.getStatus();
+            } catch (Exception e) { this.status = null; }
+        }
+    }
+
+    public static class VeiculoSimplesDTO {
+        public Integer idVeiculo;
+        public String modelo;
+        public String placa;
+        public String status;
+        public String grupo;
+        public VeiculoSimplesDTO(com.vocealuga.model.Veiculo v) {
+            this.idVeiculo = v.getIdVeiculo();
+            this.modelo = v.getModelo();
+            this.placa = v.getPlaca();
+            this.status = v.getStatus();
+            this.grupo = (v.getGrupoVeiculo() != null) ? v.getGrupoVeiculo().getGrupo() : "N/A";
+        }
+    }
+
+    @GetMapping("/veiculos-por-filial")
+    @ResponseBody
+    public List<VeiculoSimplesDTO> getVeiculosPorFilial(@RequestParam("filialId") Integer filialId) {
+        logger.info("[API] (DEBUG) Buscando veículos disponíveis para filial com ID: {}", filialId);
+        List<com.vocealuga.model.Veiculo> veiculos = estoqueService.getVeiculosDisponiveisPorFilial(filialId);
+        logger.info("[API] (DEBUG) Veículos retornados pelo service: {}", veiculos.size());
+        List<VeiculoSimplesDTO> dtos = new java.util.ArrayList<>();
+        for (com.vocealuga.model.Veiculo v : veiculos) {
+            if (v == null) {
+                logger.warn("[API] (DEBUG) Veículo nulo encontrado na lista!");
+                continue;
+            }
+            logger.info("[API] (DEBUG) Tipo do objeto: {}", v.getClass().getName());
+            try {
+                dtos.add(new VeiculoSimplesDTO(v));
+            } catch (Exception e) {
+                logger.error("[API] (DEBUG) Erro ao criar DTO para veículo: {}", e.getMessage(), e);
+            }
+        }
+        logger.info("[API] (DEBUG) Total de DTOs criados: {}", dtos.size());
+        return dtos;
     }
 }

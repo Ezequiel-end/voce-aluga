@@ -45,7 +45,8 @@ body {
 }
 
 .submenu.active {
-    max-height: 200px; /* Ou um valor maior para comportar todos os itens */
+    max-height: none;
+    overflow: visible;
     padding-top: 10px;
     padding-bottom: 10px;
 }

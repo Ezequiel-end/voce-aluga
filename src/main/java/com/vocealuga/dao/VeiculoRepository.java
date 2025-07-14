@@ -12,4 +12,6 @@ public interface VeiculoRepository extends JpaRepository<Veiculo, Integer> {
     Optional<Veiculo> findByPlaca(String placa);
     @Query("SELECT v FROM Veiculo v WHERE v.ativo = true")
     List<Veiculo> findByAtivoTrue();
+    @Query("SELECT v FROM Veiculo v WHERE v.ativo = true AND v.status = 'Disponível'")
+    List<Veiculo> findAtivosDisponiveis();
 }

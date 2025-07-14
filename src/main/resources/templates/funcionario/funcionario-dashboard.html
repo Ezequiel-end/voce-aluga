@@ -79,6 +79,7 @@
                             <li><a href="/funcionario/reservas/alterar">Alterar Reserva</a></li>
                             <li><a href="/funcionario/reservas/cancelar-reserva">Cancelar Reserva</a></li>
                             <li><a href="/funcionario/reservas/consultar-reservas">Consultar Reservas</a></li>
+                            <li><a href="/funcionario/reservas/aprovar-reserva">Aprovar Reserva</a></li>
                         </ul>
                     </li>
                     <li class="menu-item has-submenu">
@@ -111,6 +112,7 @@
                     <span th:case="'cadastrar_manutencao'">Abrir Ordem de Manutenção</span>
                     <span th:case="'suspender_manutencao'">Suspender Manutenção</span>
                     <span th:case="'gerenciar_manutencao'">Gerenciar Manutenções</span>
+                    <span th:case="'aprovar_reserva'">Aprovar Reserva</span>
                     <span th:case="*">Bem-vindo!</span>
                 </h1>
             </header>
@@ -165,6 +167,9 @@
 
                 <div th:if="${activeContent == 'gerenciar_manutencao'}"
                      th:insert="~{fragments/gerenciar_manutencao_form :: gerenciarManutencaoForm}"></div>
+
+                <div th:if="${activeContent == 'aprovar_reserva'}"
+                     th:insert="~{fragments/aprovar_reserva_form :: aprovarReservaForm}"></div>
             </section>
         </main>
     </div>
