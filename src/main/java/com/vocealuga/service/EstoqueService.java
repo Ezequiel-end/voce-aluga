@@ -6,14 +6,19 @@ import com.vocealuga.model.Veiculo;
 import com.vocealuga.dao.EstoqueRepository;
 import com.vocealuga.dao.FilialRepository; // Injetar FilialRepository
 import com.vocealuga.dao.VeiculoRepository; // Injetar VeiculoRepository
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class EstoqueService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EstoqueService.class);
 
     private final EstoqueRepository estoqueRepository;
     private final FilialRepository filialRepository; // Injetar FilialRepository
@@ -85,6 +90,16 @@ public class EstoqueService {
     }
 
     public List<Veiculo> getVeiculosDisponiveisPorFilial(Integer filialId) {
-        return estoqueRepository.findVeiculosDisponiveisPorFilial(filialId);
+        logger.info("[SERVICE] Buscando veículos disponíveis para filial ID: {}", filialId);
+        List<Veiculo> veiculos = estoqueRepository.findVeiculosDisponiveisPorFilial(filialId);
+        logger.info("[SERVICE] Veículos disponíveis encontrados: {}", veiculos.size());
+        return veiculos;
+    }
+
+    public List<Map<String, Object>> getVeiculosDisponiveisPorFilialCamposSimples(Integer filialId) {
+        logger.info("[SERVICE] (PROJECAO) Buscando veículos disponíveis para filial ID: {}", filialId);
+        List<Map<String, Object>> veiculos = estoqueRepository.findVeiculosDisponiveisPorFilialCamposSimples(filialId);
+        logger.info("[SERVICE] (PROJECAO) Veículos disponíveis encontrados: {}", veiculos.size());
+        return veiculos;
     }
 }

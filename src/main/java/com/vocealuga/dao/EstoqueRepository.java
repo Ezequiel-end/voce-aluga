@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -25,7 +26,16 @@ public interface EstoqueRepository extends JpaRepository<Estoque, Integer> {
     @Query("DELETE FROM Estoque e WHERE e.veiculo.idVeiculo = :veiculoId")
     void deleteByVeiculoId(@Param("veiculoId") Integer veiculoId);
 
-    @Query("SELECT e.veiculo FROM Estoque e WHERE e.filial.idFilial = :filialId AND e.situacao = 'Disponível'")
+    @Query("SELECT e.veiculo FROM Estoque e WHERE e.filial.idFilial = :filialId AND e.situacao = 'Disponível' AND e.veiculo.status = 'Disponível'")
     List<Veiculo> findVeiculosDisponiveisPorFilial(@Param("filialId") Integer filialId);
+
+    @Query("SELECT new map(v.idVeiculo as idVeiculo, v.modelo as modelo, v.placa as placa, v.status as status) FROM Estoque e JOIN e.veiculo v WHERE e.filial.idFilial = :filialId AND e.situacao = 'Disponível'")
+    List<Map<String, Object>> findVeiculosDisponiveisPorFilialCamposSimples(@Param("filialId") Integer filialId);
+
+    // Método default para logar chamada (debug)
+    default List<Veiculo> findVeiculosDisponiveisPorFilialComLog(Integer filialId) {
+        System.out.println("[REPOSITORY] findVeiculosDisponiveisPorFilial chamada para filialId: " + filialId);
+        return findVeiculosDisponiveisPorFilial(filialId);
+    }
 }                                                                                              
 

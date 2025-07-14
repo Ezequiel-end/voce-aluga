@@ -104,4 +104,9 @@ public class VeiculoService {
     public List<Veiculo> getAllVeiculosAtivos() {
         return veiculoRepository.findByAtivoTrue();
     }
+
+    // Novo método para listar veículos ativos e disponíveis
+    public List<Veiculo> getVeiculosAtivosDisponiveis() {
+        return veiculoRepository.findAtivosDisponiveis();
+    }
 }
