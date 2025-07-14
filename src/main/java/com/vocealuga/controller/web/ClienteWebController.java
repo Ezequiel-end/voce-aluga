@@ -389,11 +389,13 @@ public class ClienteWebController {
         public String modelo;
         public String placa;
         public String status;
+        public String grupo;
         public VeiculoSimplesDTO(com.vocealuga.model.Veiculo v) {
             this.idVeiculo = v.getIdVeiculo();
             this.modelo = v.getModelo();
             this.placa = v.getPlaca();
             this.status = v.getStatus();
+            this.grupo = (v.getGrupoVeiculo() != null) ? v.getGrupoVeiculo().getGrupo() : "N/A";
         }
     }
 

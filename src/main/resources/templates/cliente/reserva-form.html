@@ -96,7 +96,7 @@
                         veiculos.forEach(veiculo => {
                             const option = document.createElement('option');
                             option.value = veiculo.idVeiculo;
-                            option.textContent = `${veiculo.modelo} (${veiculo.placa}) - Grupo: ${veiculo.grupoVeiculo ? veiculo.grupoVeiculo.grupo : 'N/A'}`;
+                            option.textContent = `${veiculo.modelo} (${veiculo.placa}) - Grupo: ${veiculo.grupo}`;
                             veiculoSelect.appendChild(option);
                         });
                     });
