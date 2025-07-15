@@ -25,7 +25,8 @@ public class EstoqueService {
     private final VeiculoRepository veiculoRepository; // Injetar VeiculoRepository
 
     @Autowired
-    public EstoqueService(EstoqueRepository estoqueRepository, FilialRepository filialRepository, VeiculoRepository veiculoRepository) {
+    public EstoqueService(EstoqueRepository estoqueRepository, FilialRepository filialRepository,
+            VeiculoRepository veiculoRepository) {
         this.estoqueRepository = estoqueRepository;
         this.filialRepository = filialRepository;
         this.veiculoRepository = veiculoRepository;
@@ -64,7 +65,8 @@ public class EstoqueService {
             throw new RuntimeException("A filial de origem e destino não podem ser a mesma.");
         }
 
-        // 1. Valida se o veículo existe (a chamada a findById().orElseThrow() já faz a validação)
+        // 1. Valida se o veículo existe (a chamada a findById().orElseThrow() já faz a
+        // validação)
         // A variável 'veiculo' foi removida porque não era utilizada após a validação.
         veiculoRepository.findById(veiculoId)
                 .orElseThrow(() -> new RuntimeException("Veículo não encontrado com id " + veiculoId));
@@ -76,7 +78,8 @@ public class EstoqueService {
         // 3. Encontra o registro de estoque do veículo na filial de origem
         // Assumindo que um veículo só pode estar em uma filial por vez no estoque
         Estoque estoqueAtual = estoqueRepository.findByVeiculoAndFilial(veiculoId, filialOrigemId)
-                .orElseThrow(() -> new RuntimeException("Veículo não encontrado na filial de origem com id " + filialOrigemId));
+                .orElseThrow(() -> new RuntimeException(
+                        "Veículo não encontrado na filial de origem com id " + filialOrigemId));
 
         // 4. Atualiza a filial do estoque para a filial de destino
         estoqueAtual.setFilial(filialDestino);
@@ -101,5 +104,9 @@ public class EstoqueService {
         List<Map<String, Object>> veiculos = estoqueRepository.findVeiculosDisponiveisPorFilialCamposSimples(filialId);
         logger.info("[SERVICE] (PROJECAO) Veículos disponíveis encontrados: {}", veiculos.size());
         return veiculos;
+    }
+
+    public List<Veiculo> getVeiculosComEstoqueDisponivel() {
+        return veiculoRepository.findVeiculosByEstoqueSituacao("Disponível");
     }
 }

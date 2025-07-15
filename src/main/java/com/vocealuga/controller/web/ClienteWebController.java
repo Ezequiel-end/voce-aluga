@@ -45,12 +45,12 @@ public class ClienteWebController {
     private final FuncionarioService funcionarioService;
     private final EstoqueService estoqueService;
 
-
     @Autowired
     public ClienteWebController(ClienteService clienteService, ReservaService reservaService,
-                                VeiculoService veiculoService, FilialService filialService,
-                                GrupoVeiculoService grupoVeiculoService, PagamentoService pagamentoService,
-                                FormaPagamentoService formaPagamentoService, FuncionarioService funcionarioService, EstoqueService estoqueService) {
+            VeiculoService veiculoService, FilialService filialService,
+            GrupoVeiculoService grupoVeiculoService, PagamentoService pagamentoService,
+            FormaPagamentoService formaPagamentoService, FuncionarioService funcionarioService,
+            EstoqueService estoqueService) {
         this.clienteService = clienteService;
         this.reservaService = reservaService;
         this.veiculoService = veiculoService;
@@ -70,7 +70,8 @@ public class ClienteWebController {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para acessar o dashboard.");
             return "redirect:/login"; // Redireciona para o login genérico
         }
-        // Recarrega o cliente do banco de dados para garantir que os dados, incluindo pontos, estejam atualizados
+        // Recarrega o cliente do banco de dados para garantir que os dados, incluindo
+        // pontos, estejam atualizados
         Optional<Cliente> updatedClient = clienteService.getClienteById(loggedInClient.getIdCliente());
         if (updatedClient.isPresent()) {
             model.addAttribute("cliente", updatedClient.get());
@@ -95,14 +96,16 @@ public class ClienteWebController {
     }
 
     @PostMapping("/perfil/editar")
-    public String updateProfile(@ModelAttribute Cliente clienteDetails, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String updateProfile(@ModelAttribute Cliente clienteDetails, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para editar o perfil.");
             return "redirect:/login"; // Redireciona para o login genérico
         }
         try {
-            // O updateCliente no serviço já lida com a lógica de não alterar a senha se vazia
+            // O updateCliente no serviço já lida com a lógica de não alterar a senha se
+            // vazia
             Cliente updatedClient = clienteService.updateCliente(loggedInClient.getIdCliente(), clienteDetails);
             session.setAttribute("loggedInClient", updatedClient); // Atualiza o cliente na sessão
             redirectAttributes.addFlashAttribute("success", "Perfil atualizado com sucesso!");
@@ -142,7 +145,8 @@ public class ClienteWebController {
     }
 
     @PostMapping("/reservas/nova")
-    public String createReserva(@ModelAttribute Reserva reserva, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String createReserva(@ModelAttribute Reserva reserva, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para fazer uma reserva.");
@@ -162,18 +166,19 @@ public class ClienteWebController {
             // Carregar entidades relacionadas para evitar transient errors
             if (reserva.getFilial() != null && reserva.getFilial().getIdFilial() != null) {
                 reserva.setFilial(filialService.getFilialById(reserva.getFilial().getIdFilial())
-                    .orElseThrow(() -> new RuntimeException("Filial não encontrada.")));
+                        .orElseThrow(() -> new RuntimeException("Filial não encontrada.")));
             } else {
                 throw new IllegalArgumentException("Filial é obrigatória para a reserva.");
             }
             if (reserva.getVeiculo() != null && reserva.getVeiculo().getIdVeiculo() != null) {
                 Veiculo veiculo = veiculoService.getVeiculoById(reserva.getVeiculo().getIdVeiculo())
-                    .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
+                        .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
                 // Atualizar status do veículo
                 veiculo.setStatus("Em Reserva");
                 veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
                 // Atualizar situação do estoque para "Indisponível"
-                Optional<com.vocealuga.model.Estoque> estoqueOptional = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo());
+                Optional<com.vocealuga.model.Estoque> estoqueOptional = estoqueService
+                        .getEstoqueByVeiculoId(veiculo.getIdVeiculo());
                 if (estoqueOptional.isPresent()) {
                     com.vocealuga.model.Estoque estoque = estoqueOptional.get();
                     estoque.setSituacao("Indisponível");
@@ -187,7 +192,8 @@ public class ClienteWebController {
             }
 
             reservaService.createReserva(reserva);
-            redirectAttributes.addFlashAttribute("success", "Reserva criada com sucesso! Por favor, realize o pagamento.");
+            redirectAttributes.addFlashAttribute("success",
+                    "Reserva criada com sucesso! Por favor, realize o pagamento.");
             return "redirect:/cliente/reservas";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erro ao criar reserva: " + e.getMessage());
@@ -197,7 +203,8 @@ public class ClienteWebController {
 
     // --- Pagamento de Reserva ---
     @GetMapping("/reservas/{reservaId}/pagar")
-    public String showPagamentoForm(@PathVariable Integer reservaId, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String showPagamentoForm(@PathVariable Integer reservaId, Model model, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para acessar esta página.");
@@ -220,7 +227,9 @@ public class ClienteWebController {
 
         // Evita múltiplos pagamentos
         if (!"PENDENTE".equalsIgnoreCase(reserva.getStatus()) && !"CONFIRMADA".equalsIgnoreCase(reserva.getStatus())) {
-            redirectAttributes.addFlashAttribute("error", "Esta reserva não está em um status que permite pagamento (Status atual: " + reserva.getStatus() + ").");
+            redirectAttributes.addFlashAttribute("error",
+                    "Esta reserva não está em um status que permite pagamento (Status atual: " + reserva.getStatus()
+                            + ").");
             return "redirect:/cliente/reservas";
         }
 
@@ -232,7 +241,7 @@ public class ClienteWebController {
 
     @PostMapping("/reservas/{reservaId}/pagar")
     public String processarPagamento(@PathVariable Integer reservaId, @ModelAttribute Pagamento pagamento,
-                                     HttpSession session, RedirectAttributes redirectAttributes) {
+            HttpSession session, RedirectAttributes redirectAttributes) {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para processar o pagamento.");
@@ -246,8 +255,10 @@ public class ClienteWebController {
             }
             Reserva reserva = reservaOptional.get();
 
-            if (!"PENDENTE".equalsIgnoreCase(reserva.getStatus()) && !"CONFIRMADA".equalsIgnoreCase(reserva.getStatus())) {
-                redirectAttributes.addFlashAttribute("error", "Esta reserva já foi paga ou está em um status inválido.");
+            if (!"PENDENTE".equalsIgnoreCase(reserva.getStatus())
+                    && !"CONFIRMADA".equalsIgnoreCase(reserva.getStatus())) {
+                redirectAttributes.addFlashAttribute("error",
+                        "Esta reserva já foi paga ou está em um status inválido.");
                 return "redirect:/cliente/reservas";
             }
 
@@ -257,8 +268,9 @@ public class ClienteWebController {
 
             // Carrega a FormaPagamento completa
             if (pagamento.getFormaPagamento() != null && pagamento.getFormaPagamento().getIdFormaPagamento() != null) {
-                pagamento.setFormaPagamento(formaPagamentoService.getFormaPagamentoById(pagamento.getFormaPagamento().getIdFormaPagamento())
-                    .orElseThrow(() -> new RuntimeException("Forma de Pagamento não encontrada.")));
+                pagamento.setFormaPagamento(
+                        formaPagamentoService.getFormaPagamentoById(pagamento.getFormaPagamento().getIdFormaPagamento())
+                                .orElseThrow(() -> new RuntimeException("Forma de Pagamento não encontrada.")));
             } else {
                 throw new IllegalArgumentException("Forma de Pagamento é obrigatória.");
             }
@@ -276,19 +288,22 @@ public class ClienteWebController {
                 Integer pontosParaAdicionar = (int) (reserva.getValor() / 10.0f);
                 if (pontosParaAdicionar > 0) {
                     clienteService.addPontosFidelidade(reserva.getCliente().getIdCliente(), pontosParaAdicionar);
-                    redirectAttributes.addFlashAttribute("success", "Pagamento realizado com sucesso para a reserva #" + reserva.getIdReserva() + "! Você ganhou " + pontosParaAdicionar + " pontos de fidelidade!");
+                    redirectAttributes.addFlashAttribute("success",
+                            "Pagamento realizado com sucesso para a reserva #" + reserva.getIdReserva()
+                                    + "! Você ganhou " + pontosParaAdicionar + " pontos de fidelidade!");
                 } else {
-                    redirectAttributes.addFlashAttribute("success", "Pagamento realizado com sucesso para a reserva #" + reserva.getIdReserva() + ".");
+                    redirectAttributes.addFlashAttribute("success",
+                            "Pagamento realizado com sucesso para a reserva #" + reserva.getIdReserva() + ".");
                 }
             } else {
-                redirectAttributes.addFlashAttribute("success", "Pagamento realizado com sucesso para a reserva #" + reserva.getIdReserva() + ".");
+                redirectAttributes.addFlashAttribute("success",
+                        "Pagamento realizado com sucesso para a reserva #" + reserva.getIdReserva() + ".");
             }
             // Fim da Lógica de Fidelidade
 
             // Atualiza o cliente na sessão para refletir os novos pontos
             Optional<Cliente> updatedClient = clienteService.getClienteById(loggedInClient.getIdCliente());
             updatedClient.ifPresent(client -> session.setAttribute("loggedInClient", client));
-
 
             return "redirect:/cliente/reservas";
         } catch (Exception e) {
@@ -299,7 +314,8 @@ public class ClienteWebController {
 
     // --- Cancelar Reserva ---
     @PostMapping("/reservas/cancelar/{id}")
-    public String cancelarReserva(@PathVariable Integer id, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String cancelarReserva(@PathVariable Integer id, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para cancelar uma reserva.");
@@ -321,19 +337,22 @@ public class ClienteWebController {
                 return "redirect:/cliente/reservas";
             }
 
-            // Lógica para permitir cancelamento apenas se o status for PENDENTE ou CONFIRMADA
-            if ("PENDENTE".equalsIgnoreCase(reserva.getStatus()) || "CONFIRMADA".equalsIgnoreCase(reserva.getStatus())) {
+            // Lógica para permitir cancelamento apenas se o status for PENDENTE ou
+            // CONFIRMADA
+            if ("PENDENTE".equalsIgnoreCase(reserva.getStatus())
+                    || "CONFIRMADA".equalsIgnoreCase(reserva.getStatus())) {
                 reserva.setStatus("CANCELADA_CLIENTE");
                 reservaService.updateReserva(reserva.getIdReserva(), reserva);
 
                 // Liberar o veículo e o estoque, igual ao fluxo do funcionário
                 try {
                     Veiculo veiculo = veiculoService.getVeiculoById(reserva.getVeiculo().getIdVeiculo())
-                        .orElseThrow(() -> new RuntimeException("Veículo da reserva não encontrado."));
+                            .orElseThrow(() -> new RuntimeException("Veículo da reserva não encontrado."));
                     veiculo.setStatus("Disponível");
                     veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
 
-                    Optional<com.vocealuga.model.Estoque> estoqueOptional = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo());
+                    Optional<com.vocealuga.model.Estoque> estoqueOptional = estoqueService
+                            .getEstoqueByVeiculoId(veiculo.getIdVeiculo());
                     if (estoqueOptional.isPresent()) {
                         com.vocealuga.model.Estoque estoque = estoqueOptional.get();
                         estoque.setSituacao("Disponível");
@@ -346,7 +365,8 @@ public class ClienteWebController {
 
                 redirectAttributes.addFlashAttribute("success", "Reserva #" + id + " cancelada com sucesso!");
             } else {
-                redirectAttributes.addFlashAttribute("error", "Não é possível cancelar a reserva #" + id + ". Status atual: " + reserva.getStatus());
+                redirectAttributes.addFlashAttribute("error",
+                        "Não é possível cancelar a reserva #" + id + ". Status atual: " + reserva.getStatus());
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Erro ao cancelar reserva: " + e.getMessage());
@@ -368,19 +388,28 @@ public class ClienteWebController {
         public String modelo;
         public String placa;
         public String status;
+
         public VeiculoDTO(com.vocealuga.model.Veiculo v) {
             try {
                 this.idVeiculo = v.getIdVeiculo();
-            } catch (Exception e) { this.idVeiculo = null; }
+            } catch (Exception e) {
+                this.idVeiculo = null;
+            }
             try {
                 this.modelo = v.getModelo();
-            } catch (Exception e) { this.modelo = null; }
+            } catch (Exception e) {
+                this.modelo = null;
+            }
             try {
                 this.placa = v.getPlaca();
-            } catch (Exception e) { this.placa = null; }
+            } catch (Exception e) {
+                this.placa = null;
+            }
             try {
                 this.status = v.getStatus();
-            } catch (Exception e) { this.status = null; }
+            } catch (Exception e) {
+                this.status = null;
+            }
         }
     }
 
@@ -390,6 +419,7 @@ public class ClienteWebController {
         public String placa;
         public String status;
         public String grupo;
+
         public VeiculoSimplesDTO(com.vocealuga.model.Veiculo v) {
             this.idVeiculo = v.getIdVeiculo();
             this.modelo = v.getModelo();
