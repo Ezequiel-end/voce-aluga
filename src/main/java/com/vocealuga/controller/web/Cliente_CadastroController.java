@@ -10,7 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/cliente") 
+@RequestMapping("/cliente")
 public class Cliente_CadastroController {
 
     @Autowired
@@ -32,13 +32,13 @@ public class Cliente_CadastroController {
             cliente.setCpf(cpfLimpo);
 
             if (!ValidationsUtils.isValidCPF(cliente.getCpf())) {
-                redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido! Digite apenas números ou um CPF válido.");
-                return "redirect:/cliente/cadastro"; // ATUALIZADO
+                redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido!");
+                return "redirect:/cliente/cadastro";
             }
 
             if (!validation.isEmailGloballyUnique(cliente.getEmail())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "E-mail já cadastrado!");
-                return "redirect:/cliente/cadastro"; // ATUALIZADO
+                return "redirect:/cliente/cadastro";
             }
 
             String cnhLimpa = cliente.getCnh().replaceAll("[^0-9]", "");
@@ -46,22 +46,22 @@ public class Cliente_CadastroController {
 
             if (!ValidationsUtils.isValidCNH(cliente.getCnh())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "CNH inválida!");
-                return "redirect:/cliente/cadastro"; // ATUALIZADO
+                return "redirect:/cliente/cadastro";
             }
 
             if (!validation.isMaiorDeIdade(cliente.getDataNascimento())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "É necessário ter pelo menos 18 anos.");
-                return "redirect:/cliente/cadastro"; // ATUALIZADO
+                return "redirect:/cliente/cadastro";
             }
 
             clienteService.createCliente(cliente);
             redirectAttributes.addFlashAttribute("successMessage", "Cliente cadastrado com sucesso!");
 
-            return "redirect:/cliente/login"; // ATUALIZADO: Redireciona para o login do cliente
+            return "redirect:/cliente/login";
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar Cliente: " + e.getMessage());
-            return "redirect:/cliente/cadastro"; // ATUALIZADO
+            return "redirect:/cliente/cadastro";
         }
     }
 }

@@ -1,0 +1,109 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #121212;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #ffffff;
+}
+
+.cadastro-container {
+  background-color: #1e1e1e;
+  padding: 50px 40px;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2em;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+form input {
+  background-color: #2c2c2c;
+  border: none;
+  padding: 15px;
+  color: #ffffff;
+  border-radius: 20px;
+  font-size: 1em;
+  outline: none;
+}
+
+form input::placeholder {
+  color: #aaaaaa;
+}
+
+form input:focus {
+  border: 1px solid #28a745;
+}
+
+form button {
+  background-color: #28a745;
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1em;
+  transition: background-color 0.3s;
+}
+
+form button:hover {
+  background-color: #218838;
+}
+
+p {
+  font-size: 0.9em;
+}
+
+a {
+  color: #6ac36a;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.mensagem {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.95em;
+  text-align: center;
+}
+
+.erro {
+  background-color: #2c2c2c;
+  color: #ff4d4d;
+}
+
+.sucesso {
+  background-color: #2c2c2c;
+  color: #6ac36a;
+}
+
