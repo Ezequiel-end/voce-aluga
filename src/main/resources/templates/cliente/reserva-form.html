@@ -82,86 +82,72 @@
     </div>
 
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        document.getElementById('filial').addEventListener('change', function() {
-            const filialId = this.value;
-            const veiculoSelect = document.getElementById('veiculo');
-            veiculoSelect.innerHTML = '<option value="">Selecione um Veículo</option>';
-            if (filialId) {
-                fetch(`/cliente/veiculos-por-filial?filialId=${filialId}`)
-                    .then(response => response.json())
-                    .then(veiculos => {
-                        veiculos.forEach(veiculo => {
-                            const option = document.createElement('option');
-                            option.value = veiculo.idVeiculo;
-                            option.textContent = `${veiculo.modelo} (${veiculo.placa}) - Grupo: ${veiculo.grupo}`;
-                            veiculoSelect.appendChild(option);
-                        });
-                    });
+    /*<![CDATA[*/
+    const veiculoSelect = document.getElementById('veiculo');
+    const dataInicioInput = document.getElementById('dataInicio');
+    const dataFimInput = document.getElementById('dataFim');
+    const valorInput = document.getElementById('valor');
+
+    function calcularValor() {
+        const dataInicio = dataInicioInput.value;
+        const dataFim = dataFimInput.value;
+
+        if (veiculoSelect.value && dataInicio && dataFim) {
+            const veiculoSelecionado = veiculoSelect.options[veiculoSelect.selectedIndex];
+            const grupoMatch = veiculoSelecionado.text.match(/Grupo:\s*([A-C])/);
+            const grupo = grupoMatch ? grupoMatch[1] : null;
+
+            if (grupo) {
+                const taxaPorDia = {
+                    'A': 1000,
+                    'B': 500,
+                    'C': 250
+                }[grupo];
+
+                const start = new Date(dataInicio);
+                const end = new Date(dataFim);
+                const diffTime = end - start;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                const dias = diffDays > 0 ? diffDays : 1;
+                const valorCalculado = (dias * taxaPorDia).toFixed(2);
+                valorInput.value = valorCalculado;
+                return;
             }
-        });
-
-        const dataInicioInput = document.getElementById('dataInicio');
-        const dataFimInput = document.getElementById('dataFim');
-        const valorInput = document.getElementById('valor');
-
-        const veiculoSelect = document.getElementById('veiculo');
-
-function calcularValor() {
-    const dataInicio = dataInicioInput.value;
-    const dataFim = dataFimInput.value;
-
-    if (veiculoSelect.value && dataInicio && dataFim) {
-        const veiculoSelecionado = veiculoSelect.options[veiculoSelect.selectedIndex];
-        const grupoMatch = veiculoSelecionado.text.match(/Grupo:\s*([A-C])/);
-        const grupo = grupoMatch ? grupoMatch[1] : null;
-
-        if (grupo) {
-            const taxaPorDia = {
-                'A': 1000,
-                'B': 500,
-                'C': 250
-            }[grupo];
-
-            const start = new Date(dataInicio);
-            const end = new Date(dataFim);
-            const diffTime = end - start;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            const dias = diffDays > 0 ? diffDays : 1;
-            const valorCalculado = (dias * taxaPorDia).toFixed(2);
-            valorInput.value = valorCalculado;
-            return;
         }
+        valorInput.value = '0.00';
     }
-    valorInput.value = '0.00';
-}
 
+    // Único listener para o evento 'change' do filial
+    document.getElementById('filial').addEventListener('change', function() {
+        const filialId = this.value;
+        veiculoSelect.innerHTML = '<option value="">Selecione um Veículo</option>';
+        if (filialId) {
+            fetch(`/cliente/veiculos-por-filial?filialId=${filialId}`)
+                .then(response => response.json())
+                .then(veiculos => {
+                    // Remover duplicatas usando um Set baseado no idVeiculo
+                    const veiculosUnicos = Array.from(new Set(veiculos.map(v => v.idVeiculo)))
+                        .map(id => veiculos.find(v => v.idVeiculo === id));
+                    veiculosUnicos.forEach(veiculo => {
+                        const option = document.createElement('option');
+                        option.value = veiculo.idVeiculo;
+                        option.textContent = `${veiculo.modelo} (${veiculo.placa}) - Grupo: ${veiculo.grupo}`;
+                        veiculoSelect.appendChild(option);
+                    });
+                })
+                .then(calcularValor)
+                .catch(error => console.error('Erro ao buscar veículos:', error));
+        } else {
+            calcularValor();
+        }
+    });
 
-veiculoSelect.addEventListener('change', calcularValor);
-dataInicioInput.addEventListener('change', calcularValor);
-dataFimInput.addEventListener('change', calcularValor);
-
-document.getElementById('filial').addEventListener('change', function() {
-    const filialId = this.value;
-    veiculoSelect.innerHTML = '<option value="">Selecione um Veículo</option>';
-    if (filialId) {
-        fetch(`/cliente/veiculos-por-filial?filialId=${filialId}`)
-            .then(response => response.json())
-            .then(veiculos => {
-                veiculos.forEach(veiculo => {
-                    const option = document.createElement('option');
-                    option.value = veiculo.idVeiculo;
-                    option.textContent = `${veiculo.modelo} (${veiculo.placa}) - Grupo: ${veiculo.grupo}`;
-                    veiculoSelect.appendChild(option);
-                });
-            })
-            .then(calcularValor);
-    } else {
-        calcularValor();
-    }
-});
-        /*]]>*/
-    </script>
+    // Listeners para calcular o valor
+    veiculoSelect.addEventListener('change', calcularValor);
+    dataInicioInput.addEventListener('change', calcularValor);
+    dataFimInput.addEventListener('change', calcularValor);
+    /*]]>*/
+</script>
 </body>
 </html>
