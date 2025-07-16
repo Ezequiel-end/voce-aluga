@@ -68,19 +68,19 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para acessar o dashboard.");
-            return "redirect:/login"; // Redireciona para o login genérico
+            return "redirect:/login";
         }
         // Recarrega o cliente do banco de dados para garantir que os dados, incluindo
         // pontos, estejam atualizados
         Optional<Cliente> updatedClient = clienteService.getClienteById(loggedInClient.getIdCliente());
         if (updatedClient.isPresent()) {
             model.addAttribute("cliente", updatedClient.get());
-            session.setAttribute("loggedInClient", updatedClient.get()); // Atualiza a sessão
+            session.setAttribute("loggedInClient", updatedClient.get());
         } else {
             redirectAttributes.addFlashAttribute("error", "Erro ao carregar dados do cliente.");
             return "redirect:/logout"; // Força logout se o cliente não for encontrado
         }
-        return "cliente/dashboard"; // CORRIGIDO
+        return "cliente/dashboard";
     }
 
     // --- Perfil ---
@@ -89,10 +89,10 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para editar o perfil.");
-            return "redirect:/login"; // Redireciona para o login genérico
+            return "redirect:/login";
         }
         model.addAttribute("cliente", loggedInClient);
-        return "cliente/perfil-editar"; // CORRIGIDO
+        return "cliente/perfil-editar";
     }
 
     @PostMapping("/perfil/editar")
@@ -101,13 +101,12 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para editar o perfil.");
-            return "redirect:/login"; // Redireciona para o login genérico
+            return "redirect:/login";
         }
         try {
-            // O updateCliente no serviço já lida com a lógica de não alterar a senha se
-            // vazia
+
             Cliente updatedClient = clienteService.updateCliente(loggedInClient.getIdCliente(), clienteDetails);
-            session.setAttribute("loggedInClient", updatedClient); // Atualiza o cliente na sessão
+            session.setAttribute("loggedInClient", updatedClient);
             redirectAttributes.addFlashAttribute("success", "Perfil atualizado com sucesso!");
             return "redirect:/cliente/perfil/editar";
         } catch (RuntimeException e) {
@@ -122,11 +121,11 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para ver suas reservas.");
-            return "redirect:/login"; // Redireciona para o login genérico
+            return "redirect:/login";
         }
         List<Reserva> reservas = reservaService.getReservasByCliente(loggedInClient.getIdCliente());
         model.addAttribute("reservas", reservas);
-        return "cliente/reservas"; // CORRIGIDO
+        return "cliente/reservas";
     }
 
     @GetMapping("/reservas/nova")
@@ -134,14 +133,14 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para fazer uma reserva.");
-            return "redirect:/login"; // Redireciona para o login genérico
+            return "redirect:/login";
         }
 
         model.addAttribute("reserva", new Reserva());
         model.addAttribute("veiculos", veiculoService.getVeiculosAtivosDisponiveis());
         model.addAttribute("filiais", filialService.getAllFiliais());
         model.addAttribute("gruposVeiculo", grupoVeiculoService.getAllGruposVeiculo());
-        return "cliente/reserva-form"; // CORRIGIDO
+        return "cliente/reserva-form";
     }
 
     @PostMapping("/reservas/nova")
@@ -150,20 +149,18 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para fazer uma reserva.");
-            return "redirect:/login"; // Redireciona para o login genérico
+            return "redirect:/login";
         }
 
         try {
-            reserva.setCliente(loggedInClient); // Associa o cliente logado à reserva
-            // Seleciona um funcionário qualquer do banco
+            reserva.setCliente(loggedInClient);
             List<com.vocealuga.model.Funcionario> funcionarios = funcionarioService.getAllFuncionarios();
             if (funcionarios.isEmpty()) {
                 throw new RuntimeException("Nenhum funcionário cadastrado no sistema.");
             }
-            reserva.setFuncionario(funcionarios.get(0)); // Pega o primeiro funcionário encontrado
-            reserva.setStatus("PENDENTE"); // Status inicial
+            reserva.setFuncionario(funcionarios.get(0));
+            reserva.setStatus("PENDENTE");
 
-            // Carregar entidades relacionadas para evitar transient errors
             if (reserva.getFilial() != null && reserva.getFilial().getIdFilial() != null) {
                 reserva.setFilial(filialService.getFilialById(reserva.getFilial().getIdFilial())
                         .orElseThrow(() -> new RuntimeException("Filial não encontrada.")));
@@ -173,10 +170,10 @@ public class ClienteWebController {
             if (reserva.getVeiculo() != null && reserva.getVeiculo().getIdVeiculo() != null) {
                 Veiculo veiculo = veiculoService.getVeiculoById(reserva.getVeiculo().getIdVeiculo())
                         .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
-                // Atualizar status do veículo
+
                 veiculo.setStatus("Em Reserva");
                 veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
-                // Atualizar situação do estoque para "Indisponível"
+
                 Optional<com.vocealuga.model.Estoque> estoqueOptional = estoqueService
                         .getEstoqueByVeiculoId(veiculo.getIdVeiculo());
                 if (estoqueOptional.isPresent()) {
@@ -208,7 +205,7 @@ public class ClienteWebController {
         Cliente loggedInClient = (Cliente) session.getAttribute("loggedInClient");
         if (loggedInClient == null) {
             redirectAttributes.addFlashAttribute("error", "Você precisa estar logado para acessar esta página.");
-            return "redirect:/login"; // Redireciona para o login genérico
+            return "redirect:/login";
         }
 
         Optional<Reserva> reservaOptional = reservaService.getReservaById(reservaId);
@@ -338,7 +335,6 @@ public class ClienteWebController {
             }
 
             // Lógica para permitir cancelamento apenas se o status for PENDENTE ou
-            // CONFIRMADA
             if ("PENDENTE".equalsIgnoreCase(reserva.getStatus())
                     || "CONFIRMADA".equalsIgnoreCase(reserva.getStatus())) {
                 reserva.setStatus("CANCELADA_CLIENTE");
@@ -357,9 +353,9 @@ public class ClienteWebController {
                         com.vocealuga.model.Estoque estoque = estoqueOptional.get();
                         estoque.setSituacao("Disponível");
                         estoqueService.updateEstoque(estoque.getIdEstoque(), estoque);
-                    } // Se não existir estoque, não lança erro, apenas ignora
+                    }
                 } catch (Exception e) {
-                    // Loga o erro mas não impede o cancelamento da reserva
+
                     logger.error("Erro ao liberar veículo/estoque no cancelamento pelo cliente: " + e.getMessage(), e);
                 }
 
@@ -377,9 +373,9 @@ public class ClienteWebController {
     // --- Logout ---
     @GetMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
-        session.removeAttribute("loggedInClient"); // Remove o atributo da sessão
+        session.removeAttribute("loggedInClient");
         redirectAttributes.addFlashAttribute("success", "Você foi desconectado com sucesso.");
-        return "redirect:/cliente/login"; // Redireciona para a página de login genérica
+        return "redirect:/cliente/login";
     }
 
     // DTO para resposta segura

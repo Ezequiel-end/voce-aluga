@@ -36,14 +36,14 @@ public class Cliente_CadastroController {
                 return "redirect:/cliente/cadastro";
             }
 
-            if (clienteService.existsByCpf(cliente.getCpf())) {
+            if (!validation.isCpfGloballyUnique(cliente.getCpf())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "CPF já cadastrado no sistema!");
                 return "redirect:/cliente/cadastro";
             }
 
             if (!validation.isEmailGloballyUnique(cliente.getEmail())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "E-mail já cadastrado!");
-                return "redirect:/cliente/cadastro";
+                return "redirect:/c liente/cadastro";
             }
 
             String cnhLimpa = cliente.getCnh().replaceAll("[^0-9]", "");

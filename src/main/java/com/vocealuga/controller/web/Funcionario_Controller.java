@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -101,8 +102,16 @@ public class Funcionario_Controller {
     @PostMapping("/cadastrar-funcionario")
     public String registerFuncionario(@ModelAttribute Funcionario funcionario, RedirectAttributes redirectAttributes) {
         try {
+            String cleanCpf = funcionario.getCpf().replaceAll("[^0-9]", "");
+            funcionario.setCpf(cleanCpf);
+
             if (!ValidationsUtils.isValidCPF(funcionario.getCpf())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "CPF inválido!");
+                return "redirect:/funcionario/cadastrar-funcionario";
+            }
+
+            if (!validations.isCpfGloballyUnique(funcionario.getCpf())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "CPF já cadastrado no sistema!");
                 return "redirect:/funcionario/cadastrar-funcionario";
             }
 
@@ -305,7 +314,6 @@ public class Funcionario_Controller {
 
     // --- Gerenciar Manutenção ---
 
-    // Formulário para Cadastrar Manutenção
     @GetMapping("/manutencao/cadastrar")
     public String showCadastrarManutencaoForm(Model model) {
         model.addAttribute("activeContent", "cadastrar_manutencao");
@@ -316,6 +324,7 @@ public class Funcionario_Controller {
     }
 
     @PostMapping("/manutencao/cadastrar")
+    @Transactional
     public String cadastrarManutencao(@ModelAttribute Manutencao manutencao,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
@@ -324,7 +333,6 @@ public class Funcionario_Controller {
                     "Erro de validação: " + bindingResult.getAllErrors().get(0).getDefaultMessage());
             return "redirect:/funcionario/manutencao/cadastrar";
         }
-
         try {
             if (manutencao.getVeiculo() == null || manutencao.getVeiculo().getIdVeiculo() == null) {
                 throw new RuntimeException("Veículo não selecionado.");
@@ -332,39 +340,36 @@ public class Funcionario_Controller {
             if (manutencao.getFuncionario() == null || manutencao.getFuncionario().getIdFuncionario() == null) {
                 throw new RuntimeException("Funcionário não selecionado.");
             }
-
-            if (manutencao.getDataFim() == null) {
-                manutencao.setDataFim(null);
-            }
             if (manutencao.getDataInicio() == null) {
                 manutencao.setDataInicio(LocalDateTime.now());
             }
+            if (manutencao.getDataFim() == null) {
+                manutencao.setDataFim(null);
+            }
 
-            manutencao.setStatus("Em Curso");
+            manutencaoService.validateDataInicio(manutencao.getDataInicio());
+            manutencaoService.validateDataFim(manutencao.getDataInicio(), manutencao.getDataFim());
 
-            // Buscar o veículo original
             Veiculo veiculo = veiculoService.getVeiculoById(manutencao.getVeiculo().getIdVeiculo())
                     .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
 
-            // Alterar o status do veículo
-            veiculo.setStatus("Em Manutenção");
-            veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
-
-            // Buscar o estoque pelo id do veículo
             Estoque estoque = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo())
                     .orElseThrow(() -> new RuntimeException("Estoque do veículo não encontrado."));
 
-            // Alterar a situação do estoque
+            veiculo.setStatus("Em Manutenção");
+            veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
+
             estoque.setSituacao("Em Manutenção");
             estoqueService.updateEstoque(estoque.getIdEstoque(), estoque);
 
-            // Criar a manutenção
-            manutencaoService.createManutencao(manutencao);
+            manutencao.setStatus("Em Curso");
 
+            manutencaoService.createManutencao(manutencao);
             redirectAttributes.addFlashAttribute("successMessage", "Manutenção cadastrada com sucesso!");
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao cadastrar manutenção: " + e.getMessage());
+            return "redirect:/funcionario/manutencao/cadastrar";
         }
 
         return "redirect:/funcionario/manutencao/cadastrar";
@@ -382,17 +387,14 @@ public class Funcionario_Controller {
             Manutencao manutencao = manutencaoService.getManutencaoById(manutencaoId)
                     .orElseThrow(() -> new RuntimeException("Manutenção não encontrada com o ID: " + manutencaoId));
 
-            // Suspender a manutenção
             manutencao.setStatus("Suspensa");
             manutencaoService.updateManutencao(manutencaoId, manutencao);
 
-            // Liberar o veículo
             Veiculo veiculo = veiculoService.getVeiculoById(manutencao.getVeiculo().getIdVeiculo())
                     .orElseThrow(() -> new RuntimeException("Veículo da manutenção não encontrado."));
             veiculo.setStatus("Disponível");
             veiculoService.updateVeiculo(veiculo.getIdVeiculo(), veiculo);
 
-            // Liberar o estoque
             Estoque estoque = estoqueService.getEstoqueByVeiculoId(veiculo.getIdVeiculo())
                     .orElseThrow(() -> new RuntimeException("Estoque do veículo não encontrado."));
             estoque.setSituacao("Disponível");
@@ -455,9 +457,6 @@ public class Funcionario_Controller {
     }
 
     // --- Alterar Reserva ---
-
-    // Formulário para Alterar Reserva (TRATA A BUSCA POR ID)
-
     @GetMapping("/reservas/alterar")
     public String showAlterarReservaForm(@RequestParam(value = "id", required = false) Integer id, Model model) {
         model.addAttribute("activeContent", "alterar_reserva");
@@ -471,9 +470,7 @@ public class Funcionario_Controller {
                 model.addAttribute("errorMessage", "Reserva com ID '" + id + "' não encontrada.");
             }
         } else {
-            // Caso id não seja fornecido, exibe o formulário de busca ou uma lista (ajuste
-            // conforme necessário)
-            model.addAttribute("reservas", reservaService.getAllReservas()); // Opcional: lista todas as reservas
+            model.addAttribute("reservas", reservaService.getAllReservas());
         }
 
         return "funcionario/funcionario-dashboard";
