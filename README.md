@@ -1,224 +1,77 @@
-# voce-aluga
-Projeto: Eng. Software
+# Você Aluga
 
+Sistema de gestão para locação de veículos, desenvolvido em Java com Spring Boot.
 
+## Descrição
 
-# Estrutura de Diretórios do Projeto
+O **Você Aluga** é uma aplicação web para gerenciamento de aluguel de veículos, permitindo o cadastro de clientes, funcionários, veículos, reservas, pagamentos, manutenções e filiais. O sistema possui áreas distintas para clientes e funcionários, com autenticação e controle de acesso.
 
-Este é o layout do projeto.
+## Funcionalidades
 
-```plaintext
-C:.
-│   .gitattributes
-│   .gitignore
-│   build.gradle
-│   gradlew
-│   gradlew.bat
-│   HELP.md
-│   settings.gradle
-│
-├───.gradle
-│   │   file-system.probe
-│   │
-│   ├───8.14.2
-│   │   │   gc.properties
-│   │   │
-│   │   ├───checksums
-│   │   │       checksums.lock
-│   │   │       md5-checksums.bin
-│   │   │       sha1-checksums.bin
-│   │   │
-│   │   ├───executionHistory
-│   │   │       executionHistory.bin
-│   │   │       executionHistory.lock
-│   │   │
-│   │   ├───expanded
-│   │   ├───fileChanges
-│   │   │       last-build.bin
-│   │   │
-│   │   ├───fileHashes
-│   │   │       fileHashes.bin
-│   │   │       fileHashes.lock
-│   │   │       resourceHashesCache.bin
-│   │   │
-│   │   └───vcsMetadata
-│   ├───buildOutputCleanup
-│   │       buildOutputCleanup.lock
-│   │       cache.properties
-│   │       outputFiles.bin
-│   │       
-│   └───vcs-1
-│           gc.properties
-│
-├───.vscode
-│       settings.json
-│
-├───build
-│   │   resolvedMainClassName
-│   │
-│   ├───classes
-│   │   └───java
-│   │       ├───main
-│   │       │   └───com
-│   │       │       └───vocealuga
-│   │       │           │   VoceAlugaApplication.class
-│   │       │           │
-│   │       │           ├───controller
-|   |       |           |   ├───p_api
-│   │       │           │   │       ClienteController.class
-│   │       │           │   │       EstoqueController.class
-│   │       │           │   │       FilialController.class
-│   │       │           │   │       FormaPagamentoController.class
-│   │       │           │   │       FuncionarioController.class
-│   │       │           │   │       GrupoVeiculoController.class
-│   │       │           │   │       ManutencaoController.class
-│   │       │           │   │       PagamentoController.class
-│   │       │           │   │       ReservaController.class
-│   │       │           │   │       VeiculoController.class
-│   │       │           │   │
-│   │       │           │   └───web
-│   │       │           │           ClienteViewController.class
-│   │       │           │
-│   │       │           ├───dao
-│   │       │           │       ClienteRepository.class
-│   │       │           │       EstoqueRepository.class
-│   │       │           │       FilialRepository.class
-│   │       │           │       FormaPagamentoRepository.class
-│   │       │           │       FuncionarioRepository.class
-│   │       │           │       GrupoVeiculoRepository.class
-│   │       │           │       ManutencaoRepository.class
-│   │       │           │       PagamentoRepository.class
-│   │       │           │       ReservaRepository.class
-│   │       │           │       VeiculoRepository.class
-│   │       │           │
-│   │       │           ├───model
-│   │       │           │       Cliente.class
-│   │       │           │       Estoque.class
-│   │       │           │       Filial.class
-│   │       │           │       FormaPagamento.class
-│   │       │           │       Funcionario.class
-│   │       │           │       GrupoVeiculo.class
-│   │       │           │       Manutencao.class
-│   │       │           │       Pagamento.class
-│   │       │           │       Reserva.class
-│   │       │           │       Veiculo.class
-│   │       │           │
-│   │       │           └───service
-│   │       │                   ClienteService.class
-│   │       │                   EstoqueService.class
-│   │       │                   FilialService.class
-│   │       │                   FormaPagamentoService.class
-│   │       │                   FuncionarioService.class
-│   │       │                   GrupoVeiculoService.class
-│   │       │                   ManutencaoService.class
-│   │       │                   PagamentoService.class
-│   │       │                   ReservaService.class
-│   │       │                   VeiculoService.class
-│   │       │
-│   │       └───test
-│   ├───generated
-│   │   └───sources
-│   │       ├───annotationProcessor
-│   │       │   └───java
-│   │       │       └───main
-│   │       └───headers
-│   │           └───java
-│   │               └───main
-│   ├───reports
-│   │   └───problems
-│   │           problems-report.html
-│   │
-│   ├───resources
-│   │   ├───main
-│   │   │   │   application.properties
-│   │   │   │
-│   │   │   ├───static
-│   │   │   └───templates
-│   │   │           clientes.html
-│   │   │           form-cliente.html
-│   │   │
-│   │   └───test
-│   └───tmp
-│       └───compileJava
-│               previous-compilation-data.bin
-│
-├───gradle
-│   └───wrapper
-│           gradle-wrapper.jar
-│           gradle-wrapper.properties
-│
-└───src
-    ├───main
-    │   ├───java
-    │   │   └───com
-    │   │       └───vocealuga
-    │   │           │   VoceAlugaApplication.java
-    │   │           │
-    │   │           ├───controller
-    │   │           │   ├───p_api
-    │   │           │   │       ClienteController.java
-    │   │           │   │       EstoqueController.java
-    │   │           │   │       FilialController.java
-    │   │           │   │       FormaPagamentoController.java
-    │   │           │   │       FuncionarioController.java
-    │   │           │   │       GrupoVeiculoController.java
-    │   │           │   │       ManutencaoController.java
-    │   │           │   │       PagamentoController.java
-    │   │           │   │       ReservaController.java
-    │   │           │   │       VeiculoController.java
-    │   │           │   │
-    │   │           │   └───web
-    │   │           │           ClienteViewController.java
-    │   │           │
-    │   │           ├───dao
-    │   │           │       ClienteRepository.java
-    │   │           │       EstoqueRepository.java
-    │   │           │       FilialRepository.java
-    │   │           │       FormaPagamentoRepository.java
-    │   │           │       FuncionarioRepository.java
-    │   │           │       GrupoVeiculoRepository.java
-    │   │           │       ManutencaoRepository.java
-    │   │           │       PagamentoRepository.java
-    │   │           │       ReservaRepository.java
-    │   │           │       VeiculoRepository.java
-    │   │           │
-    │   │           ├───model
-    │   │           │       Cliente.java
-    │   │           │       Estoque.java
-    │   │           │       Filial.java
-    │   │           │       FormaPagamento.java
-    │   │           │       Funcionario.java
-    │   │           │       GrupoVeiculo.java
-    │   │           │       Manutencao.java
-    │   │           │       Pagamento.java
-    │   │           │       Reserva.java
-    │   │           │       Veiculo.java
-    │   │           │
-    │   │           └───service
-    │   │                   ClienteService.java
-    │   │                   EstoqueService.java
-    │   │                   FilialService.java
-    │   │                   FormaPagamentoService.java
-    │   │                   FuncionarioService.java
-    │   │                   GrupoVeiculoService.java
-    │   │                   ManutencaoService.java
-    │   │                   PagamentoService.java
-    │   │                   ReservaService.java
-    │   │                   VeiculoService.java
-    │   │
-    │   └───resources
-    │       │   application.properties
-    │       │
-    │       ├───static
-    │       └───templates
-    │               clientes.html
-    │               form-cliente.html
-    │
-    └───test
-        └───java
-            │   Funciona.class
-            │   Funciona.java
-            │
-            └───com
-                └───vocealuga
-                        VoceAlugaApplicationTests.java
+- Cadastro e login de clientes e funcionários
+- Gerenciamento de veículos, reservas e pagamentos
+- Controle de manutenções e estoque de veículos
+- Gestão de filiais e grupos de veículos
+- Interface web para clientes e funcionários
+
+## Estrutura do Projeto
+
+```
+src/
+  main/
+    java/com/vocealuga/
+      controller/      # Controllers REST e Web (MVC)
+      dao/             # Repositórios (JPA)
+      model/           # Entidades do domínio
+      service/         # Lógica de negócio
+      utils/           # Utilitários
+      SecurityConfig.java # Configuração de segurança (Spring Security)
+      VoceAlugaApplication.java # Classe principal
+    resources/
+      static/          # Arquivos estáticos (CSS)
+      templates/       # Templates Thymeleaf (HTML)
+      application.properties # Configurações da aplicação
+  test/
+    java/com/vocealuga/ # Testes unitários e de integração
+```
+
+## Tecnologias Utilizadas
+
+- Java 11+
+- Spring Boot
+- Spring MVC
+- Spring Data JPA
+- Spring Security
+- Thymeleaf
+- Gradle
+
+## Como Executar
+
+1. **Pré-requisitos:**  
+   - Java 11 ou superior  
+   - Gradle (ou use o wrapper `./gradlew`)
+
+2. **Clone o repositório:**
+   ```bash
+   git clone <url-do-repositorio>
+   cd voce-aluga-main
+   ```
+
+3. **Execute a aplicação:**
+   ```bash
+   ./gradlew bootRun
+   ```
+
+4. **Acesse no navegador:**  
+   ```
+   http://localhost:8080
+   ```
+
+## Estrutura de Telas
+
+- **Cliente:** Cadastro, login, dashboard, perfil, reservas, pagamento
+- **Funcionário:** Login, dashboard, gerenciamento de veículos, reservas, manutenções, filiais
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes. 
