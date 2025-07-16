@@ -8,5 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FuncionarioRepository extends JpaRepository<Funcionario, Integer> {
     Optional<Funcionario> findByEmailAndSenha(String email, String senha);
+
     Boolean existsByEmail(String email);
+
+    Boolean existsByCpf(String cpf);
 }

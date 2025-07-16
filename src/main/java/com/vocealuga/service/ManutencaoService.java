@@ -28,14 +28,6 @@ public class ManutencaoService {
     }
 
     public Manutencao createManutencao(Manutencao manutencao) {
-
-        if (manutencao.getDataInicio().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("A data de início não pode ser anterior ao momento atual.");
-        }
-        if (manutencao.getDataFim().isBefore(manutencao.getDataInicio().plusDays(1))) {
-            throw new RuntimeException("A data de fim deve ser pelo menos 1 dia após a data de início.");
-        }
-
         return manutencaoRepository.save(manutencao);
     }
 
@@ -54,5 +46,31 @@ public class ManutencaoService {
 
     public void deleteManutencao(Integer id) {
         manutencaoRepository.deleteById(id);
+    }
+
+    /**
+     * Valida a data de início da manutenção.
+     * 
+     * @param dataInicio Data de início da manutenção
+     * @throws RuntimeException se a data de início for anterior ao momento atual
+     */
+    public void validateDataInicio(LocalDateTime dataInicio) {
+        if (dataInicio != null && dataInicio.isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("A data de início não pode ser anterior ao momento atual.");
+        }
+    }
+
+    /**
+     * Valida a data de fim da manutenção.
+     * 
+     * @param dataInicio Data de início da manutenção
+     * @param dataFim    Data de fim da manutenção
+     * @throws RuntimeException se a data de fim for anterior a data de início + 1
+     *                          dia
+     */
+    public void validateDataFim(LocalDateTime dataInicio, LocalDateTime dataFim) {
+        if (dataFim != null && dataInicio != null && dataFim.isBefore(dataInicio.plusDays(1))) {
+            throw new RuntimeException("A data de fim deve ser pelo menos 1 dia após a data de início.");
+        }
     }
 }

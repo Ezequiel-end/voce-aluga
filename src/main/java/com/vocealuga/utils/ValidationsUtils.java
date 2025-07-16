@@ -13,6 +13,7 @@ public class ValidationsUtils {
 
     /**
      * Valida um número de CNH (11 dígitos) usando o algoritmo de verificação.
+     * 
      * @param cnh Número da CNH a ser validado
      * @return true se for válido, false caso contrário
      */
@@ -54,6 +55,7 @@ public class ValidationsUtils {
 
     /**
      * Valida um CPF (11 dígitos) usando o algoritmo de verificação.
+     * 
      * @param cpf Número do CPF a ser validado
      * @return true se for válido, false caso contrário
      */
@@ -72,16 +74,20 @@ public class ValidationsUtils {
                 sum += numbers[i] * (10 - i);
             }
             int firstDigit = 11 - (sum % 11);
-            if (firstDigit >= 10) firstDigit = 0;
-            if (firstDigit != numbers[9]) return false;
+            if (firstDigit >= 10)
+                firstDigit = 0;
+            if (firstDigit != numbers[9])
+                return false;
 
             sum = 0;
             for (int i = 0; i < 10; i++) {
                 sum += numbers[i] * (11 - i);
             }
             int secondDigit = 11 - (sum % 11);
-            if (secondDigit >= 10) secondDigit = 0;
-            if (secondDigit != numbers[10]) return false;
+            if (secondDigit >= 10)
+                secondDigit = 0;
+            if (secondDigit != numbers[10])
+                return false;
 
             return true;
         } catch (Exception e) {
@@ -104,6 +110,22 @@ public class ValidationsUtils {
         return !(existsInCliente || existsInFuncionario);
     }
 
+    /**
+     * Verifica se o CPF é globalmente único (não existe em Cliente ou Funcionario).
+     * 
+     * @param cpf Número do CPF a ser validado
+     * @return true se o CPF não existe, false caso contrário
+     */
+    public boolean isCpfGloballyUnique(String cpf) {
+        if (cpf == null || cpf.trim().isEmpty()) {
+            return false;
+        }
+        String cleanCpf = cpf.replaceAll("[^0-9]", "");
+        boolean existsInCliente = clienteRepository.existsByCpf(cleanCpf);
+        boolean existsInFuncionario = funcionarioRepository.existsByCpf(cleanCpf);
+        return !(existsInCliente || existsInFuncionario);
+    }
+
     public boolean isMaiorDeIdade(LocalDate dataNascimento) {
         if (dataNascimento == null) {
             return false;
@@ -113,4 +135,3 @@ public class ValidationsUtils {
         return idade.getYears() >= 18;
     }
 }
-
