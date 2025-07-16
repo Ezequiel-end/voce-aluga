@@ -12,7 +12,8 @@ import java.util.Optional;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
-    // Mantido 'validation' injetado, pois 'isEmailGloballyUnique' pode não ser estático puro
+    // Mantido 'validation' injetado, pois 'isEmailGloballyUnique' pode não ser
+    // estático puro
     private final ValidationsUtils validation;
 
     @Autowired
@@ -53,23 +54,24 @@ public class ClienteService {
     public Cliente updateCliente(Integer id, Cliente clienteDetails) {
         return clienteRepository.findById(id)
                 .map(cliente -> {
-                    //cliente.setCpf(clienteDetails.getCpf());
+                    // cliente.setCpf(clienteDetails.getCpf());
                     cliente.setNome(clienteDetails.getNome());
                     cliente.setEmail(clienteDetails.getEmail());
                     // A senha só deve ser atualizada se for fornecida no clienteDetails
                     if (clienteDetails.getSenha() != null && !clienteDetails.getSenha().isEmpty()) {
                         cliente.setSenha(clienteDetails.getSenha());
                     }
-                    //cliente.setCnh(clienteDetails.getCnh());
-                    //cliente.setDataNascimento(clienteDetails.getDataNascimento());
-                    
+                    // cliente.setCnh(clienteDetails.getCnh());
+                    // cliente.setDataNascimento(clienteDetails.getDataNascimento());
+
                     return clienteRepository.save(cliente);
                 }).orElseThrow(() -> new RuntimeException("Cliente not found with id " + id));
     }
 
     /**
      * Adiciona pontos de fidelidade a um cliente existente.
-     * @param clienteId O ID do cliente.
+     * 
+     * @param clienteId           O ID do cliente.
      * @param pontosParaAdicionar O número de pontos a ser adicionado.
      * @return O cliente atualizado.
      * @throws RuntimeException se o cliente não for encontrado.
@@ -101,6 +103,11 @@ public class ClienteService {
                 .or(() -> {
                     throw new RuntimeException("Cliente não registrado com CPF: " + cleanCpf);
                 });
+    }
+
+    public boolean existsByCpf(String cpf) {
+        String cleanCpf = cpf.replaceAll("[^0-9]", "");
+        return clienteRepository.existsByCpf(cleanCpf);
     }
 
 }

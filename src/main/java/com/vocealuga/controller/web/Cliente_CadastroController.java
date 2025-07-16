@@ -36,6 +36,11 @@ public class Cliente_CadastroController {
                 return "redirect:/cliente/cadastro";
             }
 
+            if (clienteService.existsByCpf(cliente.getCpf())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "CPF já cadastrado no sistema!");
+                return "redirect:/cliente/cadastro";
+            }
+
             if (!validation.isEmailGloballyUnique(cliente.getEmail())) {
                 redirectAttributes.addFlashAttribute("errorMessage", "E-mail já cadastrado!");
                 return "redirect:/cliente/cadastro";
@@ -64,4 +69,5 @@ public class Cliente_CadastroController {
             return "redirect:/cliente/cadastro";
         }
     }
+
 }
