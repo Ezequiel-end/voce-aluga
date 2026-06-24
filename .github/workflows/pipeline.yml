@@ -179,6 +179,7 @@ jobs:
 
       - name: Gerar chave SSH para Ansible
         run: |
+          rm -f infra/ansible/files/voce-aluga infra/ansible/files/voce-aluga.pub
           ssh-keygen -t ed25519 -f infra/ansible/files/voce-aluga -N ""
           chmod 600 infra/ansible/files/voce-aluga
 
@@ -213,7 +214,7 @@ jobs:
 
       - name: Subir ambiente local
         run: |
-          docker compose -f infra/docker-compose.yml up -d ec2-api gateway api-rest api-web
+          docker compose -f infra/docker-compose.yml up -d --force-recreate ec2-api gateway api-rest api-web
           sleep 45
 
       - name: Criar cluster kind
