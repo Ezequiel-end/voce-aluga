@@ -63,33 +63,55 @@ jobs:
         run: |
           docker run -d --name sonarqube -p 9000:9000 \
             -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true sonarqube:community
-          for i in $(seq 1 60); do
-            curl -sf http://localhost:9000/api/system/status | grep -q UP && break
+          for i in $(seq 1 90); do
+            curl -sf http://localhost:9000/api/system/status | grep -q '"status":"UP"' && break
             sleep 5
           done
+          sleep 15
+
+      - name: Configurar autenticacao SonarQube
+        env:
+          SONAR_TOKEN_SECRET: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [ -n "$SONAR_TOKEN_SECRET" ]; then
+            echo "SONAR_CI_TOKEN=$SONAR_TOKEN_SECRET" >> "$GITHUB_ENV"
+            echo "SONAR_QG_AUTH=${SONAR_TOKEN_SECRET}:" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          curl -sf -u admin:admin -X POST \
+            "http://localhost:9000/api/users/change_password" \
+            -d "login=admin&previousPassword=admin&password=admin123" || true
+          for PASS in admin123 admin; do
+            TOKEN=$(curl -sf -u "admin:${PASS}" -X POST \
+              "http://localhost:9000/api/user_tokens/generate?name=gha-${{ github.run_id }}" \
+              | python3 -c "import sys,json; print(json.load(sys.stdin).get('token',''))" 2>/dev/null || true)
+            if [ -n "$TOKEN" ]; then
+              echo "SONAR_CI_TOKEN=$TOKEN" >> "$GITHUB_ENV"
+              echo "SONAR_QG_AUTH=${TOKEN}:" >> "$GITHUB_ENV"
+              exit 0
+            fi
+          done
+          echo "Falha ao gerar token SonarQube"
+          exit 1
+
       - name: Executar testes com cobertura
         run: chmod +x gradlew && ./gradlew test jacocoTestReport
+
       - name: SonarQube Scan
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           chmod +x gradlew
           ./gradlew sonar \
             -Dsonar.projectKey=voce-aluga \
             -Dsonar.host.url=${{ env.SONAR_HOST }} \
-            -Dsonar.token="${SONAR_TOKEN:-admin}"
+            -Dsonar.token="${SONAR_CI_TOKEN}"
+
       - name: Verificar Quality Gate
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PASSWORD: ${{ secrets.SONAR_PASSWORD }}
         run: |
-          USER="${SONAR_TOKEN:-admin}"
-          PASS="${SONAR_PASSWORD:-admin}"
-          sleep 15
-          STATUS=$(curl -s -u "${USER}:${PASS}" \
+          sleep 10
+          STATUS=$(curl -s -u "${SONAR_QG_AUTH}" \
             "${{ env.SONAR_HOST }}/api/qualitygates/project_status?projectKey=voce-aluga" \
             | grep -o '"status":"[^"]*"' | head -1 || true)
-          echo "Quality Gate: ${STATUS:-desconhecido}"
+          echo "Quality Gate: ${STATUS:-pendente}"
           echo "${STATUS}" | grep -q '"status":"OK"' || echo "Quality Gate ainda nao OK (continuando pipeline)"
 
   sast:
