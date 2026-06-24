@@ -19,7 +19,8 @@ RUN useradd -m -s /bin/bash ubuntu \
 RUN mkdir -p /var/run/sshd \
     && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
     && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
-    && echo "UseDNS no" >> /etc/ssh/sshd_config
+    && printf '%s\n' 'PubkeyAuthentication yes' 'PasswordAuthentication yes' 'UseDNS no' \
+      > /etc/ssh/sshd_config.d/99-voce-aluga.conf
 
 EXPOSE 22 8081
 

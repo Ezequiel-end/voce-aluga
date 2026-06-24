@@ -2,6 +2,7 @@
 set -e
 
 mkdir -p /home/ubuntu/.ssh
+chown ubuntu:ubuntu /home/ubuntu/.ssh
 chmod 700 /home/ubuntu/.ssh
 
 if [ -f /run/keys/authorized_keys ]; then
