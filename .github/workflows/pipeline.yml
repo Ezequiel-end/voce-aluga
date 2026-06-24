@@ -242,7 +242,8 @@ jobs:
         run: |
           cd infra/ansible
           ansible-playbook playbooks/deploy-docker.yml \
-            -e docker_tag=${{ github.sha }}
+            -e docker_tag=${{ github.sha }} \
+            -e ansible_ssh_private_key_file=${{ github.workspace }}/infra/ansible/files/voce-aluga
 
       - name: Deploy K8s via Ansible
         run: |
