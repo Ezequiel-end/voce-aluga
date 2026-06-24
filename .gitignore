@@ -35,3 +35,23 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Secrets e credenciais ###
+.env
+.env.*
+*.pem
+*.key
+infra/ansible/files/voce-aluga
+!infra/ansible/files/voce-aluga.pub
+
+### Terraform ###
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.*
+*.tfvars
+!infra/terraform/terraform.tfvars.example
+
+### DevOps / local ###
+.sonar/
+.scannerwork/
+*.log

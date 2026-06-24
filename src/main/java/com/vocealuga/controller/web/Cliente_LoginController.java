@@ -1,6 +1,7 @@
 // src/main/java/com/vocealuga/controller/web/Cliente_LoginController.java
 package com.vocealuga.controller.web;
 
+import org.springframework.context.annotation.Profile;
 import com.vocealuga.model.Cliente;
 import com.vocealuga.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 
+@Profile("web")
 @Controller
 @RequestMapping("/cliente")
 public class Cliente_LoginController {

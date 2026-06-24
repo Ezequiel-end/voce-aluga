@@ -1,5 +1,6 @@
 package com.vocealuga.controller.web;
 
+import org.springframework.context.annotation.Profile;
 import com.vocealuga.model.*;
 import com.vocealuga.service.*;
 import com.vocealuga.utils.ValidationsUtils;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@Profile("web")
 @Controller
 @RequestMapping("/funcionario")
 public class Funcionario_Controller {

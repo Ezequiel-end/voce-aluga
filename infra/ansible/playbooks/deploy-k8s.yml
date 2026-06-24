@@ -1,0 +1,69 @@
+---
+- name: Deploy da API Web (Kubernetes)
+  hosts: k8s
+  connection: local
+  gather_facts: false
+  vars:
+    k8s_manifest_dir: "{{ playbook_dir }}/../../kubernetes"
+    k8s_namespace: voce-aluga
+    image_web: "{{ docker_image_web | default('vocealuga/api-web') }}"
+    image_tag: "{{ docker_tag | default('latest') }}"
+
+  tasks:
+    - name: Garantir namespace
+      ansible.builtin.command:
+        cmd: kubectl apply -f {{ k8s_manifest_dir }}/namespace.yaml
+      changed_when: true
+
+    - name: Aplicar secrets e banco MySQL
+      ansible.builtin.command:
+        cmd: kubectl apply -f {{ item }}
+      loop:
+        - "{{ k8s_manifest_dir }}/database/secret.yaml"
+        - "{{ k8s_manifest_dir }}/database/configmap-primary.yaml"
+        - "{{ k8s_manifest_dir }}/database/configmap-replica.yaml"
+        - "{{ k8s_manifest_dir }}/database/statefulset-primary.yaml"
+        - "{{ k8s_manifest_dir }}/database/statefulset-replica.yaml"
+      changed_when: true
+
+    - name: Aplicar quotas e limites
+      ansible.builtin.command:
+        cmd: kubectl apply -f {{ item }}
+      loop:
+        - "{{ k8s_manifest_dir }}/resource-quota.yaml"
+        - "{{ k8s_manifest_dir }}/limit-range.yaml"
+      changed_when: true
+
+    - name: Atualizar imagem do deployment api-web
+      ansible.builtin.shell: |
+        set -euo pipefail
+        sed "s|image: vocealuga/api-web:.*|image: {{ image_web }}:{{ image_tag }}|" \
+          "{{ k8s_manifest_dir }}/deployment.yaml" | kubectl apply -f -
+      args:
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Aplicar manifests da API Web e gateway
+      ansible.builtin.command:
+        cmd: kubectl apply -f {{ item }}
+      loop:
+        - "{{ k8s_manifest_dir }}/service.yaml"
+        - "{{ k8s_manifest_dir }}/hpa.yaml"
+        - "{{ k8s_manifest_dir }}/gateway-deployment.yaml"
+        - "{{ k8s_manifest_dir }}/gateway-service.yaml"
+        - "{{ k8s_manifest_dir }}/ingress.yaml"
+      changed_when: true
+
+    - name: Aguardar rollout api-web
+      ansible.builtin.command:
+        cmd: kubectl rollout status deployment/api-web -n {{ k8s_namespace }} --timeout=180s
+      changed_when: false
+
+    - name: Aguardar rollout gateway
+      ansible.builtin.command:
+        cmd: kubectl rollout status deployment/gateway -n {{ k8s_namespace }} --timeout=120s
+      changed_when: false
+
+    - name: Notificar sucesso do deploy K8s
+      ansible.builtin.debug:
+        msg: "Deploy K8s concluido - {{ image_web }}:{{ image_tag }}"

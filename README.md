@@ -74,4 +74,24 @@ src/
 
 ## Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes. 
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## Trabalho Final — DevOps (Gerência de Configuração)
+
+Repositório original validado: **https://github.com/Ezequiel-end/voce-aluga**
+
+### APIs do projeto
+
+| API | Linguagem | Responsabilidade | Rotas principais |
+|-----|-----------|------------------|------------------|
+| **API REST** | Java / Spring Boot | Endpoints JSON para o domínio de locação | `/api/clientes`, `/api/veiculos`, `/api/reservas`, `/api/pagamentos`, etc. |
+| **API Web** | Java / Spring Boot + Thymeleaf | Interface web para clientes e funcionários | `/cliente/*`, `/funcionario/*` |
+
+Deploy:
+- **API REST** → Docker (multi-stage) + EC2 via Ansible
+- **API Web** → Kubernetes (2+ réplicas, HPA, Ingress, probes)
+
+Documentação completa da infraestrutura: [infra/README.md](infra/README.md)
+

@@ -1,0 +1,74 @@
+---
+- name: Deploy da API REST (Docker) na EC2
+  hosts: api
+  become: true
+  vars:
+    docker_registry: "{{ registry_host | default('localhost:5000') }}"
+    image_name: "{{ docker_registry }}/vocealuga/api-rest"
+    image_tag: "{{ docker_tag | default('latest') }}"
+    container_name: voce-aluga-api-rest
+    api_port: 8081
+    db_url: "jdbc:mysql://{{ db_host | default('10.0.3.10') }}:{{ db_port | default('3306') }}/db_voce_aluga"
+    db_user: "{{ db_username | default('root') }}"
+    db_pass: "{{ db_password | default('senha123') }}"
+
+  tasks:
+    - name: Instalar Docker
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - curl
+        state: present
+        update_cache: true
+
+    - name: Verificar Docker disponivel (socket do host)
+      ansible.builtin.command:
+        cmd: docker version
+      changed_when: false
+
+    - name: Adicionar usuario ubuntu ao grupo docker
+      ansible.builtin.user:
+        name: ubuntu
+        groups: docker
+        append: true
+
+    - name: Baixar imagem do registry privado
+      ansible.builtin.command:
+        cmd: docker pull {{ image_name }}:{{ image_tag }}
+      changed_when: true
+
+    - name: Parar container antigo
+      ansible.builtin.command:
+        cmd: docker rm -f {{ container_name }}
+      failed_when: false
+      changed_when: false
+
+    - name: Subir container da API REST na EC2
+      ansible.builtin.command:
+        cmd: >
+          docker run -d --name {{ container_name }}
+          --restart unless-stopped
+          --network infra_aws-net
+          -p {{ api_port }}:8081
+          -e SPRING_PROFILES_ACTIVE=api
+          -e SERVER_PORT=8081
+          -e DB_URL={{ db_url }}
+          -e DB_USER={{ db_user }}
+          -e DB_PASSWORD={{ db_pass }}
+          {{ image_name }}:{{ image_tag }}
+      changed_when: true
+
+    - name: Aguardar health da API REST
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ api_port }}/actuator/health"
+        status_code: 200
+      delegate_to: localhost
+      become: false
+      register: health
+      until: health.status == 200
+      retries: 24
+      delay: 5
+
+    - name: Notificar sucesso do deploy Docker
+      ansible.builtin.debug:
+        msg: "Deploy Docker concluido - {{ image_name }}:{{ image_tag }}"

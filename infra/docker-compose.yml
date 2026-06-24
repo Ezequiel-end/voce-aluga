@@ -1,0 +1,144 @@
+services:
+  localstack:
+    image: localstack/localstack:3.8
+    container_name: voce-aluga-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=ec2,vpc,apigateway,iam,sts,rds,s3
+      - DEBUG=0
+      - PERSISTENCE=0
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - localstack-data:/var/lib/localstack
+    networks:
+      aws-net:
+        ipv4_address: 10.0.0.10
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  rds-mysql:
+    image: mysql:8.0
+    container_name: voce-aluga-rds-mysql
+    hostname: rds-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: senha123
+      MYSQL_DATABASE: db_voce_aluga
+    networks:
+      aws-net:
+        ipv4_address: 10.0.3.10
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-psenha123"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  ec2-api:
+    build:
+      context: ./docker/ec2-api
+    container_name: voce-aluga-ec2-api
+    hostname: api-server
+    depends_on:
+      rds-mysql:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:2224:22"
+    networks:
+      aws-net:
+        ipv4_address: 10.0.4.10
+    volumes:
+      - ./ansible/files/voce-aluga.pub:/run/keys/authorized_keys:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  api-rest:
+    build:
+      context: ..
+      dockerfile: infra/apis/api-1/Docker/Dockerfile
+    container_name: voce-aluga-api-rest
+    depends_on:
+      rds-mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: api
+      SERVER_PORT: "8081"
+      DB_URL: jdbc:mysql://rds-mysql:3306/db_voce_aluga
+      DB_USER: root
+      DB_PASSWORD: senha123
+    ports:
+      - "8081:8081"
+    networks:
+      aws-net:
+        ipv4_address: 10.0.4.20
+
+  api-web:
+    build:
+      context: ..
+      dockerfile: infra/apis/api-2/Docker/Dockerfile
+    container_name: voce-aluga-api-web
+    depends_on:
+      rds-mysql:
+        condition: service_healthy
+      api-rest:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: web
+      SERVER_PORT: "8082"
+      DB_URL: jdbc:mysql://rds-mysql:3306/db_voce_aluga
+      DB_USER: root
+      DB_PASSWORD: senha123
+      API_REST_URL: http://api-rest:8081
+    expose:
+      - "8082"
+    networks:
+      aws-net:
+
+  gateway:
+    image: nginx:alpine
+    container_name: voce-aluga-gateway
+    depends_on:
+      - api-rest
+      - api-web
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      aws-net:
+        ipv4_address: 10.0.0.11
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: voce-aluga-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+      SONAR_FORCEAUTHENTICATION: "false"
+    networks:
+      aws-net:
+
+  registry:
+    image: registry:2
+    container_name: voce-aluga-registry
+    ports:
+      - "5000:5000"
+    networks:
+      aws-net:
+        ipv4_address: 10.0.0.20
+
+networks:
+  aws-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/16
+          gateway: 10.0.0.1
+
+volumes:
+  localstack-data:

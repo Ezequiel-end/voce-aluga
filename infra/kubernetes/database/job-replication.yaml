@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-setup-replication
+  namespace: voce-aluga
+spec:
+  ttlSecondsAfterFinished: 86400
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: setup
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: voce-aluga-db
+                  key: password
+          command:
+            - bash
+            - -c
+            - |
+              set -e
+              PRIMARY=mysql-primary-0.mysql-primary.voce-aluga.svc.cluster.local
+              until mysql -h "$PRIMARY" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1"; do sleep 3; done
+              mysql -h "$PRIMARY" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE USER IF NOT EXISTS 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'replpass'; ALTER USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'replpass'; GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%'; FLUSH PRIVILEGES;"
+              for HOST in mysql-replica-0.mysql-replica mysql-replica-1.mysql-replica; do
+                until mysql -h "${HOST}.voce-aluga.svc.cluster.local" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1" 2>/dev/null; do
+                  echo "aguardando $HOST"; sleep 5;
+                done
+                FQDN="${HOST}.voce-aluga.svc.cluster.local"
+                mysql -h "$FQDN" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "STOP REPLICA;"
+                mysql -h "$FQDN" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "RESET REPLICA ALL;"
+                mysql -h "$FQDN" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "CHANGE REPLICATION SOURCE TO SOURCE_HOST='${PRIMARY}', SOURCE_USER='repl', SOURCE_PASSWORD='replpass', SOURCE_AUTO_POSITION=1;"
+                mysql -h "$FQDN" -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "START REPLICA;"
+                echo "replicacao configurada em $HOST"
+              done

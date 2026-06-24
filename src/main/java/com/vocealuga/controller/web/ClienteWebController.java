@@ -1,6 +1,7 @@
 // src/main/java/com/vocealuga/controller/web/ClienteWebController.java
 package com.vocealuga.controller.web;
 
+import org.springframework.context.annotation.Profile;
 import com.vocealuga.model.Cliente;
 import com.vocealuga.model.Reserva;
 import com.vocealuga.model.Pagamento;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Profile("web")
 @Controller
 @RequestMapping("/cliente")
 public class ClienteWebController {

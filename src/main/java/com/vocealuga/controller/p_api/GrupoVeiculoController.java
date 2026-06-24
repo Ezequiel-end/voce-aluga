@@ -1,5 +1,6 @@
 package com.vocealuga.controller.p_api;
 
+import org.springframework.context.annotation.Profile;
 import com.vocealuga.model.GrupoVeiculo;
 import com.vocealuga.service.GrupoVeiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Profile("api")
 @RestController
 @RequestMapping("/api/grupos-veiculo")
 public class GrupoVeiculoController {

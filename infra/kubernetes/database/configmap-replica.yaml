@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-replica-init
+  namespace: voce-aluga
+data:
+  setup-replication.sh: |
+    #!/bin/bash
+    set -e
+    until mysql -h mysql-primary.voce-aluga.svc.cluster.local -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1" >/dev/null 2>&1; do
+      echo "aguardando mysql-primary..."
+      sleep 3
+    done
+    MASTER_FILE=$(mysql -h mysql-primary.voce-aluga.svc.cluster.local -uroot -p"${MYSQL_ROOT_PASSWORD}" -N -e "SHOW MASTER STATUS" | awk '{print $1}')
+    MASTER_POS=$(mysql -h mysql-primary.voce-aluga.svc.cluster.local -uroot -p"${MYSQL_ROOT_PASSWORD}" -N -e "SHOW MASTER STATUS" | awk '{print $2}')
+    mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" <<-EOSQL
+      STOP REPLICA;
+      CHANGE REPLICATION SOURCE TO
+        SOURCE_HOST='mysql-primary.voce-aluga.svc.cluster.local',
+        SOURCE_USER='repl',
+        SOURCE_PASSWORD='replpass',
+        SOURCE_LOG_FILE='${MASTER_FILE}',
+        SOURCE_LOG_POS=${MASTER_POS};
+      START REPLICA;
+    EOSQL
+    echo "replicacao configurada"

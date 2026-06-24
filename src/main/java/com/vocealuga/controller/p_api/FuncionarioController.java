@@ -1,5 +1,6 @@
 package com.vocealuga.controller.p_api;
 
+import org.springframework.context.annotation.Profile;
 import com.vocealuga.model.Funcionario;
 import com.vocealuga.service.FuncionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Profile("api")
 @RestController
 @RequestMapping("/api/funcionarios")
 public class FuncionarioController {

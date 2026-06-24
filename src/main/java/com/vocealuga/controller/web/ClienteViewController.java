@@ -1,5 +1,6 @@
 package com.vocealuga.controller.web;
 
+import org.springframework.context.annotation.Profile;
 import com.vocealuga.model.Cliente;
 import com.vocealuga.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+@Profile("web")
 @Controller
 @RequestMapping("/clientes")
 public class ClienteViewController {

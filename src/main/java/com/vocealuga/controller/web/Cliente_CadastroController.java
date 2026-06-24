@@ -1,5 +1,6 @@
 package com.vocealuga.controller.web;
 
+import org.springframework.context.annotation.Profile;
 import com.vocealuga.model.Cliente;
 import com.vocealuga.service.ClienteService;
 import com.vocealuga.utils.ValidationsUtils;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+@Profile("web")
 @Controller
 @RequestMapping("/cliente")
 public class Cliente_CadastroController {

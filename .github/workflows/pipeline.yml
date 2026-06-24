@@ -1,0 +1,192 @@
+name: CI/CD Pipeline — Você Aluga
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  JAVA_VERSION: "21"
+  DOCKER_IMAGE_API: vocealuga/api-rest
+  DOCKER_IMAGE_WEB: vocealuga/api-web
+  SONAR_HOST: http://localhost:9000
+  GATEWAY_URL: http://localhost:8080
+
+jobs:
+  test-api:
+    name: Testes API REST
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+      - name: Testes unitarios API REST
+        run: ./gradlew test --tests "com.vocealuga.controller.p_api.*" --tests "com.vocealuga.service.*"
+
+  test-web:
+    name: Testes API Web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+      - name: Testes unitarios API Web
+        run: ./gradlew test --tests "com.vocealuga.controller.web.*"
+
+  sonarqube:
+    name: Analise SonarQube
+    needs: [test-api, test-web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+      - name: Subir SonarQube
+        run: |
+          docker run -d --name sonarqube -p 9000:9000 \
+            -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true sonarqube:community
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:9000/api/system/status && break
+            sleep 5
+          done
+      - name: Executar testes com cobertura
+        run: ./gradlew test jacocoTestReport
+      - name: SonarQube Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./gradlew sonar \
+            -Dsonar.projectKey=voce-aluga \
+            -Dsonar.host.url=${{ env.SONAR_HOST }} \
+            -Dsonar.login=${SONAR_TOKEN:-admin} \
+            -Dsonar.password=${{ secrets.SONAR_PASSWORD || 'admin' }}
+      - name: Verificar Quality Gate
+        run: |
+          STATUS=$(curl -s -u "${{ secrets.SONAR_TOKEN || 'admin' }}:${{ secrets.SONAR_PASSWORD || 'admin' }}" \
+            "${{ env.SONAR_HOST }}/api/qualitygates/project_status?projectKey=voce-aluga" | grep -o '"status":"[^"]*"' | head -1)
+          echo "Quality Gate: $STATUS"
+          echo "$STATUS" | grep -q '"status":"OK"' || exit 1
+
+  sast:
+    name: SAST (Trivy + Semgrep)
+    needs: [test-api, test-web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: p/default
+      - name: Build imagem para scan
+        run: docker build -f infra/apis/api-1/Docker/Dockerfile -t ${{ env.DOCKER_IMAGE_API }}:scan .
+      - name: Trivy scan imagem
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.DOCKER_IMAGE_API }}:scan
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
+
+  build-and-push:
+    name: Build e Push Docker
+    needs: [sonarqube, sast]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build e push API REST
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/apis/api-1/Docker/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE_API }}:latest
+            ${{ env.DOCKER_IMAGE_API }}:${{ github.sha }}
+      - name: Build e push API Web
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/apis/api-2/Docker/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE_WEB }}:latest
+            ${{ env.DOCKER_IMAGE_WEB }}:${{ github.sha }}
+
+  deploy-homolog:
+    name: Deploy Homologacao
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar kind e kubectl
+        run: |
+          curl -fsSL https://kind.sigs.k8s.io/dl/v0.26.0/kind-linux-amd64 -o kind && chmod +x kind
+          curl -fsSL https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl -o kubectl && chmod +x kubectl
+          sudo mv kind kubectl /usr/local/bin/
+      - name: Build imagens locais
+        run: |
+          docker build -f infra/apis/api-1/Docker/Dockerfile -t ${{ env.DOCKER_IMAGE_API }}:${{ github.sha }} .
+          docker build -f infra/apis/api-2/Docker/Dockerfile -t ${{ env.DOCKER_IMAGE_WEB }}:${{ github.sha }} .
+      - name: Subir ambiente local
+        run: |
+          docker compose -f infra/docker-compose.yml up -d localstack rds-mysql ec2-api gateway api-rest api-web
+          sleep 30
+      - name: Criar cluster kind
+        run: bash infra/scripts/setup-kind.sh
+      - name: Carregar imagens no kind
+        run: |
+          kind load docker-image ${{ env.DOCKER_IMAGE_WEB }}:${{ github.sha }} --name voce-aluga
+      - name: Deploy Docker via Ansible
+        run: |
+          pip install ansible
+          ansible-playbook -i infra/ansible/inventory/hosts.ini infra/ansible/playbooks/deploy-docker.yml \
+            -e docker_image=${{ env.DOCKER_IMAGE_API }} \
+            -e docker_tag=${{ github.sha }}
+      - name: Deploy K8s via Ansible
+        run: |
+          ansible-playbook -i infra/ansible/inventory/hosts.ini infra/ansible/playbooks/deploy-k8s.yml \
+            -e docker_image_web=${{ env.DOCKER_IMAGE_WEB }} \
+            -e docker_tag=${{ github.sha }}
+
+  dast:
+    name: DAST (OWASP ZAP)
+    needs: deploy-homolog
+    runs-on: ubuntu-latest
+    steps:
+      - name: ZAP Baseline Scan no Gateway
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: ${{ env.GATEWAY_URL }}
+          allow_issue_writing: false
+
+  notify:
+    name: Notificacao
+    needs: [dast]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resumo do pipeline
+        run: |
+          if [ "${{ needs.dast.result }}" = "success" ]; then
+            echo "PIPELINE STATUS: SUCESSO - Deploy e scans concluidos para voce-aluga"
+          else
+            echo "PIPELINE STATUS: FALHA - Verifique os jobs anteriores"
+            exit 1
+          fi

@@ -1,0 +1,8 @@
+aws_region             = "us-east-1"
+localstack_endpoint    = "http://localhost:4566"
+project_name           = "voce-aluga"
+use_localstack_rds     = false
+emulated_rds_host      = "10.0.3.10"
+emulated_rds_port      = 3306
+kubeconfig_path        = "~/.kube/config"
+k8s_namespace          = "voce-aluga"
