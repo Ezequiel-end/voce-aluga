@@ -177,12 +177,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Gerar chave SSH para Ansible
-        run: |
-          rm -f infra/ansible/files/voce-aluga infra/ansible/files/voce-aluga.pub
-          ssh-keygen -t ed25519 -f infra/ansible/files/voce-aluga -N ""
-          chmod 600 infra/ansible/files/voce-aluga
-
       - name: Instalar dependencias
         run: |
           curl -fsSL https://kind.sigs.k8s.io/dl/v0.26.0/kind-linux-amd64 -o kind && chmod +x kind
@@ -207,15 +201,31 @@ jobs:
 
       - name: Publicar imagens no registry privado
         run: |
-          docker tag vocealuga/api-rest:latest localhost:5000/vocealuga/api-rest:latest
-          docker tag vocealuga/api-web:latest localhost:5000/vocealuga/api-web:latest
-          docker push localhost:5000/vocealuga/api-rest:latest
-          docker push localhost:5000/vocealuga/api-web:latest
+          for IMG in api-rest api-web; do
+            docker tag vocealuga/${IMG}:${{ github.sha }} localhost:5000/vocealuga/${IMG}:${{ github.sha }}
+            docker tag vocealuga/${IMG}:${{ github.sha }} localhost:5000/vocealuga/${IMG}:latest
+            docker push localhost:5000/vocealuga/${IMG}:${{ github.sha }}
+            docker push localhost:5000/vocealuga/${IMG}:latest
+          done
 
-      - name: Subir ambiente local
+      - name: Subir EC2 simulada e validar SSH
         run: |
-          docker compose -f infra/docker-compose.yml up -d --force-recreate ec2-api gateway api-rest api-web
-          sleep 45
+          rm -f infra/ansible/files/voce-aluga infra/ansible/files/voce-aluga.pub
+          ssh-keygen -t ed25519 -f infra/ansible/files/voce-aluga -N ""
+          chmod 600 infra/ansible/files/voce-aluga
+          docker compose -f infra/docker-compose.yml up -d --build --force-recreate ec2-api
+          for i in $(seq 1 24); do
+            ssh -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
+              -p 2224 -i infra/ansible/files/voce-aluga ubuntu@127.0.0.1 echo ok && exit 0
+            sleep 5
+          done
+          docker logs voce-aluga-ec2-api --tail 50
+          exit 1
+
+      - name: Subir gateway e APIs
+        run: |
+          docker compose -f infra/docker-compose.yml up -d gateway api-rest api-web
+          sleep 30
 
       - name: Criar cluster kind
         run: bash infra/scripts/setup-kind.sh
