@@ -2,9 +2,9 @@ name: CI/CD Pipeline — Você Aluga
 
 on:
   push:
-    branches: [main, master, trabalho-final-devops]
+    branches: [trabalho-final-devops]
   pull_request:
-    branches: [main, master, trabalho-final-devops]
+    branches: [trabalho-final-devops]
   workflow_dispatch:
 
 permissions:
