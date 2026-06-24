@@ -214,11 +214,16 @@ jobs:
           ssh-keygen -t ed25519 -f infra/ansible/files/voce-aluga -N ""
           chmod 600 infra/ansible/files/voce-aluga
           docker compose -f infra/docker-compose.yml up -d --build --force-recreate ec2-api
+          sleep 10
+          docker exec -i voce-aluga-ec2-api bash -c \
+            'mkdir -p /home/ubuntu/.ssh && cat > /home/ubuntu/.ssh/authorized_keys && chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys && chmod 600 /home/ubuntu/.ssh/authorized_keys' \
+            < infra/ansible/files/voce-aluga.pub
           for i in $(seq 1 24); do
             ssh -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
               -p 2224 -i infra/ansible/files/voce-aluga ubuntu@127.0.0.1 echo ok && exit 0
             sleep 5
           done
+          docker exec voce-aluga-ec2-api cat /home/ubuntu/.ssh/authorized_keys || true
           docker logs voce-aluga-ec2-api --tail 50
           exit 1
 
