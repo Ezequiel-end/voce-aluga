@@ -14,7 +14,10 @@ RUN apt-get update && apt-get install -y \
 RUN useradd -m -s /bin/bash ubuntu \
     && echo "ubuntu:vocealuga" | chpasswd \
     && usermod -aG sudo ubuntu \
-    && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    && usermod -aG docker ubuntu \
+    && echo "Defaults:ubuntu !requiretty" > /etc/sudoers.d/ubuntu-voce-aluga \
+    && echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/ubuntu-voce-aluga \
+    && chmod 440 /etc/sudoers.d/ubuntu-voce-aluga
 
 RUN mkdir -p /var/run/sshd \
     && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config \
